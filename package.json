@@ -1,0 +1,103 @@
+{
+  "name": "loaf",
+  "version": "0.1.0",
+  "homepage": "./",
+  "description": "Loaf Messenger",
+  "author": "0sh10",
+  "private": true,
+  "dependencies": {
+    "@material-ui/core": "^4.9.0",
+    "@material-ui/icons": "^4.5.1",
+    "@types/jest": "24.0.18",
+    "@types/react": "16.9.4",
+    "@types/react-dom": "16.9.1",
+    "@types/uuid": "^3.4.6",
+    "big-integer": "^1.6.47",
+    "cors": "^2.8.5",
+    "cross-env": "^6.0.3",
+    "ip": "^1.1.5",
+    "moment": "^2.24.0",
+    "node-fetch": "^2.6.0",
+    "notp": "^2.0.3",
+    "qrcode": "^1.4.4",
+    "react": "^16.11.0",
+    "react-dom": "^16.11.0",
+    "react-router-dom": "^5.1.2",
+    "react-scripts": "^3.3.0",
+    "request": "^2.88.0",
+    "socket.io": "^2.3.0",
+    "socket.io-client": "^2.3.0",
+    "thirty-two": "^1.0.2",
+    "typescript": "^3.7.2",
+    "util": "^0.12.1",
+    "uuid": "^3.3.3"
+  },
+  "build": {
+    "appId": "pl.bakerysoft.loaf",
+    "productName": "Loaf Messenger",
+    "win": {
+      "target": "NSIS"
+    },
+    "directories": {
+      "output": "app",
+      "buildResources": "assets"
+    },
+    "files": [
+      "dist/**/*",
+      "package.json",
+      {
+        "from": "dist",
+        "to": "build",
+        "filter": "**/*"
+      },
+      "!**/*.asar",
+      "!**/app/**/*",
+      "!**/app/*",
+      "!**/win-unpacked/*",
+      "!**/.git/**/*",
+      "!**/.git/*"
+    ]
+  },
+  "main": "dist/electron.js",
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "npm run transpile && react-scripts build && rm -rf dist/build &&  mv build dist",
+    "test": "react-scripts test",
+    "transpile": "tsc electron.ts --outDir dist --esModuleInterop true",
+    "electron": "npm run transpile && cross-env DEV=true electron ./",
+    "dev": "concurrently \"cross-env BROWSER=none npm start\" \"npm run electron\"",
+    "eject": "react-scripts eject",
+    "pack": "electron-builder --dir",
+    "compile": "npm run build && npm run pack"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.6",
+    "@types/material-ui": "^0.21.7",
+    "@types/node": "^12.11.7",
+    "@types/qrcode": "^1.3.4",
+    "@types/react-router-dom": "^5.1.3",
+    "@types/request": "^2.48.3",
+    "@types/socket.io": "^2.1.4",
+    "@types/socket.io-client": "^1.4.32",
+    "concurrently": "^4.1.2",
+    "electron": "^6.1.2",
+    "electron-builder": "^21.2.0",
+    "electron-rebuild": "^1.8.6",
+    "wait-on": "^3.3.0"
+  }
+}
