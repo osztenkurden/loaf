@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import * as I from "./../../../modules/interface";
 import Request from "./Request";
 
-export default  class Announcement extends Component<{ request: boolean, chat: I.IChat }> {
+export default class Announcement extends Component<{ request: boolean, chat: I.IChat }> {
     public render() {
         const { chat, request } = this.props;
         if (request) {

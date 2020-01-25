@@ -38,15 +38,24 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
 exports.__esModule = true;
 var electron_1 = require("electron");
 var path_1 = __importDefault(require("path"));
-// import {events} from "./events";
+var EventInit = __importStar(require("./modules/EventHandler"));
+var Machine = __importStar(require("./modules/Machine"));
 // import * as Storage from "./storage/storage";
 var isDev = process.env.DEV === "true";
 var startApp = function () { return __awaiter(void 0, void 0, void 0, function () {
     var win;
     return __generator(this, function (_a) {
+        Machine.checkDirectories();
         win = new electron_1.BrowserWindow({
             height: 720,
             icon: path_1["default"].join(__dirname, "assets/icon.png"),
@@ -68,6 +77,7 @@ var startApp = function () { return __awaiter(void 0, void 0, void 0, function (
         win.setMenuBarVisibility(false);
         win.loadURL(isDev ? "http://localhost:3000" : "file://" + __dirname + "/build/index.html");
         win.on("close", electron_1.app.quit);
+        EventInit.start();
         return [2 /*return*/];
     });
 }); };
