@@ -1,7 +1,23 @@
-import util from "util";
+import * as Keys from "./Keys";
+// import util from "util";
+
 declare let window: any;
 const libsignal = window.libsignal;
 
+function toHex(str: string) {
+    let hex = "";
+    for (let i = 0; i < str.length; i++) {
+        hex += "" + str.charCodeAt(i).toString(16);
+    }
+    return hex;
+}
+function hexToAscii(hex: string) {
+    hex = hex.toString(); // force conversion
+    let str = "";
+    for (let i = 0; (i < hex.length && hex.substr(i, 2) !== "00"); i += 2)
+        str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+    return str;
+}
 class LoafBreadbox {
     public Direction: {
         SENDING: number;
@@ -48,7 +64,7 @@ class LoafBreadbox {
         delete this.store[key];
     }
 
-    public isTrustedIdentity = (identifier: any, identityKey: any, direction: any) => {
+    public isTrustedIdentity = (identifier: string, identityKey: ArrayBuffer, direction: any) => {
         if (identifier === null || identifier === undefined) {
             throw new Error("tried to check identity key for undefined/null key");
         }
@@ -59,16 +75,16 @@ class LoafBreadbox {
         if (trusted === undefined) {
             return true;
         }
-        return util.toString(identityKey) === util.toString(trusted);
+        return identityKey.toString() === trusted.toString();
     }
 
-    public loadIdentityKey = (identifier: any) => {
+    public loadIdentityKey = (identifier: string) => {
         if (identifier === null || identifier === undefined)
             throw new Error("Tried to get identity key for undefined/null key");
         return this.get(`identityKey${identifier}`);
     }
 
-    public saveIdentity = (identifier: any, identityKey: any) => {
+    public saveIdentity = (identifier: any, identityKey: ArrayBuffer) => {
         if (identifier === null || identifier === undefined)
             throw new Error("Tried to put identity key for undefined/null key");
         const address = new libsignal.SignalProtocolAddress.fromString(identifier);
@@ -76,7 +92,7 @@ class LoafBreadbox {
 
         this.put(`identityKey${address.getName()}`, identityKey);
 
-        if (existing && util.toString(identityKey) !== util.toString(existing)) {
+        if (existing && identityKey.toString() !== existing.toString()) {
             return true;
         }
         return false;
@@ -145,14 +161,85 @@ class LoafBreadbox {
         }
     }
 
-    public loadStoreData = (data: string) => {
+    public isValidKeyPair = (keyPair: any) => {
+        return (keyPair.pubKey && keyPair.privKey
+            && typeof keyPair.pubKey === "string"
+            && typeof keyPair.privKey === "string");
+    }
 
-        const store = JSON.parse(data);
-        for (const i in store) {
+    public setStore = (data: string) => {
+        try {
+            const json = hexToAscii(data);
+            const store = JSON.parse(json);
+
+            for (const i of Object.keys(store)) {
+                if (typeof i !== "string") {
+                    throw new Error("");
+                }
+                if (this.isValidKeyPair(store[i])) {
+                    //
+                    const keyPair = Keys.bufferify(store[i]);
+                    const inStoreKeyPair = {
+                        keyId: store[i].keyId,
+                        privKey: keyPair.privKey,
+                        pubKey: keyPair.pubKey,
+                        signature: store[i].signature ? Keys.toArrayBuffer(store[i].signature) : undefined,
+                    };
+                    this.put(i, inStoreKeyPair);
+                } else if (typeof store[i] === "string" && (i.startsWith("identityKey") || i.startsWith("session"))) {
+                    this.put(i, store[i]);
+                } else if (i === "registrationId" && Number.isInteger(store[i])) {
+                    this.put(i, store[i]);
+                } else if (i.startsWith("25519KeypreKey") || i.startsWith("25519KeysignedKey")) {
+                    const keyPair = Keys.bufferify(store[i]);
+                    const inStoreKeyPair = {
+                        keyId: store[i].keyId,
+                        privKey: keyPair.privKey,
+                        pubKey: keyPair.pubKey,
+                        signature: store[i].signature ? Keys.toArrayBuffer(store[i].signature) : undefined,
+                    };
+                    this.put(i, inStoreKeyPair);
+                }
+            }
+            return;
+        } catch {
+            return null;
+        }
+    }
+
+    public getStore = () => {
+        if (!this.store.registrationId || !this.store.identityKey) {
+            throw new Error("");
+        }
+        const json: any = {
+            identityKey: Keys.stringify(this.store.identityKey),
+            registrationId: this.store.registrationId,
+        };
+
+        for (const i of Object.keys(this.store)) {
             if (typeof i !== "string") {
                 throw new Error("");
             }
-
+            if (i.startsWith("25519KeypreKey") || i.startsWith("25519KeysignedKey")) {
+                const keyPair = Keys.stringify(this.store[i]);
+                json[i] = {
+                    keyId: this.store[i].keyId,
+                    privKey: keyPair.privKey,
+                    pubKey: keyPair.pubKey,
+                };
+                if (this.store[i].signature) {
+                    json[i].signature = Keys.toString(this.store[i].signature);
+                }
+            }
+            if ((i.startsWith("identityKey") && i !== "identityKey") || i.startsWith("session")) {
+                json[i] = this.store[i];
+            }
         }
+
+        const stringified = JSON.stringify(json);
+        const hexStore = toHex(stringified);
+        return hexStore;
     }
 }
+
+export default LoafBreadbox;
