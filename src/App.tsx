@@ -1,10 +1,42 @@
 import React from "react";
-import Main from "./Modules/Main/Main";
+import * as I from "./../modules/interface";
+import api from "./API";
+import * as Loaf from "./API/Loaf";
+// import Main from "./Modules/Main/Main";
+import Splash from "./Modules/Splash";
 
-export default class App extends React.Component {
+interface IState {
+    user: I.IUser | null;
+    loading: boolean;
+}
+
+export default class App extends React.Component<any, IState> {
+    constructor(props: any) {
+        super(props);
+        this.state = {
+            loading: true,
+            user: null,
+        };
+    }
+    public componentDidMount() {
+        Loaf.on("user", (user: I.IUser) => {
+            this.setState({user, loading: false});
+        });
+        const loggedInUser = api.user.get();
+
+        if (loggedInUser) {
+            return this.setState({ user: loggedInUser, loading: false});
+        }
+        api.user.load();
+    }
     public render() {
-        return (
-            <Main cxt={undefined} />
-        );
+        const { user, loading } = this.state;
+        if (loading) {
+            return <Splash />;
+        }
+        if (user) {
+            return `HELLO ${user.username}`;
+        }
+        return ":(";
     }
 }

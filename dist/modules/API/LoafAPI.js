@@ -35,48 +35,48 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-exports.__esModule = true;
-var electron_1 = require("electron");
-exports.on = function (eventName, handler) {
-    electron_1.ipcMain.on(eventName, function (event) {
-        var args = [];
-        for (var _i = 1; _i < arguments.length; _i++) {
-            args[_i - 1] = arguments[_i];
-        }
-        var result = handler.apply(void 0, args);
-        if (!result) {
-            return null;
-        }
-        event.returnValue = result.data;
-    });
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.onAsync = function (eventName, handler) {
-    electron_1.ipcMain.on(eventName, function (event) {
-        var args = [];
-        for (var _i = 1; _i < arguments.length; _i++) {
-            args[_i - 1] = arguments[_i];
-        }
-        return __awaiter(void 0, void 0, void 0, function () {
-            var result;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, handler.apply(void 0, args)];
-                    case 1:
-                        result = _a.sent();
-                        if (!result) {
-                            return [2 /*return*/, null];
-                        }
-                        event.reply(result.event, result.data);
-                        return [2 /*return*/];
-                }
-            });
+exports.__esModule = true;
+var fetch_cookie_1 = __importDefault(require("fetch-cookie"));
+var node_fetch_1 = __importDefault(require("node-fetch"));
+var fetch = fetch_cookie_1["default"](node_fetch_1["default"]);
+var config = {
+    apiURL: "http://localhost:5000"
+};
+function apiV2(url, method, body) {
+    if (method === void 0) { method = "GET"; }
+    return __awaiter(this, void 0, void 0, function () {
+        var options, res, _a;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
+                case 0:
+                    options = {
+                        headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                        method: method
+                    };
+                    if (body) {
+                        options.body = JSON.stringify(body);
+                    }
+                    return [4 /*yield*/, fetch(config.apiURL + "/" + url, options)];
+                case 1:
+                    res = _b.sent();
+                    _b.label = 2;
+                case 2:
+                    _b.trys.push([2, 4, , 5]);
+                    return [4 /*yield*/, res.json()];
+                case 3: return [2 /*return*/, _b.sent()];
+                case 4:
+                    _a = _b.sent();
+                    // Checks if status was successfull (HTTP200-HTTP299)
+                    if (res && res.status < 300) {
+                        return [2 /*return*/, true];
+                    }
+                    return [2 /*return*/, false];
+                case 5: return [2 /*return*/];
+            }
         });
     });
-};
-exports.send = function (eventName) {
-    var args = [];
-    for (var _i = 1; _i < arguments.length; _i++) {
-        args[_i - 1] = arguments[_i];
-    }
-    return electron_1.ipcMain.emit(eventName, args);
-};
+}
+exports["default"] = apiV2;

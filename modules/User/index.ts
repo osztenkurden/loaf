@@ -1,9 +1,10 @@
+import * as I from "../interface";
 import { api } from "./../API";
 import Storage from "./../UserStorage";
 
 export class User {
     private id: number | null;
-    private user: any;
+    private user: I.IUser | null;
     private storage: Storage | null;
 
     constructor() {
@@ -15,8 +16,11 @@ export class User {
     public async loadUser() {
         const user = await api.user.get();
         if (!user) {
+            // api.user.fakeLogin();
             return this;
         }
+
+        this.user = user;
 
         const storage = new Storage(user.id);
         this.storage = storage;

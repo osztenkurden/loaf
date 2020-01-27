@@ -35,48 +35,39 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-exports.__esModule = true;
-var electron_1 = require("electron");
-exports.on = function (eventName, handler) {
-    electron_1.ipcMain.on(eventName, function (event) {
-        var args = [];
-        for (var _i = 1; _i < arguments.length; _i++) {
-            args[_i - 1] = arguments[_i];
-        }
-        var result = handler.apply(void 0, args);
-        if (!result) {
-            return null;
-        }
-        event.returnValue = result.data;
-    });
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.onAsync = function (eventName, handler) {
-    electron_1.ipcMain.on(eventName, function (event) {
-        var args = [];
-        for (var _i = 1; _i < arguments.length; _i++) {
-            args[_i - 1] = arguments[_i];
-        }
-        return __awaiter(void 0, void 0, void 0, function () {
-            var result;
+exports.__esModule = true;
+var LoafAPI_1 = __importDefault(require("./LoafAPI"));
+exports.api = {
+    user: {
+        authenticate: function (authcode) { return LoafAPI_1["default"]("auth/auth", "POST", { authcode: authcode }); },
+        fakeLogin: function () { return __awaiter(void 0, void 0, void 0, function () {
+            var loginObject, response, res2;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, handler.apply(void 0, args)];
+                    case 0:
+                        console.log("PROCEEDING FAKE LOGIN");
+                        loginObject = {
+                            machineId: 1234,
+                            password: "LeMoni@da1",
+                            username: "osztenkurden"
+                        };
+                        return [4 /*yield*/, LoafAPI_1["default"]("auth/login", "POST", loginObject)];
                     case 1:
-                        result = _a.sent();
-                        if (!result) {
-                            return [2 /*return*/, null];
-                        }
-                        event.reply(result.event, result.data);
+                        response = _a.sent();
+                        console.log(response);
+                        return [4 /*yield*/, LoafAPI_1["default"]("auth/auth", "POST", { authcode: 405384 })];
+                    case 2:
+                        res2 = _a.sent();
+                        console.log(res2);
                         return [2 /*return*/];
                 }
             });
-        });
-    });
-};
-exports.send = function (eventName) {
-    var args = [];
-    for (var _i = 1; _i < arguments.length; _i++) {
-        args[_i - 1] = arguments[_i];
+        }); },
+        get: function () { return LoafAPI_1["default"]("user"); },
+        // tslint:disable-next-line:max-line-length
+        login: function (body) { return LoafAPI_1["default"]("auth/login", "POST", body); }
     }
-    return electron_1.ipcMain.emit(eventName, args);
 };

@@ -1,0 +1,11 @@
+.loaf-app-splash {
+    background-color: var(--primaryColor800);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.progress-container {
+    width: 700px;
+    max-width: 90%;
+}

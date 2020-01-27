@@ -5,7 +5,7 @@
     --primaryColor700:#5a2700;
     --secondaryColor:#0e4380;
 }*/
-html, body, #root, .loaf-app, .loaf-app-logging, .playground {
+html, body, #root, .loaf-app, .loaf-app-logging, .playground, .loaf-app-splash {
     height:100%;
 }
 body {
@@ -16,6 +16,7 @@ body {
     --primaryColor: #607D8B;
     --primaryColor600:#39434a;
     --primaryColor700:#242b2f;
+    --primaryColor800: #161c1f;
     --secondaryColor:#0e4380;
 }
 .registerInput > div {

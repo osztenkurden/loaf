@@ -25,8 +25,13 @@ export const start = () => {
         return null;
     });
 
-    Loaf.on("loadUser", () => {
-        User.loadUser();
-        return null;
+    Loaf.on("getUser", () => {
+
+        return { event: "user", data: User.getUser() };
+    });
+
+    Loaf.onAsync("loadUser", async () => {
+        await User.loadUser();
+        return { event: "user", data: User.getUser() };
     });
 };

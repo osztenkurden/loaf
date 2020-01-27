@@ -4,6 +4,7 @@ import ReactDOM from "react-dom";
 import Loaf from "./App";
 import Theme from "./Theme";
 import "./Theme/styles/app.css";
+import "./Theme/styles/fonts/montserrat.css";
 import "./Theme/styles/index.css";
 
 const App = <MuiThemeProvider theme={Theme}>

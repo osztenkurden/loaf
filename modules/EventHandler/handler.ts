@@ -5,7 +5,17 @@ export const on = (eventName: string, handler: (...args: any[]) => I.IEventRespo
     ipcMain.on(eventName, (event, ...args) => {
         const result = handler(...args);
         if (!result) {
-            return;
+            return null;
+        }
+        event.returnValue = result.data;
+    });
+};
+
+export const onAsync  = (eventName: string, handler: (...args: any[]) => Promise<I.IEventResponse>) => {
+    ipcMain.on(eventName, async (event, ...args) => {
+        const result = await handler(...args);
+        if (!result) {
+            return null;
         }
         event.reply(result.event, result.data);
     });

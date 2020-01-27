@@ -25,7 +25,8 @@ const startApp = async () => {
         title: "Loaf Messenger",
         webPreferences: {
             backgroundThrottling: false,
-            preload: __dirname + "/preload.js",
+            // preload: __dirname + "/preload.js",
+            nodeIntegration: true,
         },
         width: 1280,
     });

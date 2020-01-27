@@ -16,7 +16,7 @@ export default async function apiV2(url: string, method = "GET", body?: object) 
         options.body = JSON.stringify(body);
     }
 
-    const res = await fetch(`${config.apiURL}/api/${url}`, options);
+    const res = await fetch(`${config.apiURL}/${url}`, options);
     try {
         return await res.json();
     } catch {

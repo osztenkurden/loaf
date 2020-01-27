@@ -50,10 +50,9 @@ var electron_1 = require("electron");
 var path_1 = __importDefault(require("path"));
 var EventInit = __importStar(require("./modules/EventHandler"));
 var Machine = __importStar(require("./modules/Machine"));
-// import * as Storage from "./storage/storage";
 var isDev = process.env.DEV === "true";
 var startApp = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var win, tray, context, not;
+    var win, tray, context;
     return __generator(this, function (_a) {
         electron_1.app.setAppUserModelId("com.bakerysoft.loaf");
         Machine.checkDirectories();
@@ -66,7 +65,8 @@ var startApp = function () { return __awaiter(void 0, void 0, void 0, function (
             title: "Loaf Messenger",
             webPreferences: {
                 backgroundThrottling: false,
-                preload: __dirname + "/preload.js"
+                // preload: __dirname + "/preload.js",
+                nodeIntegration: true
             },
             width: 1280
         });
@@ -102,18 +102,6 @@ var startApp = function () { return __awaiter(void 0, void 0, void 0, function (
             return false;
         });
         EventInit.start();
-        if (electron_1.Notification.isSupported()) {
-            not = new electron_1.Notification({
-                body: "CIAŁO",
-                icon: path_1["default"].join(__dirname, "assets/icon.png"),
-                subtitle: "PODTYTUŁ",
-                title: "TYTU"
-            });
-            not.on("show", function () {
-                console.log("NOT asdasdUPPORTED");
-            });
-            not.show();
-        }
         return [2 /*return*/];
     });
 }); };
