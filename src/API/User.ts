@@ -1,10 +1,13 @@
-class UserStorage {
-    user: any;
-    store: string;
+export class UserStorage {
+    public user: any;
+    public store: string;
 
     constructor() {
-
+        this.user = {};
+        this.store = "";
     }
 
-    loadStore(store: )
+    public loadStore(store: string) {
+        this.store = store;
+    }
 }

@@ -53,8 +53,9 @@ var Machine = __importStar(require("./modules/Machine"));
 // import * as Storage from "./storage/storage";
 var isDev = process.env.DEV === "true";
 var startApp = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var win;
+    var win, tray, context, not;
     return __generator(this, function (_a) {
+        electron_1.app.setAppUserModelId("com.bakerysoft.loaf");
         Machine.checkDirectories();
         win = new electron_1.BrowserWindow({
             height: 720,
@@ -69,6 +70,22 @@ var startApp = function () { return __awaiter(void 0, void 0, void 0, function (
             },
             width: 1280
         });
+        tray = new electron_1.Tray(path_1["default"].join(__dirname, "assets/icon.png"));
+        context = electron_1.Menu.buildFromTemplate([
+            {
+                click: function () {
+                    var application = electron_1.app;
+                    application.isQuitting = true;
+                    application.quit();
+                },
+                label: "Quit Loaf Messenger"
+            },
+        ]);
+        tray.setContextMenu(context);
+        tray.setToolTip("Loaf Messenger");
+        tray.on("click", function () {
+            win.show();
+        });
         electron_1.app.on("before-quit", function () {
             win.removeAllListeners("close");
             win.close();
@@ -76,8 +93,27 @@ var startApp = function () { return __awaiter(void 0, void 0, void 0, function (
         win.once("ready-to-show", win.show);
         win.setMenuBarVisibility(false);
         win.loadURL(isDev ? "http://localhost:3000" : "file://" + __dirname + "/build/index.html");
-        win.on("close", electron_1.app.quit);
+        win.on("close", function (event) {
+            var application = electron_1.app;
+            if (!application.isQuitting) {
+                event.preventDefault();
+                win.hide();
+            }
+            return false;
+        });
         EventInit.start();
+        if (electron_1.Notification.isSupported()) {
+            not = new electron_1.Notification({
+                body: "CIAŁO",
+                icon: path_1["default"].join(__dirname, "assets/icon.png"),
+                subtitle: "PODTYTUŁ",
+                title: "TYTU"
+            });
+            not.on("show", function () {
+                console.log("NOT asdasdUPPORTED");
+            });
+            not.show();
+        }
         return [2 /*return*/];
     });
 }); };

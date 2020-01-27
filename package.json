@@ -15,6 +15,7 @@
     "big-integer": "^1.6.47",
     "cors": "^2.8.5",
     "cross-env": "^6.0.3",
+    "fetch-cookie": "^0.7.3",
     "ip": "^1.1.5",
     "moment": "^2.24.0",
     "node-fetch": "^2.6.0",
@@ -33,7 +34,7 @@
     "uuid": "^3.3.3"
   },
   "build": {
-    "appId": "pl.bakerysoft.loaf",
+    "appId": "com.bakerysoft.loaf",
     "productName": "Loaf Messenger",
     "win": {
       "target": "NSIS"
@@ -67,6 +68,7 @@
     "electron": "npm run transpile && cross-env DEV=true electron ./",
     "dev": "concurrently \"cross-env BROWSER=none npm start\" \"npm run electron\"",
     "eject": "react-scripts eject",
+    "dist": "electron-builder",
     "pack": "electron-builder --dir",
     "compile": "npm run build && npm run pack"
   },
@@ -89,6 +91,7 @@
     "@types/cors": "^2.8.6",
     "@types/material-ui": "^0.21.7",
     "@types/node": "^12.11.7",
+    "@types/node-fetch": "^2.5.4",
     "@types/qrcode": "^1.3.4",
     "@types/react-router-dom": "^5.1.3",
     "@types/request": "^2.48.3",

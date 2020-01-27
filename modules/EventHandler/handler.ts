@@ -10,3 +10,7 @@ export const on = (eventName: string, handler: (...args: any[]) => I.IEventRespo
         event.reply(result.event, result.data);
     });
 };
+
+export const send = (eventName: string, ...args: any[]) => {
+    return ipcMain.emit(eventName, args);
+};

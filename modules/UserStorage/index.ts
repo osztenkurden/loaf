@@ -1,10 +1,21 @@
 import * as fs from "fs";
 import * as path from "path";
 
-export const getUser = (userId: number) => {
-    //
-};
+export default class Storage {
+    private id: number;
+    private store: string;
 
-export const setUser = (userId: number, store: string) => {
-    //
-};
+    constructor(id: number) {
+        this.id = id;
+        this.store = "";
+    }
+
+    public get() {
+        return this.store;
+    }
+
+    public set(store: string) {
+        this.store = store;
+        return this;
+    }
+}

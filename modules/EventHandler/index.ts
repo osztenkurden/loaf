@@ -1,20 +1,20 @@
 import * as Machine from "./../Machine";
-import * as User from "./../UserStorage";
+import User from "./../User";
 import * as Loaf from "./handler";
 
 export const start = () => {
-    Loaf.on("getUser", (userId: number) => {
-        const user = User.getUser(userId);
+    Loaf.on("getUserStore", () => {
+        const user = User.getStore();
 
-        return { event: "getUser", data: user };
+        return { event: "getUserStore", data: user };
     });
 
-    Loaf.on("saveUser", (userId: number, user: string) => {
-        User.setUser(userId, user);
+    Loaf.on("setUserStore", (store: string) => {
+        User.setStore(store);
         return null;
     });
 
-    Loaf.on("getMachineId ", () => {
+    Loaf.on("getMachineId", () => {
         const machineId = Machine.getMachineId();
 
         return { event: "getMachineId", data: machineId };
@@ -22,6 +22,11 @@ export const start = () => {
 
     Loaf.on("createKeys", () => {
         // TODO: Add child process for creating keys
+        return null;
+    });
+
+    Loaf.on("loadUser", () => {
+        User.loadUser();
         return null;
     });
 };
