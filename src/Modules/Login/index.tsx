@@ -1,18 +1,60 @@
-import { LinearProgress } from "@material-ui/core";
+import { TextField } from "@material-ui/core";
+import API from "API";
 import React, { Component } from "react";
-import api from "./../../API";
+import LoafButton from "Theme/Components/LoafButton";
 
-export default class Login extends Component {
-    public componentDidMount() {
-        api.user.load();
+interface IProps {
+    authentication?: boolean;
+}
+
+interface IState {
+    username: string;
+    password: string;
+    authCode: number;
+}
+
+export default class Login extends Component<IProps, IState> {
+    constructor(props: IProps) {
+        super(props);
+        this.state = {
+            authCode: 0,
+            password: "",
+            username: "",
+        };
     }
+
     public render() {
         return (
             <div className="loaf-app-splash">
-                <div className="progress-container">
-                    <LinearProgress />
+                <div id="login-page">
+                    <TextField
+                        className="username-input"
+                        placeholder="Username"
+                        color="primary"
+                        value={this.state.username}
+                        onChange={this.handleChange("username")}
+                        required
+                    />
+                    <TextField
+                        className="password-input"
+                        placeholder="Password"
+                        required
+                        value={this.state.password}
+                        onChange={this.handleChange("password")}
+                        type="password"
+                    />
+                    <LoafButton main big onClick={this.logIn}>Login</LoafButton>
                 </div>
             </div>
         );
+    }
+
+    private handleChange = (field: "password" | "username" | "authCode") => (e: any) => {
+        const value = e.target.value;
+        this.setState((state) => ({...state, [field]: value}));
+    }
+
+    private logIn = () => {
+        API.user.logIn(this.state.username, this.state.password);
     }
 }

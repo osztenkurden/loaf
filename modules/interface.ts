@@ -36,7 +36,15 @@ export interface IUser {
     lastName?: string;
 }
 
-export interface IServerError {
-    errors: string[];
+export interface IServerResponse {
+    data?: any;
+    success: boolean;
+    status: number;
+    errors?: string[];
     unauthorized?: boolean;
+}
+
+export interface IStatusListener {
+    status: number;
+    listener: () => void;
 }

@@ -1,0 +1,10 @@
+{
+    "compilerOptions": {
+        "baseUrl": "./",
+        "paths": {
+            "@Components/*": [ "src/Theme/Components/*" ],
+            "@Modules/*": [ "src/Modules/*" ],
+            "@API": [ "src/API/index.ts" ]
+        }
+    }
+}

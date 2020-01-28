@@ -44,9 +44,9 @@ exports.api = {
     user: {
         authenticate: function (authcode) { return LoafAPI_1["default"]("auth/auth", "POST", { authcode: authcode }); },
         fakeLogin: function () { return __awaiter(void 0, void 0, void 0, function () {
-            var loginObject, response, res2;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
+            var loginObject, response, res2, _a, _b;
+            return __generator(this, function (_c) {
+                switch (_c.label) {
                     case 0:
                         console.log("PROCEEDING FAKE LOGIN");
                         loginObject = {
@@ -56,17 +56,34 @@ exports.api = {
                         };
                         return [4 /*yield*/, LoafAPI_1["default"]("auth/login", "POST", loginObject)];
                     case 1:
-                        response = _a.sent();
+                        response = _c.sent();
                         console.log(response);
-                        return [4 /*yield*/, LoafAPI_1["default"]("auth/auth", "POST", { authcode: 405384 })];
+                        return [4 /*yield*/, LoafAPI_1["default"]("auth/auth", "POST", { authcode: 322343 })];
                     case 2:
-                        res2 = _a.sent();
+                        res2 = _c.sent();
                         console.log(res2);
+                        _b = (_a = console).log;
+                        return [4 /*yield*/, exports.api.user.get()];
+                    case 3:
+                        _b.apply(_a, [_c.sent()]);
                         return [2 /*return*/];
                 }
             });
         }); },
-        get: function () { return LoafAPI_1["default"]("user"); },
+        get: function () { return __awaiter(void 0, void 0, void 0, function () {
+            var res;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, LoafAPI_1["default"]("auth")];
+                    case 1:
+                        res = _a.sent();
+                        if (res.data && res.success) {
+                            return [2 /*return*/, res.data];
+                        }
+                        return [2 /*return*/, null];
+                }
+            });
+        }); },
         // tslint:disable-next-line:max-line-length
         login: function (body) { return LoafAPI_1["default"]("auth/login", "POST", body); }
     }

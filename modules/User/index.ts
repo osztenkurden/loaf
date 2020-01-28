@@ -16,7 +16,6 @@ export class User {
     public async loadUser() {
         const user = await api.user.get();
         if (!user) {
-            // api.user.fakeLogin();
             return this;
         }
 
@@ -25,6 +24,14 @@ export class User {
         const storage = new Storage(user.id);
         this.storage = storage;
         return this;
+    }
+
+    public async logIn(username: string, password: string) {
+        const result = await api.user.login({username, password, machineId: 6809 });
+        if (result.status === 200) {
+            await this.loadUser();
+        }
+        return result.status;
     }
 
     public getStore() {

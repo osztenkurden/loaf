@@ -56,13 +56,30 @@ var User = /** @class */ (function () {
                     case 1:
                         user = _a.sent();
                         if (!user) {
-                            // api.user.fakeLogin();
                             return [2 /*return*/, this];
                         }
                         this.user = user;
                         storage = new UserStorage_1["default"](user.id);
                         this.storage = storage;
                         return [2 /*return*/, this];
+                }
+            });
+        });
+    };
+    User.prototype.logIn = function (username, password) {
+        return __awaiter(this, void 0, void 0, function () {
+            var result;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, API_1.api.user.login({ username: username, password: password, machineId: 6809 })];
+                    case 1:
+                        result = _a.sent();
+                        if (!(result.status === 200)) return [3 /*break*/, 3];
+                        return [4 /*yield*/, this.loadUser()];
+                    case 2:
+                        _a.sent();
+                        _a.label = 3;
+                    case 3: return [2 /*return*/, result.status];
                 }
             });
         });

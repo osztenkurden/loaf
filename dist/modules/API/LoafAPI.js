@@ -48,9 +48,9 @@ var config = {
 function apiV2(url, method, body) {
     if (method === void 0) { method = "GET"; }
     return __awaiter(this, void 0, void 0, function () {
-        var options, res, _a;
-        return __generator(this, function (_b) {
-            switch (_b.label) {
+        var options, res, response, _a, _b;
+        return __generator(this, function (_c) {
+            switch (_c.label) {
                 case 0:
                     options = {
                         headers: { "Accept": "application/json", "Content-Type": "application/json" },
@@ -61,22 +61,44 @@ function apiV2(url, method, body) {
                     }
                     return [4 /*yield*/, fetch(config.apiURL + "/" + url, options)];
                 case 1:
-                    res = _b.sent();
-                    _b.label = 2;
+                    res = _c.sent();
+                    _c.label = 2;
                 case 2:
-                    _b.trys.push([2, 4, , 5]);
+                    _c.trys.push([2, 4, , 5]);
+                    _a = {};
                     return [4 /*yield*/, res.json()];
-                case 3: return [2 /*return*/, _b.sent()];
+                case 3:
+                    response = (_a.data = _c.sent(),
+                        _a.status = res.status,
+                        _a.success = res.status < 300,
+                        _a);
+                    return [2 /*return*/, response];
                 case 4:
-                    _a = _b.sent();
+                    _b = _c.sent();
                     // Checks if status was successfull (HTTP200-HTTP299)
-                    if (res && res.status < 300) {
-                        return [2 /*return*/, true];
-                    }
-                    return [2 /*return*/, false];
+                    return [2 /*return*/, { status: res.status, success: res.status < 300 }];
                 case 5: return [2 /*return*/];
             }
         });
     });
 }
 exports["default"] = apiV2;
+exports.LoafStatus = function (listeners) { return function (url, method, body) {
+    if (method === void 0) { method = "GET"; }
+    return __awaiter(void 0, void 0, void 0, function () {
+        var response, actualListeners, _i, actualListeners_1, listener;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, apiV2(url, method, body)];
+                case 1:
+                    response = _a.sent();
+                    actualListeners = listeners.filter(function (listener) { return listener.status === response.status; });
+                    for (_i = 0, actualListeners_1 = actualListeners; _i < actualListeners_1.length; _i++) {
+                        listener = actualListeners_1[_i];
+                        listener.listener();
+                    }
+                    return [2 /*return*/];
+            }
+        });
+    });
+}; };
