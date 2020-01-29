@@ -1,7 +1,7 @@
 import * as I from "../interface";
+import Storage from "../Storage";
 import { api } from "./../API";
 import * as Machine from "./../Machine";
-import Storage from "./../UserStorage";
 
 export class User {
     private id: number | null;
@@ -41,21 +41,6 @@ export class User {
             await this.loadUser();
         }
         return result.status;
-    }
-
-    public getStore() {
-        if (!this.storage) {
-            return null;
-        }
-        return this.storage.get();
-    }
-
-    public setStore(store: string) {
-        if (!this.storage) {
-            return null;
-        }
-        this.storage.set(store);
-        return this;
     }
 
     public getUser() {

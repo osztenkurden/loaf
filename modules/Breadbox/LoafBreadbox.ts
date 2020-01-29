@@ -1,8 +1,10 @@
 import * as Keys from "./Keys";
 // import util from "util";
 
-declare let window: any;
-const libsignal = window.libsignal;
+// declare let window: any;
+
+// tslint:disable-next-line:no-var-requires
+const libsignal = require("./../Breadcrumb/libsignal/index");
 
 function toHex(str: string) {
     let hex = "";
@@ -25,12 +27,17 @@ class LoafBreadbox {
     };
     public store: any;
 
-    constructor() {
+    constructor(storeHex?: string) {
         this.Direction = {
             RECEIVING: 2,
             SENDING: 1,
         };
         this.store = {};
+        if (storeHex) {
+            this.setStore(storeHex);
+        } else {
+            this.init();
+        }
     }
 
     public put = (key: string, value: any) => {
@@ -84,7 +91,7 @@ class LoafBreadbox {
         return this.get(`identityKey${identifier}`);
     }
 
-    public saveIdentity = (identifier: any, identityKey: ArrayBuffer) => {
+    public saveIdentity = (identifier: string, identityKey: ArrayBuffer) => {
         if (identifier === null || identifier === undefined)
             throw new Error("Tried to put identity key for undefined/null key");
         const address = new libsignal.SignalProtocolAddress.fromString(identifier);
@@ -239,6 +246,32 @@ class LoafBreadbox {
         const stringified = JSON.stringify(json);
         const hexStore = toHex(stringified);
         return hexStore;
+    }
+
+    private async init() {
+        const keyHelper = libsignal.KeyHelper;
+        const registrationId = await keyHelper.generateRegistrationId();
+        const identityKeyPair = await keyHelper.generateIdentityKeyPair();
+
+        const preKeys = await keyHelper.generatePreKey(/** dodac id */);
+        const signedPreKeys = await keyHelper.generateSignedPreKey(identityKeyPair /** dodac id */);
+
+        const preKey = {
+            keyId: preKeys.keyId,
+            ...preKeys.keyPair,
+        };
+
+        const signedPreKey = {
+            keyId: signedPreKeys.keyId,
+            signature: signedPreKeys.signature,
+            ...signedPreKeys.keyPair,
+        };
+
+        this.put("identityKey", identityKeyPair);
+        this.put("registrationId", registrationId);
+
+        this.storePreKey(preKey.keyId, preKey);
+        this.storeSignedPreKey(signedPreKey.keyId, signedPreKeys);
     }
 }
 

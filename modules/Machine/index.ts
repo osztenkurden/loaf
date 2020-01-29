@@ -2,7 +2,7 @@ import { app } from "electron";
 import * as fs from "fs";
 import * as path from "path";
 
-const directories = {
+export const directories = {
     db: path.join(app.getPath("userData"), "database"),
     user: app.getPath("userData"),
 };

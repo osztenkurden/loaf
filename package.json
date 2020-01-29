@@ -2,8 +2,8 @@
   "name": "loaf",
   "version": "0.1.0",
   "homepage": "./",
-  "description": "Loaf Messenger",
-  "author": "0sh10",
+  "description": "Loaf",
+  "author": "Bakerysoft Montreal",
   "private": true,
   "dependencies": {
     "@material-ui/core": "^4.9.0",
@@ -15,6 +15,7 @@
     "big-integer": "^1.6.47",
     "cors": "^2.8.5",
     "cross-env": "^6.0.3",
+    "electron-builder-squirrel-windows": "^22.3.3",
     "fetch-cookie": "^0.7.3",
     "ip": "^1.1.5",
     "moment": "^2.24.0",
@@ -35,7 +36,7 @@
   },
   "build": {
     "appId": "com.bakerysoft.loaf",
-    "productName": "Loaf Messenger",
+    "productName": "Loaf",
     "win": {
       "target": "NSIS"
     },
