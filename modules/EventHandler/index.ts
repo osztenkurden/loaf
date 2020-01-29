@@ -30,6 +30,12 @@ export const start = () => {
         return { event: "user", data: User.getUser() };
     });
 
+    Loaf.onAsync("authenticateUser", async (authCode: number) => {
+        const status = await User.authenticate(authCode);
+
+        return { event: "userStatus", data: status };
+    });
+
     Loaf.onAsync("logInUser", async (username: string, password: string) => {
         const status = await User.logIn(username, password);
 

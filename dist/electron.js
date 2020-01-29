@@ -62,7 +62,7 @@ var startApp = function () { return __awaiter(void 0, void 0, void 0, function (
             minHeight: 600,
             minWidth: 400,
             show: false,
-            title: "Loaf Messenger",
+            title: "Loaf",
             webPreferences: {
                 backgroundThrottling: false,
                 // preload: __dirname + "/preload.js",
@@ -78,11 +78,11 @@ var startApp = function () { return __awaiter(void 0, void 0, void 0, function (
                     application.isQuitting = true;
                     application.quit();
                 },
-                label: "Quit Loaf Messenger"
+                label: "Quit Loaf"
             },
         ]);
         tray.setContextMenu(context);
-        tray.setToolTip("Loaf Messenger");
+        tray.setToolTip("Loaf");
         tray.on("click", function () {
             win.show();
         });

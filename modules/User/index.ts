@@ -1,5 +1,6 @@
 import * as I from "../interface";
 import { api } from "./../API";
+import * as Machine from "./../Machine";
 import Storage from "./../UserStorage";
 
 export class User {
@@ -27,7 +28,15 @@ export class User {
     }
 
     public async logIn(username: string, password: string) {
-        const result = await api.user.login({username, password, machineId: 6809 });
+        const result = await api.user.login({username, password, machineId: Machine.getMachineId() });
+        if (result.status === 200) {
+            await this.loadUser();
+        }
+        return result.status;
+    }
+
+    public async authenticate(authCode: number) {
+        const result = await api.user.authenticate(authCode);
         if (result.status === 200) {
             await this.loadUser();
         }

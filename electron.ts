@@ -5,7 +5,7 @@ import * as EventInit from "./modules/EventHandler";
 import * as Machine from "./modules/Machine";
 // import * as Storage from "./storage/storage";
 
-interface IExtendedApplication extends App {
+interface IExtApp extends App {
     isQuitting?: boolean;
 }
 
@@ -22,7 +22,7 @@ const startApp = async () => {
         minHeight: 600,
         minWidth: 400,
         show: false,
-        title: "Loaf Messenger",
+        title: "Loaf",
         webPreferences: {
             backgroundThrottling: false,
             // preload: __dirname + "/preload.js",
@@ -35,15 +35,15 @@ const startApp = async () => {
     const context = Menu.buildFromTemplate([
         {
             click: () => {
-                const application: IExtendedApplication = app;
+                const application: IExtApp = app;
                 application.isQuitting = true;
                 application.quit();
             },
-            label: "Quit Loaf Messenger",
+            label: "Quit Loaf",
         },
     ]);
     tray.setContextMenu(context);
-    tray.setToolTip("Loaf Messenger");
+    tray.setToolTip("Loaf");
     tray.on("click", () => {
         win.show();
     });
@@ -60,7 +60,7 @@ const startApp = async () => {
     win.loadURL(isDev ? "http://localhost:3000" : `file://${__dirname}/build/index.html`);
 
     win.on("close", (event) => {
-        const application: IExtendedApplication = app;
+        const application: IExtApp = app;
         if (!application.isQuitting) {
             event.preventDefault();
             win.hide();

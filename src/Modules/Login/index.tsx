@@ -24,6 +24,24 @@ export default class Login extends Component<IProps, IState> {
     }
 
     public render() {
+        if (this.props.authentication) {
+            return (
+                <div className="loaf-app-splash">
+                    <div id="login-page">
+                        <TextField
+                            type="number"
+                            className="username-input"
+                            placeholder="Username"
+                            color="primary"
+                            value={this.state.authCode}
+                            onChange={this.handleChange("authCode")}
+                            required
+                        />
+                        <LoafButton main big onClick={this.validate}>Authenticate</LoafButton>
+                    </div>
+                </div>
+            );
+        }
         return (
             <div className="loaf-app-splash">
                 <div id="login-page">
@@ -51,10 +69,14 @@ export default class Login extends Component<IProps, IState> {
 
     private handleChange = (field: "password" | "username" | "authCode") => (e: any) => {
         const value = e.target.value;
-        this.setState((state) => ({...state, [field]: value}));
+        this.setState((state) => ({ ...state, [field]: value }));
     }
 
     private logIn = () => {
         API.user.logIn(this.state.username, this.state.password);
+    }
+
+    private validate = () => {
+        API.user.authenticate(this.state.authCode);
     }
 }

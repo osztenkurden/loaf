@@ -69,6 +69,17 @@ exports.start = function () {
     Loaf.on("getUser", function () {
         return { event: "user", data: User_1["default"].getUser() };
     });
+    Loaf.onAsync("authenticateUser", function (authCode) { return __awaiter(void 0, void 0, void 0, function () {
+        var status;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, User_1["default"].authenticate(authCode)];
+                case 1:
+                    status = _a.sent();
+                    return [2 /*return*/, { event: "userStatus", data: status }];
+            }
+        });
+    }); });
     Loaf.onAsync("logInUser", function (username, password) { return __awaiter(void 0, void 0, void 0, function () {
         var status;
         return __generator(this, function (_a) {

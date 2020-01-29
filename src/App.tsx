@@ -1,20 +1,22 @@
+import Main from "Modules/Main";
 import React from "react";
 import * as I from "./../modules/interface";
 import api from "./API";
 import * as Loaf from "./API/Loaf";
-// import Main from "./Modules/Main/Main";
 import Login from "./Modules/Login";
 import Splash from "./Modules/Splash";
 
 interface IState {
     user: I.IUser | null;
     loading: boolean;
+    authentication: boolean;
 }
 
 export default class App extends React.Component<any, IState> {
     constructor(props: any) {
         super(props);
         this.state = {
+            authentication: false,
             loading: true,
             user: null,
         };
@@ -28,19 +30,21 @@ export default class App extends React.Component<any, IState> {
         Loaf.on("userStatus", (status: number) => {
             if (status === 200) {
                 this.getUser();
+            } else if (status === 403) {
+                this.setState({authentication: true});
             }
         });
         this.getUser();
     }
     public render() {
-        const { user, loading } = this.state;
+        const { user, loading, authentication } = this.state;
         if (loading) {
             return <Splash />;
         }
         if (user) {
-            return `HELLO ${user.username}`;
+            return <Main cxt={user} />;
         }
-        return <Login/>;
+        return <Login authentication={authentication}/>;
     }
 
     private getUser() {
