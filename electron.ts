@@ -1,5 +1,4 @@
-import { fork } from "child_process";
-import { app, App, autoUpdater, BrowserWindow, Menu, Notification, Tray } from "electron";
+import { app, App, BrowserWindow, Menu, Tray } from "electron";
 import path from "path";
 import * as EventInit from "./modules/EventHandler";
 import * as Machine from "./modules/Machine";

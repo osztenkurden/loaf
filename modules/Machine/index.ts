@@ -1,5 +1,6 @@
 import { app } from "electron";
 import * as fs from "fs";
+import os from "os";
 import * as path from "path";
 
 export const directories = {
@@ -33,4 +34,21 @@ export const getMachineId = (): number => {
     } catch {
         return 0;
     }
+};
+
+export const getMachineName = () => {
+    function OS(platform) {
+        if (platform === "freebsd") {
+            return "FreeBSD";
+        }
+        if (platform === "win32") {
+            return "Windows";
+        }
+        return platform[0].toUpperCase() + platform.substr(1);
+    }
+    return `${OS(os.platform())} ${os.release()} - ${os.hostname()}`;
+};
+
+export const getMachine = () => {
+    return { name: getMachineName(), id: getMachineId() };
 };

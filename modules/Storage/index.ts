@@ -15,13 +15,21 @@ export default class Storage {
         const store = new Breadbox(storeContent);
 
         this.store = store;
-        this.saveStoreFile();
+        this.saveStoreToFile();
 
         this.cypher = new Cypher(this.store);
     }
 
-    public get() {
-        return this.store;
+    public encodeMessage() {
+
+        this.saveStoreToFile();
+        return this.cypher;
+    }
+
+    public decodeMessage() {
+
+        this.saveStoreToFile();
+        return this.cypher;
     }
 
     /*public set(store: string) {
@@ -42,7 +50,7 @@ export default class Storage {
         return storeContent;
     }
 
-    private saveStoreFile() {
+    private saveStoreToFile() {
         const storePath = this.getStorePath();
         if (!fs.existsSync(storePath)) {
             return this;

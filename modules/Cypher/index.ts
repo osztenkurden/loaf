@@ -3,25 +3,9 @@ import Breadbox from "./../Breadbox/LoafBreadbox";
 // tslint:disable-next-line:no-var-requires
 const libsignal = require("./../Breadcrumb/libsignal/index");
 
-interface IMessageObjectIncoming {
-    senderId: number;
-    recipientId: number;
-    machineId: number;
-    message: string;
-    isFirst?: boolean;
-}
-
 interface IMessageObjectSending {
-    senderId: number;
-    recipientId: number;
-    machineId: number;
-    message: {
-        type: string;
-        content: string;
-    };
     type: string;
     content: string;
-    bundle?: any;
 }
 
 export default class Cypher {
@@ -31,13 +15,13 @@ export default class Cypher {
         this.store = store;
     }
 
-    public async decrypt(message: IMessageObjectIncoming) {
-        const original = Buffer.from(message.message, "hex").toString("ucs-2");
+    public async decrypt(message: string, senderId: number, machineId: number, isFirst = false) {
+        const original = Buffer.from(message, "hex").toString("ucs-2");
 
-        const address = new libsignal.SignalProtocolAddress(message.senderId, message.machineId);
-        const cipher =  new libsignal.SessionCipher(this.store, address);
+        const address = new libsignal.SignalProtocolAddress(senderId, machineId);
+        const cipher = new libsignal.SessionCipher(this.store, address);
 
-        if (message.isFirst) {
+        if (isFirst) {
             const contentInit = await cipher.decryptPreKeyWhisperMessage(original, "binary");
             return Buffer.from(contentInit).toString();
         }
@@ -45,12 +29,12 @@ export default class Cypher {
         return Buffer.from(content).toString();
     }
 
-    public async encrypt(message: IMessageObjectSending) {
+    public async encrypt(message: IMessageObjectSending, recipientId: number, machineId: number, bundle?: any) {
         const content = this.encodeMessage(message);
-        const address = new libsignal.SignalProtocolAddress(message.recipientId, message.machineId);
+        const address = new libsignal.SignalProtocolAddress(recipientId, machineId);
 
-        if (message.bundle) {
-            await this.store.createSession(address, message.bundle);
+        if (bundle) {
+            await this.store.createSession(address, bundle);
         }
 
         const cipher = new libsignal.SessionCipher(this.store, address);
@@ -60,7 +44,7 @@ export default class Cypher {
     }
 
     private encodeMessage(message: IMessageObjectSending) {
-        const text = JSON.stringify(message.message);
+        const text = JSON.stringify(message);
         return ArrayBuffers.create(Buffer.from(text));
     }
 }
