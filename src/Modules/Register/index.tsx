@@ -10,12 +10,14 @@ interface IProps {
 interface IState {
     username: string;
     password: string;
+    firstName: string;
 }
 
 export default class Register extends Component<IProps, IState> {
     constructor(props: IProps) {
         super(props);
         this.state = {
+            firstName: "",
             password: "",
             username: "",
         };
@@ -25,6 +27,14 @@ export default class Register extends Component<IProps, IState> {
         return (
             <div className="loaf-app-splash">
                 <div id="login-page">
+                    <TextField
+                        className="firstname-input"
+                        placeholder="First Name"
+                        color="primary"
+                        value={this.state.firstName}
+                        onChange={this.handleChange("firstName")}
+                        required
+                    />
                     <TextField
                         className="username-input"
                         placeholder="Username"
@@ -48,12 +58,12 @@ export default class Register extends Component<IProps, IState> {
         );
     }
 
-    private handleChange = (field: "password" | "username") => (e: any) => {
+    private handleChange = (field: "password" | "username" | "firstName") => (e: any) => {
         const value = e.target.value;
         this.setState((state) => ({ ...state, [field]: value }));
     }
 
     private register = () => {
-        API.user.logIn(this.state.username, this.state.password);
+        API.user.register(this.state.username, this.state.password, this.state.firstName);
     }
 }

@@ -1,6 +1,6 @@
-import * as ArrBuffer from "./ArrayBuffer"
+import * as ArrBuffer from "./ArrayBuffer";
 
-export const toString = (key: Buffer) => Buffer.from(key).toString("hex");
+export const toString = (key: Buffer | ArrayBuffer) => Buffer.from(key).toString("hex");
 
 export const toArrayBuffer = (key: string) => {
     const buffer = Buffer.from(key,  "hex");

@@ -48,7 +48,6 @@ var __importStar = (this && this.__importStar) || function (mod) {
 exports.__esModule = true;
 var electron_1 = require("electron");
 var path_1 = __importDefault(require("path"));
-var DiffieHellman_1 = require("./modules/Crypto/DiffieHellman");
 var EventInit = __importStar(require("./modules/EventHandler"));
 var Machine = __importStar(require("./modules/Machine"));
 var isDev = process.env.DEV === "true";
@@ -57,11 +56,6 @@ var startApp = function () { return __awaiter(void 0, void 0, void 0, function (
     return __generator(this, function (_a) {
         electron_1.app.setAppUserModelId("com.bakerysoft.loaf");
         Machine.checkDirectories();
-        DiffieHellman_1.generateKeys().then(function (keys) {
-            console.log(keys);
-        })["catch"](function (reason) {
-            console.log(reason);
-        });
         win = new electron_1.BrowserWindow({
             height: 720,
             icon: path_1["default"].join(__dirname, "assets/icon.png"),

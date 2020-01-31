@@ -5,14 +5,34 @@ import Cypher from "./../Cypher";
 import * as Machine from "./../Machine";
 
 export default class Storage {
-    private userId: number;
-    private store: Breadbox;
-    private cypher: Cypher;
+    private userId?: number;
+    private store: Breadbox | null;
+    private cypher: Cypher | null;
 
-    constructor(id: number) {
-        this.userId = id;
-        const storeContent = this.loadStore();
-        const store = new Breadbox(storeContent);
+    constructor() {
+        /*let storeContent = "";
+        if (id) {
+            this.userId = id;
+            storeContent = this.loadStore();
+        }
+        const store = new Breadbox();
+        store.init(storeContent);
+
+        this.store = store;
+        this.saveStoreToFile();
+
+        this.cypher = new Cypher(this.store);*/
+
+    }
+
+    public async init(userId?: number) {
+        let storeContent = "";
+        if (userId) {
+            this.userId = userId;
+            storeContent = this.loadStore();
+        }
+        const store = new Breadbox();
+        await store.init(storeContent);
 
         this.store = store;
         this.saveStoreToFile();
@@ -32,6 +52,17 @@ export default class Storage {
         return this.cypher;
     }
 
+    public setUserId(id: number) {
+        if (this.userId) {
+            return this;
+        }
+        this.userId = id;
+        return this;
+    }
+    /**
+     * Registration data retrivial methods
+     */
+
     public getRegistrationId() {
         return this.store.getLocalRegistrationId();
     }
@@ -40,10 +71,27 @@ export default class Storage {
         return this.store.getIdentityKeyPair();
     }
 
-    /*public set(store: string) {
-        // this.store = store;
+    public getPreKeys() {
+        return this.store.getPreKeys();
+    }
+
+    public getSignedPreKey() {
+        return this.store.getSignedPreKey();
+    }
+
+    /**
+     * Managing storage on user's drive
+     */
+
+    public saveStoreToFile() {
+        const storePath = this.getStorePath();
+        if (!fs.existsSync(storePath)) {
+            return this;
+        }
+
+        fs.writeFileSync(storePath, this.store.getStore(), "utf8");
         return this;
-    }*/
+    }
 
     private getStorePath() {
         const storePath = path.join(Machine.directories.db, `user-${this.userId}.loaf`);
@@ -56,16 +104,6 @@ export default class Storage {
         const storeContent = fs.readFileSync(this.getStorePath(), "utf8");
 
         return storeContent;
-    }
-
-    private saveStoreToFile() {
-        const storePath = this.getStorePath();
-        if (!fs.existsSync(storePath)) {
-            return this;
-        }
-
-        fs.writeFileSync(storePath, this.store.getStore(), "utf8");
-        return this;
     }
 
     private createStoreFile() {

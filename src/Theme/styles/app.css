@@ -76,20 +76,20 @@ body {
     background-color: rgba(0,0,0,0.23);
     padding:20px;
 }
-#login-page .password-input, #login-page .username-input {
+#login-page .password-input, #login-page .username-input, #login-page .firstname-input {
     color: white;
     height: 70px;
     align-items:center;
     display:flex;   
     justify-content: center;
 }
-#login-page .password-input > div::after, #login-page .username-input > div::after {
+#login-page .password-input > div::after, #login-page .username-input > div::after, #login-page .firstname-input > div::after {
     display: none !important;
 }
-#login-page .password-input > div::before, #login-page .username-input > div::before {
+#login-page .password-input > div::before, #login-page .username-input > div::before, #login-page .firstname-input > div::before {
     display: none !important;
 }
-#login-page .password-input input, #login-page .username-input input {
+#login-page .password-input input, #login-page .username-input input, #login-page .firstname-input input {
     color: white;
     height: 30px;
     border: 1px solid rgba(255,255,255,0.2);

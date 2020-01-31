@@ -46,6 +46,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 exports.__esModule = true;
+var DiffieHellman_1 = require("./../Crypto/DiffieHellman");
 var Machine = __importStar(require("./../Machine"));
 var User_1 = __importDefault(require("./../User"));
 var Loaf = __importStar(require("./handler"));
@@ -56,11 +57,48 @@ exports.start = function () {
     });
     Loaf.on("createKeys", function () {
         // TODO: Add child process for creating keys
+        // PRETODO: Make sure it is actually necessary to call this from frontend
         return null;
     });
     Loaf.on("getUser", function () {
         return { event: "user", data: User_1["default"].getUser() };
     });
+    Loaf.onAsync("register", function (username, password, name) { return __awaiter(void 0, void 0, void 0, function () {
+        var keys, storage, body, e_1;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    _a.trys.push([0, 3, , 4]);
+                    return [4 /*yield*/, DiffieHellman_1.generateKeys()];
+                case 1:
+                    keys = _a.sent();
+                    return [4 /*yield*/, User_1["default"].initStorage()];
+                case 2:
+                    storage = (_a.sent()).getStorage();
+                    body = {
+                        firstName: name,
+                        identityKey: storage.getIdentityKeyPair().pubKey,
+                        keys: {
+                            generator: keys.gen,
+                            prime: keys.prime,
+                            public: keys.public
+                        },
+                        password: password,
+                        preKeys: storage.getPreKeys(),
+                        registrationId: storage.getRegistrationId(),
+                        signedPreKey: storage.getSignedPreKey(),
+                        username: username
+                    };
+                    console.log(body);
+                    return [2 /*return*/, { event: "userCreated", data: true }];
+                case 3:
+                    e_1 = _a.sent();
+                    console.log(e_1);
+                    return [2 /*return*/, { event: "userCreated", data: false }];
+                case 4: return [2 /*return*/];
+            }
+        });
+    }); });
     Loaf.onAsync("authenticateUser", function (authCode) { return __awaiter(void 0, void 0, void 0, function () {
         var status;
         return __generator(this, function (_a) {

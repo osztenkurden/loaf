@@ -57,7 +57,7 @@ var User = /** @class */ (function () {
     }
     User.prototype.loadUser = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var user, storage;
+            var user;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, API_1.api.user.get()];
@@ -67,8 +67,16 @@ var User = /** @class */ (function () {
                             return [2 /*return*/, this];
                         }
                         this.user = user;
-                        storage = new Storage_1["default"](user.id);
+                        return [4 /*yield*/, this.initStorage(user.id)];
+                    case 2:
+                        _a.sent();
+                        /*
+                        const storage = new Storage();
+                
+                        await storage.init(user.id);
+                
                         this.storage = storage;
+                        */
                         return [2 /*return*/, this];
                 }
             });
@@ -109,6 +117,25 @@ var User = /** @class */ (function () {
                 }
             });
         });
+    };
+    User.prototype.initStorage = function (userId) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (!!this.storage) return [3 /*break*/, 2];
+                        this.storage = new Storage_1["default"]();
+                        return [4 /*yield*/, this.storage.init(userId)];
+                    case 1:
+                        _a.sent();
+                        _a.label = 2;
+                    case 2: return [2 /*return*/, this];
+                }
+            });
+        });
+    };
+    User.prototype.getStorage = function () {
+        return this.storage;
     };
     User.prototype.getUser = function () {
         return this.user;

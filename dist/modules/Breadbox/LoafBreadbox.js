@@ -59,6 +59,14 @@ var Keys = __importStar(require("./Keys"));
 // declare let window: any;
 // tslint:disable-next-line:no-var-requires
 var libsignal = require("./../Breadcrumb/libsignal/index");
+// tslint:disable-next-line:no-var-requires
+var crypto = require("./../Breadcrumb/libsignal/crypto/index").crypto;
+exports.generateId = function (amount) {
+    if (amount === void 0) { amount = 1; }
+    var array = new Uint32Array(amount);
+    var randoms = crypto.getRandomValues(array);
+    return randoms;
+};
 function toHex(str) {
     var hex = "";
     for (var i = 0; i < str.length; i++) {
@@ -73,8 +81,16 @@ function hexToAscii(hex) {
         str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
     return str;
 }
+function parseKeyObject(obj) {
+    var response = {
+        keyId: obj.keyId,
+        pubKey: Keys.toString(obj.pubKey),
+        signature: obj.signature ? Keys.toString(obj.signature) : undefined
+    };
+    return response;
+}
 var LoafBreadbox = /** @class */ (function () {
-    function LoafBreadbox(storeHex) {
+    function LoafBreadbox() {
         var _this = this;
         this.put = function (key, value) {
             if (key === undefined || value === undefined || key === null || value === null) {
@@ -93,7 +109,7 @@ var LoafBreadbox = /** @class */ (function () {
             return defaultValue;
         };
         this.getIdentityKeyPair = function () {
-            return _this.get("identityKey");
+            return parseKeyObject(_this.get("identityKey"));
         };
         this.getLocalRegistrationId = function () {
             return _this.get("registrationId");
@@ -178,6 +194,41 @@ var LoafBreadbox = /** @class */ (function () {
                 }
             });
         }); };
+        this.getSignedPreKey = function () {
+            var objKeys = Object.keys(_this.store).filter(function (key) { return key.startsWith("25519KeysignedKey"); });
+            var keys = objKeys.map(function (key) { return _this.store[key]; }).map(parseKeyObject);
+            return keys[0];
+        };
+        this.getPreKeys = function () {
+            var objKeys = Object.keys(_this.store).filter(function (key) { return key.startsWith("25519KeypreKey"); });
+            var keys = objKeys.map(function (key) { return _this.store[key]; }).map(parseKeyObject);
+            return keys;
+        };
+        this.createPreKeys = function (preKeysAmount) { return __awaiter(_this, void 0, void 0, function () {
+            var randomIds, keyHelper, preKeys, i, preKey;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        randomIds = exports.generateId(preKeysAmount);
+                        keyHelper = libsignal.KeyHelper;
+                        preKeys = [];
+                        i = 0;
+                        _a.label = 1;
+                    case 1:
+                        if (!(i < preKeysAmount)) return [3 /*break*/, 4];
+                        return [4 /*yield*/, keyHelper.generatePreKey(randomIds[i])];
+                    case 2:
+                        preKey = _a.sent();
+                        preKeys.push(preKey);
+                        this.storePreKey(preKey.keyId, __assign(__assign({}, preKey.keyPair), { keyId: preKey.keyId }));
+                        _a.label = 3;
+                    case 3:
+                        i++;
+                        return [3 /*break*/, 1];
+                    case 4: return [2 /*return*/, preKeys];
+                }
+            });
+        }); };
         this.loadSession = function (identifier) {
             return _this.get("session" + identifier);
         };
@@ -239,7 +290,7 @@ var LoafBreadbox = /** @class */ (function () {
                 return;
             }
             catch (_b) {
-                return null;
+                return;
             }
         };
         this.getStore = function () {
@@ -279,19 +330,16 @@ var LoafBreadbox = /** @class */ (function () {
             SENDING: 1
         };
         this.store = {};
-        if (storeHex) {
-            this.setStore(storeHex);
-        }
-        else {
-            this.init();
-        }
     }
-    LoafBreadbox.prototype.init = function () {
+    LoafBreadbox.prototype.init = function (storeHex) {
         return __awaiter(this, void 0, void 0, function () {
-            var keyHelper, registrationId, identityKeyPair, preKeys, signedPreKeys, preKey, signedPreKey;
+            var keyHelper, registrationId, identityKeyPair, signedPreKeyGenId, signedPreKeys, signedPreKey;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
+                        if (storeHex) {
+                            return [2 /*return*/, this.setStore(storeHex)];
+                        }
                         keyHelper = libsignal.KeyHelper;
                         return [4 /*yield*/, keyHelper.generateRegistrationId()];
                     case 1:
@@ -299,18 +347,17 @@ var LoafBreadbox = /** @class */ (function () {
                         return [4 /*yield*/, keyHelper.generateIdentityKeyPair()];
                     case 2:
                         identityKeyPair = _a.sent();
-                        return [4 /*yield*/, keyHelper.generatePreKey( /** dodac id */)];
+                        return [4 /*yield*/, this.createPreKeys(20)];
                     case 3:
-                        preKeys = _a.sent();
-                        return [4 /*yield*/, keyHelper.generateSignedPreKey(identityKeyPair /** dodac id */)];
+                        _a.sent();
+                        signedPreKeyGenId = exports.generateId()[0];
+                        return [4 /*yield*/, keyHelper.generateSignedPreKey(identityKeyPair, signedPreKeyGenId)];
                     case 4:
                         signedPreKeys = _a.sent();
-                        preKey = __assign({ keyId: preKeys.keyId }, preKeys.keyPair);
                         signedPreKey = __assign({ keyId: signedPreKeys.keyId, signature: signedPreKeys.signature }, signedPreKeys.keyPair);
                         this.put("identityKey", identityKeyPair);
                         this.put("registrationId", registrationId);
-                        this.storePreKey(preKey.keyId, preKey);
-                        this.storeSignedPreKey(signedPreKey.keyId, signedPreKeys);
+                        this.storeSignedPreKey(signedPreKey.keyId, signedPreKey);
                         return [2 /*return*/];
                 }
             });

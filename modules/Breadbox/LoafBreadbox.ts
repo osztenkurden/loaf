@@ -5,6 +5,14 @@ import * as Keys from "./Keys";
 
 // tslint:disable-next-line:no-var-requires
 const libsignal = require("./../Breadcrumb/libsignal/index");
+// tslint:disable-next-line:no-var-requires
+const crypto = require("./../Breadcrumb/libsignal/crypto/index").crypto;
+
+export const generateId = (amount = 1) => {
+    const array = new Uint32Array(amount);
+    const randoms: number[] = crypto.getRandomValues(array);
+    return randoms;
+};
 
 function toHex(str: string) {
     let hex = "";
@@ -20,6 +28,23 @@ function hexToAscii(hex: string) {
         str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
     return str;
 }
+
+interface IKeyObject {
+    privKey: ArrayBuffer;
+    pubKey: ArrayBuffer;
+    signature?: ArrayBuffer;
+    keyId: number;
+}
+
+function parseKeyObject(obj: IKeyObject) {
+    const response = {
+        keyId: obj.keyId,
+        pubKey: Keys.toString(obj.pubKey),
+        signature: obj.signature ? Keys.toString(obj.signature) : undefined,
+    };
+    return response;
+}
+
 class LoafBreadbox {
     public Direction: {
         SENDING: number;
@@ -27,17 +52,12 @@ class LoafBreadbox {
     };
     public store: any;
 
-    constructor(storeHex?: string) {
+    constructor() {
         this.Direction = {
             RECEIVING: 2,
             SENDING: 1,
         };
         this.store = {};
-        if (storeHex) {
-            this.setStore(storeHex);
-        } else {
-            this.init();
-        }
     }
 
     public put = (key: string, value: any) => {
@@ -58,7 +78,7 @@ class LoafBreadbox {
     }
 
     public getIdentityKeyPair = () => {
-        return this.get("identityKey");
+        return parseKeyObject(this.get("identityKey"));
     }
 
     public getLocalRegistrationId = () => {
@@ -148,6 +168,31 @@ class LoafBreadbox {
         }
     }
 
+    public getSignedPreKey = () => {
+        const objKeys = Object.keys(this.store).filter((key) => key.startsWith("25519KeysignedKey"));
+        const keys = objKeys.map((key) => this.store[key]).map(parseKeyObject);
+        return keys[0];
+    }
+
+    public getPreKeys = () => {
+        const objKeys = Object.keys(this.store).filter((key) => key.startsWith("25519KeypreKey"));
+        const keys = objKeys.map((key) => this.store[key]).map(parseKeyObject);
+        return keys;
+    }
+
+    public createPreKeys = async (preKeysAmount: number) => {
+        const randomIds = generateId(preKeysAmount);
+        const keyHelper = libsignal.KeyHelper;
+        const preKeys = [];
+        for (let i = 0; i < preKeysAmount; i++) {
+            const preKey = await keyHelper.generatePreKey(randomIds[i]);
+            preKeys.push(preKey);
+            this.storePreKey(preKey.keyId, { ...preKey.keyPair, keyId: preKey.keyId });
+        }
+        return preKeys;
+
+    }
+
     public loadSession = (identifier: string) => {
         return this.get(`session${identifier}`);
     }
@@ -210,7 +255,7 @@ class LoafBreadbox {
             }
             return;
         } catch {
-            return null;
+            return;
         }
     }
 
@@ -248,18 +293,18 @@ class LoafBreadbox {
         return hexStore;
     }
 
-    private async init() {
+    public async init(storeHex?: string) {
+        if (storeHex) {
+            return this.setStore(storeHex);
+        }
         const keyHelper = libsignal.KeyHelper;
         const registrationId = await keyHelper.generateRegistrationId();
         const identityKeyPair = await keyHelper.generateIdentityKeyPair();
 
-        const preKeys = await keyHelper.generatePreKey(/** dodac id */);
-        const signedPreKeys = await keyHelper.generateSignedPreKey(identityKeyPair /** dodac id */);
+        await this.createPreKeys(20);
 
-        const preKey = {
-            keyId: preKeys.keyId,
-            ...preKeys.keyPair,
-        };
+        const signedPreKeyGenId = generateId()[0];
+        const signedPreKeys = await keyHelper.generateSignedPreKey(identityKeyPair, signedPreKeyGenId);
 
         const signedPreKey = {
             keyId: signedPreKeys.keyId,
@@ -270,8 +315,7 @@ class LoafBreadbox {
         this.put("identityKey", identityKeyPair);
         this.put("registrationId", registrationId);
 
-        this.storePreKey(preKey.keyId, preKey);
-        this.storeSignedPreKey(signedPreKey.keyId, signedPreKeys);
+        this.storeSignedPreKey(signedPreKey.keyId, signedPreKey);
     }
 }
 

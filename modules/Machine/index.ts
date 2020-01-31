@@ -2,6 +2,7 @@ import { app } from "electron";
 import * as fs from "fs";
 import os from "os";
 import * as path from "path";
+import { generateId } from "./../Breadbox/LoafBreadbox";
 
 export const directories = {
     db: path.join(app.getPath("userData"), "database"),
@@ -9,7 +10,7 @@ export const directories = {
 };
 
 export const claimMachine = () => {
-    const machineId = Math.round(Math.random() * 9999 + 1);
+    const machineId = generateId()[0];
     const content = { machineId };
 
     fs.writeFileSync(path.join(directories.user, "machine.loaf"), JSON.stringify(content));

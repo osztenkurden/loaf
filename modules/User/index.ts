@@ -22,8 +22,14 @@ export class User {
 
         this.user = user;
 
-        const storage = new Storage(user.id);
+        await this.initStorage(user.id);
+        /*
+        const storage = new Storage();
+
+        await storage.init(user.id);
+
         this.storage = storage;
+        */
         return this;
     }
 
@@ -41,6 +47,14 @@ export class User {
             await this.loadUser();
         }
         return result.status;
+    }
+
+    public async initStorage(userId?: number) {
+        if (!this.storage) {
+            this.storage = new Storage();
+            await this.storage.init(userId);
+        }
+        return this;
     }
 
     public getStorage() {

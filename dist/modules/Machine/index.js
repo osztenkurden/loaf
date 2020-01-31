@@ -14,12 +14,13 @@ var electron_1 = require("electron");
 var fs = __importStar(require("fs"));
 var os_1 = __importDefault(require("os"));
 var path = __importStar(require("path"));
+var LoafBreadbox_1 = require("./../Breadbox/LoafBreadbox");
 exports.directories = {
     db: path.join(electron_1.app.getPath("userData"), "database"),
     user: electron_1.app.getPath("userData")
 };
 exports.claimMachine = function () {
-    var machineId = Math.round(Math.random() * 9999 + 1);
+    var machineId = LoafBreadbox_1.generateId()[0];
     var content = { machineId: machineId };
     fs.writeFileSync(path.join(exports.directories.user, "machine.loaf"), JSON.stringify(content));
 };

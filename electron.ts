@@ -16,12 +16,6 @@ const startApp = async () => {
 
     Machine.checkDirectories();
 
-    generateKeys().then((keys) => {
-        console.log(keys);
-    }).catch((reason) => {
-        console.log(reason);
-    });
-
     const win = new BrowserWindow({
         height: 720,
         icon: path.join(__dirname, "assets/icon.png"),

@@ -1,3 +1,4 @@
+import { generateKeys } from "./../Crypto/DiffieHellman";
 import * as Machine from "./../Machine";
 import User from "./../User";
 import * as Loaf from "./handler";
@@ -21,20 +22,30 @@ export const start = () => {
         return { event: "user", data: User.getUser() };
     });
 
-    Loaf.on("getRegistrationId", () => {
-        const storage = User.getStorage();
-        if (!storage) {
-            return { event: "registrationId", data: null };
+    Loaf.onAsync("register", async (username: string, password: string, name: string) => {
+        try {
+           const keys = await generateKeys();
+           const storage = (await User.initStorage()).getStorage();
+           const body = {
+                firstName: name,
+                identityKey: storage.getIdentityKeyPair().pubKey,
+                keys: {
+                    generator: keys.gen,
+                    prime: keys.prime,
+                    public: keys.public,
+                },
+                password,
+                preKeys: storage.getPreKeys(),
+                registrationId: storage.getRegistrationId(),
+                signedPreKey: storage.getSignedPreKey(),
+                username,
+           };
+           console.log(body);
+           return { event: "userCreated", data: true };
+        } catch (e) {
+            console.log(e);
+            return { event: "userCreated", data: false };
         }
-        return { event: "registrationId", data: storage.getRegistrationId() };
-    });
-
-    Loaf.on("getIdentityKey", () => {
-        const storage = User.getStorage();
-        if (!storage) {
-            return { event: "identityKey", data: null };
-        }
-        return { event: "identityKey", data: storage.getIdentityKeyPair() };
     });
 
     Loaf.onAsync("authenticateUser", async (authCode: number) => {

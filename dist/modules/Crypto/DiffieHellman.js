@@ -44,13 +44,12 @@ var path_1 = __importDefault(require("path"));
 exports.generateKeys = function () { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         return [2 /*return*/, new Promise(function (res, rej) {
-                console.log(path_1["default"].join(__dirname, "DiffieHellmanGenerator.js"));
-                var diffieHellman = child_process_1.fork("./dist/modules/Crypto/DiffieHellmanGenerator.js");
+                var diffieHellman = child_process_1.fork(path_1["default"].join(__dirname, "DiffieHellmanGenerator.js"));
                 diffieHellman.on("message", function (msg) {
                     res(msg.keys);
                 });
                 diffieHellman.on("exit", function () {
-                    rej(null);
+                    res(null);
                 });
             })];
     });
