@@ -48,3 +48,25 @@ export interface IStatusListener {
     status: number;
     listener: () => void;
 }
+
+export interface IRegisterPayload {
+    username: string;
+    password: string;
+    firstName: string;
+    identityKey: string;
+    registrationId: number;
+    keys: {
+        generator: string;
+        prime: string;
+        public: string;
+    };
+    preKeys: {
+        pubKey: string;
+        keyId: number;
+    }[];
+    signedPreKey: {
+        pubKey: string;
+        signature: string;
+        keyId: number;
+    };
+}

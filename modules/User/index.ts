@@ -1,3 +1,4 @@
+import { generateKeys } from "./../Crypto/DiffieHellman";
 import * as I from "../interface";
 import Storage from "../Storage";
 import { api } from "./../API";
@@ -39,6 +40,32 @@ export class User {
             await this.loadUser();
         }
         return result.status;
+    }
+
+    public async register(username: string, password: string, firstName: string) {
+        try {
+            const keys = await generateKeys();
+            const storage = (await this.initStorage()).getStorage();
+            const payload: I.IRegisterPayload = {
+                 firstName,
+                 identityKey: storage.getIdentityKeyPair().pubKey,
+                 keys: {
+                     generator: keys.gen,
+                     prime: keys.prime,
+                     public: keys.public,
+                 },
+                 password,
+                 preKeys: storage.getPreKeys(),
+                 registrationId: storage.getRegistrationId(),
+                 signedPreKey: storage.getSignedPreKey(),
+                 username,
+            };
+            const result = await api.user.register(payload);
+            return true;
+         } catch (e) {
+             console.log(e);
+             return false;
+         }
     }
 
     public async authenticate(authCode: number) {

@@ -23,29 +23,9 @@ export const start = () => {
     });
 
     Loaf.onAsync("register", async (username: string, password: string, name: string) => {
-        try {
-           const keys = await generateKeys();
-           const storage = (await User.initStorage()).getStorage();
-           const body = {
-                firstName: name,
-                identityKey: storage.getIdentityKeyPair().pubKey,
-                keys: {
-                    generator: keys.gen,
-                    prime: keys.prime,
-                    public: keys.public,
-                },
-                password,
-                preKeys: storage.getPreKeys(),
-                registrationId: storage.getRegistrationId(),
-                signedPreKey: storage.getSignedPreKey(),
-                username,
-           };
-           console.log(body);
-           return { event: "userCreated", data: true };
-        } catch (e) {
-            console.log(e);
-            return { event: "userCreated", data: false };
-        }
+        const result = await User.register(username, password, name);
+        
+        return { event: "userCreated", data: result };
     });
 
     Loaf.onAsync("authenticateUser", async (authCode: number) => {

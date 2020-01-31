@@ -13,5 +13,9 @@ export const api = {
         },
         // tslint:disable-next-line:max-line-length
         login: (body: {username: string, password: string, machineId: number}) => Loaf("auth/login", "POST", body),
+        register: async (payload: I.IRegisterPayload) => {
+            const response = await Loaf("auth/register", "POST", payload);
+            
+        }
     },
 };
