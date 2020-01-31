@@ -49,6 +49,11 @@ export interface IStatusListener {
     listener: () => void;
 }
 
+export interface SignalEncrypted {
+    type: number;
+    body: string;
+}
+
 export interface IRegisterPayload {
     username: string;
     password: string;

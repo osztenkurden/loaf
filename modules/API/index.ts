@@ -15,7 +15,11 @@ export const api = {
         login: (body: {username: string, password: string, machineId: number}) => Loaf("auth/login", "POST", body),
         register: async (payload: I.IRegisterPayload) => {
             const response = await Loaf("auth/register", "POST", payload);
-            
+            //TODO: Add secret token processing for TOTP
+            return response.data || response.success;
         }
     },
+    messages:  {
+      //  
+    }
 };

@@ -61,6 +61,16 @@ export class User {
                  username,
             };
             const result = await api.user.register(payload);
+            if (!result) {
+                return false;
+            }
+
+            // TODO: Mockup for saving user data after register, validate
+
+            const user = result.user;
+
+            storage.setUserId(user.id).saveStoreToFile();
+
             return true;
          } catch (e) {
              console.log(e);

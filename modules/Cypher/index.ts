@@ -1,5 +1,6 @@
 import * as ArrayBuffers from "./../Breadbox/ArrayBuffer";
 import Breadbox from "./../Breadbox/LoafBreadbox";
+import * as I from "./../interface";
 // tslint:disable-next-line:no-var-requires
 const libsignal = require("./../Breadcrumb/libsignal/index");
 
@@ -21,12 +22,20 @@ export default class Cypher {
         const address = new libsignal.SignalProtocolAddress(senderId, machineId);
         const cipher = new libsignal.SessionCipher(this.store, address);
 
+        let decrypted;
+
         if (isFirst) {
             const contentInit = await cipher.decryptPreKeyWhisperMessage(original, "binary");
-            return Buffer.from(contentInit).toString();
+            decrypted = Buffer.from(contentInit).toString();
+        } else {
+            const content = await cipher.decryptWhisperMessage(original, "binary");
+            decrypted = Buffer.from(content).toString();
         }
-        const content = await cipher.decryptWhisperMessage(original, "binary");
-        return Buffer.from(content).toString();
+        try {
+            return <IMessageObjectSending>JSON.parse(decrypted);
+        } catch {
+            return <string>decrypted;
+        }
     }
 
     public async encrypt(message: IMessageObjectSending, recipientId: number, machineId: number, bundle?: any) {
@@ -38,7 +47,7 @@ export default class Cypher {
         }
 
         const cipher = new libsignal.SessionCipher(this.store, address);
-        const ciphered = await cipher.encrypt(content);
+        const ciphered: I.ISignalEncrypted = await cipher.encrypt(content);
         ciphered.body = Buffer.from(ciphered.body, "ucs-2").toString("hex");
         return ciphered;
     }

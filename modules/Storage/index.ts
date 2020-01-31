@@ -40,13 +40,19 @@ export default class Storage {
         this.cypher = new Cypher(this.store);
     }
 
-    public encodeMessage() {
+    public async encodeMessage() {
+        if (!this.cypher) {
+            return null;
+        }
 
         this.saveStoreToFile();
         return this.cypher;
     }
 
-    public decodeMessage() {
+    public async decodeMessage() {
+        if (!this.cypher) {
+            return null;
+        }
 
         this.saveStoreToFile();
         return this.cypher;
@@ -80,7 +86,7 @@ export default class Storage {
     }
 
     /**
-     * Managing storage on user's drive
+     * Saves up-to-date user encryption session to drive
      */
 
     public saveStoreToFile() {
