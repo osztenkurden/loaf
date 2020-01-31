@@ -35,62 +35,23 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 exports.__esModule = true;
-var Machine = __importStar(require("./../Machine"));
-var User_1 = __importDefault(require("./../User"));
-var Loaf = __importStar(require("./handler"));
-exports.start = function () {
-    Loaf.on("getMachineId", function () {
-        var machineId = Machine.getMachineId();
-        return { event: "getMachineId", data: machineId };
+var child_process_1 = require("child_process");
+var path_1 = __importDefault(require("path"));
+exports.generateKeys = function () { return __awaiter(void 0, void 0, void 0, function () {
+    return __generator(this, function (_a) {
+        return [2 /*return*/, new Promise(function (res, rej) {
+                console.log(path_1["default"].join(__dirname, "DiffieHellmanGenerator.js"));
+                var diffieHellman = child_process_1.fork("./dist/modules/Crypto/DiffieHellmanGenerator.js");
+                diffieHellman.on("message", function (msg) {
+                    res(msg.keys);
+                });
+                diffieHellman.on("exit", function () {
+                    rej(null);
+                });
+            })];
     });
-    Loaf.on("createKeys", function () {
-        // TODO: Add child process for creating keys
-        return null;
-    });
-    Loaf.on("getUser", function () {
-        return { event: "user", data: User_1["default"].getUser() };
-    });
-    Loaf.onAsync("authenticateUser", function (authCode) { return __awaiter(void 0, void 0, void 0, function () {
-        var status;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, User_1["default"].authenticate(authCode)];
-                case 1:
-                    status = _a.sent();
-                    return [2 /*return*/, { event: "userStatus", data: status }];
-            }
-        });
-    }); });
-    Loaf.onAsync("logInUser", function (username, password) { return __awaiter(void 0, void 0, void 0, function () {
-        var status;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, User_1["default"].logIn(username, password)];
-                case 1:
-                    status = _a.sent();
-                    return [2 /*return*/, { event: "userStatus", data: status }];
-            }
-        });
-    }); });
-    Loaf.onAsync("loadUser", function () { return __awaiter(void 0, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, User_1["default"].loadUser()];
-                case 1:
-                    _a.sent();
-                    return [2 /*return*/, { event: "user", data: User_1["default"].getUser() }];
-            }
-        });
-    }); });
-};
+}); };

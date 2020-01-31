@@ -35,9 +35,6 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
@@ -46,75 +43,64 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 exports.__esModule = true;
-var Storage_1 = __importDefault(require("../Storage"));
-var API_1 = require("./../API");
-var Machine = __importStar(require("./../Machine"));
-var User = /** @class */ (function () {
-    function User() {
-        this.id = null;
-        this.user = null;
-        this.storage = null;
+var ArrayBuffers = __importStar(require("./../Breadbox/ArrayBuffer"));
+// tslint:disable-next-line:no-var-requires
+var libsignal = require("./../Breadcrumb/libsignal/index");
+var Cypher = /** @class */ (function () {
+    function Cypher(store) {
+        this.store = store;
     }
-    User.prototype.loadUser = function () {
+    Cypher.prototype.decrypt = function (message, senderId, machineId, isFirst) {
+        if (isFirst === void 0) { isFirst = false; }
         return __awaiter(this, void 0, void 0, function () {
-            var user, storage;
+            var original, address, cipher, contentInit, content;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, API_1.api.user.get()];
+                    case 0:
+                        original = Buffer.from(message, "hex").toString("ucs-2");
+                        address = new libsignal.SignalProtocolAddress(senderId, machineId);
+                        cipher = new libsignal.SessionCipher(this.store, address);
+                        if (!isFirst) return [3 /*break*/, 2];
+                        return [4 /*yield*/, cipher.decryptPreKeyWhisperMessage(original, "binary")];
                     case 1:
-                        user = _a.sent();
-                        if (!user) {
-                            return [2 /*return*/, this];
-                        }
-                        this.user = user;
-                        storage = new Storage_1["default"](user.id);
-                        this.storage = storage;
-                        return [2 /*return*/, this];
+                        contentInit = _a.sent();
+                        return [2 /*return*/, Buffer.from(contentInit).toString()];
+                    case 2: return [4 /*yield*/, cipher.decryptWhisperMessage(original, "binary")];
+                    case 3:
+                        content = _a.sent();
+                        return [2 /*return*/, Buffer.from(content).toString()];
                 }
             });
         });
     };
-    User.prototype.logIn = function (username, password) {
+    Cypher.prototype.encrypt = function (message, recipientId, machineId, bundle) {
         return __awaiter(this, void 0, void 0, function () {
-            var result;
+            var content, address, cipher, ciphered;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, API_1.api.user.login({ username: username, password: password, machineId: Machine.getMachineId() })];
+                    case 0:
+                        content = this.encodeMessage(message);
+                        address = new libsignal.SignalProtocolAddress(recipientId, machineId);
+                        if (!bundle) return [3 /*break*/, 2];
+                        return [4 /*yield*/, this.store.createSession(address, bundle)];
                     case 1:
-                        result = _a.sent();
-                        if (!(result.status === 200)) return [3 /*break*/, 3];
-                        return [4 /*yield*/, this.loadUser()];
-                    case 2:
                         _a.sent();
-                        _a.label = 3;
-                    case 3: return [2 /*return*/, result.status];
-                }
-            });
-        });
-    };
-    User.prototype.authenticate = function (authCode) {
-        return __awaiter(this, void 0, void 0, function () {
-            var result;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, API_1.api.user.authenticate(authCode, Machine.getMachineName())];
-                    case 1:
-                        result = _a.sent();
-                        if (!(result.status === 200)) return [3 /*break*/, 3];
-                        return [4 /*yield*/, this.loadUser()];
+                        _a.label = 2;
                     case 2:
-                        _a.sent();
-                        _a.label = 3;
-                    case 3: return [2 /*return*/, result.status];
+                        cipher = new libsignal.SessionCipher(this.store, address);
+                        return [4 /*yield*/, cipher.encrypt(content)];
+                    case 3:
+                        ciphered = _a.sent();
+                        ciphered.body = Buffer.from(ciphered.body, "ucs-2").toString("hex");
+                        return [2 /*return*/, ciphered];
                 }
             });
         });
     };
-    User.prototype.getUser = function () {
-        return this.user;
+    Cypher.prototype.encodeMessage = function (message) {
+        var text = JSON.stringify(message);
+        return ArrayBuffers.create(Buffer.from(text));
     };
-    return User;
+    return Cypher;
 }());
-exports.User = User;
-var localUser = new User();
-exports["default"] = localUser;
+exports["default"] = Cypher;

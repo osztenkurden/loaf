@@ -4,45 +4,24 @@ import React, { Component } from "react";
 import LoafButton from "Theme/Components/LoafButton";
 
 interface IProps {
-    authentication?: boolean;
     togglePage: () => void;
 }
 
 interface IState {
     username: string;
     password: string;
-    authCode: number;
 }
 
-export default class Login extends Component<IProps, IState> {
+export default class Register extends Component<IProps, IState> {
     constructor(props: IProps) {
         super(props);
         this.state = {
-            authCode: 0,
             password: "",
             username: "",
         };
     }
 
     public render() {
-        if (this.props.authentication) {
-            return (
-                <div className="loaf-app-splash">
-                    <div id="login-page">
-                        <TextField
-                            type="number"
-                            className="username-input"
-                            placeholder="Username"
-                            color="primary"
-                            value={this.state.authCode}
-                            onChange={this.handleChange("authCode")}
-                            required
-                        />
-                        <LoafButton main big onClick={this.validate}>Authenticate</LoafButton>
-                    </div>
-                </div>
-            );
-        }
         return (
             <div className="loaf-app-splash">
                 <div id="login-page">
@@ -62,23 +41,19 @@ export default class Login extends Component<IProps, IState> {
                         onChange={this.handleChange("password")}
                         type="password"
                     />
-                    <LoafButton main big onClick={this.logIn}>Login</LoafButton>
-                    <LoafButton big onClick={this.props.togglePage}>Sign Up</LoafButton>
+                    <LoafButton main big onClick={this.register}>Register</LoafButton>
+                    <LoafButton big onClick={this.props.togglePage}>Log In</LoafButton>
                 </div>
             </div>
         );
     }
 
-    private handleChange = (field: "password" | "username" | "authCode") => (e: any) => {
+    private handleChange = (field: "password" | "username") => (e: any) => {
         const value = e.target.value;
         this.setState((state) => ({ ...state, [field]: value }));
     }
 
-    private logIn = () => {
+    private register = () => {
         API.user.logIn(this.state.username, this.state.password);
-    }
-
-    private validate = () => {
-        API.user.authenticate(this.state.authCode);
     }
 }

@@ -22,6 +22,11 @@ const theme = createMuiTheme({
                 width: "34%",
             },
         },
+        MuiButton: {
+            textPrimary: {
+                color: "white",
+            },
+        },
         MuiDivider: {
             inset: {
                 marginRight: "72px",

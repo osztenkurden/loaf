@@ -43,6 +43,10 @@ export class User {
         return result.status;
     }
 
+    public getStorage() {
+        return this.storage;
+    }
+
     public getUser() {
         return this.user;
     }

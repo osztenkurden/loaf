@@ -32,6 +32,14 @@ export default class Storage {
         return this.cypher;
     }
 
+    public getRegistrationId() {
+        return this.store.getLocalRegistrationId();
+    }
+
+    public getIdentityKeyPair() {
+        return this.store.getIdentityKeyPair();
+    }
+
     /*public set(store: string) {
         // this.store = store;
         return this;

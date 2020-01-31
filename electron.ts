@@ -1,5 +1,6 @@
 import { app, App, BrowserWindow, Menu, Tray } from "electron";
 import path from "path";
+import { generateKeys } from "./modules/Crypto/DiffieHellman";
 import * as EventInit from "./modules/EventHandler";
 import * as Machine from "./modules/Machine";
 // import * as Storage from "./storage/storage";
@@ -14,6 +15,12 @@ const startApp = async () => {
     app.setAppUserModelId("com.bakerysoft.loaf");
 
     Machine.checkDirectories();
+
+    generateKeys().then((keys) => {
+        console.log(keys);
+    }).catch((reason) => {
+        console.log(reason);
+    });
 
     const win = new BrowserWindow({
         height: 720,

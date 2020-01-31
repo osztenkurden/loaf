@@ -42,34 +42,7 @@ exports.__esModule = true;
 var LoafAPI_1 = __importDefault(require("./LoafAPI"));
 exports.api = {
     user: {
-        authenticate: function (authcode) { return LoafAPI_1["default"]("auth/auth", "POST", { authcode: authcode }); },
-        fakeLogin: function () { return __awaiter(void 0, void 0, void 0, function () {
-            var loginObject, response, res2, _a, _b;
-            return __generator(this, function (_c) {
-                switch (_c.label) {
-                    case 0:
-                        console.log("PROCEEDING FAKE LOGIN");
-                        loginObject = {
-                            machineId: 1234,
-                            password: "LeMoni@da1",
-                            username: "osztenkurden"
-                        };
-                        return [4 /*yield*/, LoafAPI_1["default"]("auth/login", "POST", loginObject)];
-                    case 1:
-                        response = _c.sent();
-                        console.log(response);
-                        return [4 /*yield*/, LoafAPI_1["default"]("auth/auth", "POST", { authcode: 322343 })];
-                    case 2:
-                        res2 = _c.sent();
-                        console.log(res2);
-                        _b = (_a = console).log;
-                        return [4 /*yield*/, exports.api.user.get()];
-                    case 3:
-                        _b.apply(_a, [_c.sent()]);
-                        return [2 /*return*/];
-                }
-            });
-        }); },
+        authenticate: function (authcode, machineName) { return LoafAPI_1["default"]("auth/auth", "POST", { authcode: authcode, machineName: machineName }); },
         get: function () { return __awaiter(void 0, void 0, void 0, function () {
             var res;
             return __generator(this, function (_a) {

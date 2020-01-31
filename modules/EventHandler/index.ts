@@ -11,12 +11,30 @@ export const start = () => {
 
     Loaf.on("createKeys", () => {
         // TODO: Add child process for creating keys
+
+        // PRETODO: Make sure it is actually necessary to call this from frontend
         return null;
     });
 
     Loaf.on("getUser", () => {
 
         return { event: "user", data: User.getUser() };
+    });
+
+    Loaf.on("getRegistrationId", () => {
+        const storage = User.getStorage();
+        if (!storage) {
+            return { event: "registrationId", data: null };
+        }
+        return { event: "registrationId", data: storage.getRegistrationId() };
+    });
+
+    Loaf.on("getIdentityKey", () => {
+        const storage = User.getStorage();
+        if (!storage) {
+            return { event: "identityKey", data: null };
+        }
+        return { event: "identityKey", data: storage.getIdentityKeyPair() };
     });
 
     Loaf.onAsync("authenticateUser", async (authCode: number) => {
