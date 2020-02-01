@@ -2,6 +2,7 @@ import * as Loaf from "./Loaf";
 
 const api = {
     chats: {
+        accept: (chatId: number) => Loaf.api("acceptChat", false, chatId),
         create: (name: string, users: number[]) => Loaf.api("createGroup", false, name, users),
         get: () => Loaf.api("getChats", false),
     },

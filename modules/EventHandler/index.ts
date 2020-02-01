@@ -11,13 +11,6 @@ export const start = (win: Electron.WebContents) => {
         return { event: "getMachineId", data: machineId };
     });
 
-    Loaf.on("createKeys", () => {
-        // TODO: Add child process for creating keys
-
-        // PRETODO: Make sure it is actually necessary to call this from frontend
-        return null;
-    });
-
     Loaf.on("getUser", () => {
 
         return { event: "user", data: User.getUser() };
@@ -29,6 +22,15 @@ export const start = (win: Electron.WebContents) => {
         await inbox.addFriend(userId);
 
         return { event: "userAdded", data: true };
+    });
+
+    Loaf.onAsync("acceptChat", async (chatId: number) => {
+        const inbox = User.getInbox();
+        const result = await inbox.acceptChat(chatId);
+        if (result) {
+            await inbox.loadChats();
+        }
+        return { event: "acceptInvitation", data: null };
     });
 
     Loaf.onAsync("getChats", async () => {
