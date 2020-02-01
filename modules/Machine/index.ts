@@ -7,6 +7,7 @@ import { generateId } from "./../Breadbox/LoafBreadbox";
 export const directories = {
     db: path.join(app.getPath("userData"), "database"),
     user: app.getPath("userData"),
+    messages: path.join(app.getPath("userData"), "database", "messages"),
 };
 
 export const claimMachine = () => {
