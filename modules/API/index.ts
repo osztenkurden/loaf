@@ -7,6 +7,10 @@ interface IRegisterResponse {
 }
 
 export const api = {
+    inbox: {
+        addFriend: (userId: number) => Loaf("chats?private=true", "POST", { name: "", users: [userId]}),
+        getChats: () => Loaf("chats"),
+    },
     messages:  {
       //
     },

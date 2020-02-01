@@ -48,6 +48,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 exports.__esModule = true;
 var crypto_1 = __importDefault(require("crypto"));
 var thirty_two_1 = __importDefault(require("thirty-two"));
+var Inbox_1 = __importDefault(require("../Inbox"));
 var Storage_1 = __importDefault(require("../Storage"));
 var API_1 = require("./../API");
 var DiffieHellman_1 = require("./../Crypto/DiffieHellman");
@@ -57,7 +58,11 @@ var User = /** @class */ (function () {
         this.id = null;
         this.user = null;
         this.storage = null;
+        this.window = null;
     }
+    User.prototype.assign = function (window) {
+        this.window = window;
+    };
     User.prototype.loadUser = function () {
         return __awaiter(this, void 0, void 0, function () {
             var user;
@@ -73,6 +78,7 @@ var User = /** @class */ (function () {
                         return [4 /*yield*/, this.initStorage(user.id)];
                     case 2:
                         _a.sent();
+                        this.initInbox();
                         /*
                         const storage = new Storage();
                 
@@ -187,11 +193,20 @@ var User = /** @class */ (function () {
             });
         });
     };
+    User.prototype.getInbox = function () {
+        return this.inbox;
+    };
     User.prototype.getStorage = function () {
         return this.storage;
     };
     User.prototype.getUser = function () {
         return this.user;
+    };
+    User.prototype.initInbox = function () {
+        if (!this.inbox) {
+            this.inbox = new Inbox_1["default"](this.window);
+        }
+        return this;
     };
     return User;
 }());

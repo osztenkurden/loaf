@@ -73,7 +73,7 @@ exports.onAsync = function (eventName, handler) {
         });
     });
 };
-exports.send = function (eventName) {
+exports.register = function (eventName) {
     var args = [];
     for (var _i = 1; _i < arguments.length; _i++) {
         args[_i - 1] = arguments[_i];

@@ -1,9 +1,10 @@
-import { generateKeys } from "./../Crypto/DiffieHellman";
 import * as Machine from "./../Machine";
 import User from "./../User";
 import * as Loaf from "./handler";
 
-export const start = () => {
+export const start = (win: Electron.WebContents) => {
+    User.assign(win);
+
     Loaf.on("getMachineId", () => {
         const machineId = Machine.getMachineId();
 
@@ -20,6 +21,21 @@ export const start = () => {
     Loaf.on("getUser", () => {
 
         return { event: "user", data: User.getUser() };
+    });
+
+    Loaf.onAsync("addUser", async (userId: number) => {
+        const inbox = User.getInbox();
+
+        await inbox.addFriend(userId);
+
+        return { event: "userAdded", data: true };
+    });
+
+    Loaf.onAsync("getChats", async () => {
+        const inbox = User.getInbox();
+        await inbox.loadChats();
+
+        return { event: "chatsLoaded", data: true };
     });
 
     Loaf.onAsync("register", async (username: string, password: string, name: string) => {

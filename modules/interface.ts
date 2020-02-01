@@ -22,6 +22,7 @@ export interface IChat {
     private: boolean;
     status: number;
     unread: boolean;
+    messages: IMessage[];
 }
 
 export interface IUser {

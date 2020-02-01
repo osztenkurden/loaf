@@ -5,12 +5,9 @@ import React, { Component } from "react";
 import Announcement from "../Message/Announcement";
 import Message from "../Message/Message";
 import * as I from "./../../../modules/interface";
-import * as Utils from "./../Utils";
 
 interface IProps {
     chat: I.IChat | null;
-    manager: any;
-    messages: I.IMessage[];
 }
 
 interface IState {
@@ -22,32 +19,17 @@ interface IState {
 export default class Chat extends Component<IProps, IState> {
     constructor(props: any) {
         super(props);
-        this.handleChange = this.handleChange.bind(this);
-        this.handleKeyDown = this.handleKeyDown.bind(this);
         this.state = {
             form: {
                 textMessage: "",
             },
         };
     }
-    public handleKeyDown = (e: any) => {
-        if (e.key === "Enter" && this.state.form.textMessage && this.props.chat) {
-            this.props.manager.addMessageToStack(this.state.form.textMessage, this.props.chat.id);
-            this.props.manager.sendMessage(this.state.form.textMessage, this.props.chat.id);
-            this.setState({ form: { textMessage: "" } });
-        }
-    }
-    public handleChange = (e: any) => {
-        const { form } = this.state;
-        const field: "textMessage" = e.target.name;
-        form[field] = e.target.value;
-        this.setState({ form });
-    }
     public render() {
         if (!this.props.chat) {
             return <div className="chat_container">Choose chat</div>;
         }
-        const { chat, messages } = this.props;
+        const { chat } = this.props;
         // console.log(this.props.messages)
         return (
             <div className="chat_container">
@@ -75,13 +57,13 @@ export default class Chat extends Component<IProps, IState> {
                     </Toolbar>
                 </AppBar>
                 <div className={"message_container"}>
-                    { chat.status === 1 || !messages.length ?
+                    { chat.status === 1 || !chat.messages.length ?
                     <Announcement
                         request={chat.status === 1}
                         chat={chat}
                         /* manager={this.props.manager}*/
                     /> : ""}
-                    {chat.status === 2 ? messages.map((message) => <Message message={message} />) : ""}
+                    {chat.status === 2 ? chat.messages.map((message) => <Message message={message} />) : ""}
                 </div>
                 {this.props.chat.status === 2 ? <div className="text_sender">
                     <TextField
@@ -101,16 +83,16 @@ export default class Chat extends Component<IProps, IState> {
             </div>
         );
     }
+    private handleKeyDown = (e: any) => {
+        if (e.key === "Enter" && this.state.form.textMessage && this.props.chat) {
+            // TODO: SEND MESSAGE
+            this.setState({ form: { textMessage: "" } });
+        }
+    }
+    private handleChange = (e: any) => {
+        const { form } = this.state;
+        const field: "textMessage" = e.target.name;
+        form[field] = e.target.value;
+        this.setState({ form });
+    }
 }
-
-/*
-
-          <div onClick={() => {
-            if(this.props.chat) this.props.manager.sendMessage("Dupa", this.props.chat.id)
-          }}>SEND MESSAGE</div>
-
-            {this.state.chats.map((chat: any) => <div>CHAT:{chat.name}, STAT
-            S: {chat.status} {chat.status ===1 ? <div onClick={() => this.acce
-                ptInvitation(chat.id)}>ACCEPT INVITATION</div> : ''}</div>)}
-            <div onClick={() => this.requestFriend(2)}>Add Friend</div>
-            <div onClick={() => this.loadMessages(1)}>Get messages</div>*/

@@ -49,7 +49,8 @@ exports.__esModule = true;
 var Machine = __importStar(require("./../Machine"));
 var User_1 = __importDefault(require("./../User"));
 var Loaf = __importStar(require("./handler"));
-exports.start = function () {
+exports.start = function (win) {
+    User_1["default"].assign(win);
     Loaf.on("getMachineId", function () {
         var machineId = Machine.getMachineId();
         return { event: "getMachineId", data: machineId };
@@ -62,6 +63,32 @@ exports.start = function () {
     Loaf.on("getUser", function () {
         return { event: "user", data: User_1["default"].getUser() };
     });
+    Loaf.onAsync("addUser", function (userId) { return __awaiter(void 0, void 0, void 0, function () {
+        var inbox;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    inbox = User_1["default"].getInbox();
+                    return [4 /*yield*/, inbox.addFriend(userId)];
+                case 1:
+                    _a.sent();
+                    return [2 /*return*/, { event: "userAdded", data: true }];
+            }
+        });
+    }); });
+    Loaf.onAsync("getChats", function () { return __awaiter(void 0, void 0, void 0, function () {
+        var inbox;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    inbox = User_1["default"].getInbox();
+                    return [4 /*yield*/, inbox.loadChats()];
+                case 1:
+                    _a.sent();
+                    return [2 /*return*/, { event: "chatsLoaded", data: true }];
+            }
+        });
+    }); });
     Loaf.onAsync("register", function (username, password, name) { return __awaiter(void 0, void 0, void 0, function () {
         var result;
         return __generator(this, function (_a) {

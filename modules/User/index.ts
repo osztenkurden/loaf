@@ -1,5 +1,6 @@
 import crypto from "crypto";
 import base32 from "thirty-two";
+import Inbox from "../Inbox";
 import * as I from "../interface";
 import Storage from "../Storage";
 import { api } from "./../API";
@@ -10,11 +11,18 @@ export class User {
     private id: number | null;
     private user: I.IUser | null;
     private storage: Storage | null;
+    private inbox: Inbox | null;
+    private window: Electron.WebContents;
 
     constructor() {
         this.id = null;
         this.user = null;
         this.storage = null;
+        this.window = null;
+    }
+
+    public assign(window: Electron.WebContents) {
+        this.window = window;
     }
 
     public async loadUser() {
@@ -26,6 +34,7 @@ export class User {
         this.user = user;
 
         await this.initStorage(user.id);
+        this.initInbox();
         /*
         const storage = new Storage();
 
@@ -102,12 +111,23 @@ export class User {
         return this;
     }
 
+    public getInbox() {
+        return this.inbox;
+    }
+
     public getStorage() {
         return this.storage;
     }
 
     public getUser() {
         return this.user;
+    }
+
+    private initInbox() {
+        if (!this.inbox) {
+            this.inbox = new Inbox(this.window);
+        }
+        return this;
     }
 }
 

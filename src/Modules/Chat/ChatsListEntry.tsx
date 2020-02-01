@@ -1,10 +1,8 @@
 import { Avatar, Divider, IconButton, ListItem, ListItemText } from "@material-ui/core";
-import { CheckCircleRounded } from "@material-ui/icons";
 import moment from "moment";
 import React, { Component } from "react";
 // import * as API from "./api";
 import * as I from "./../../../modules/interface";
-import * as Utils from "./../Utils";
 
 function getSubText(chat: I.IChat) {
     switch (chat.status) {
@@ -19,14 +17,14 @@ function getSubText(chat: I.IChat) {
     }
 }
 
-export default class ChatsListEntry extends Component<{ chat: I.IChat, loadChat: any }, any> {
+export default class ChatsListEntry extends Component<{ chat: I.IChat, loadChat: (chat: I.IChat) => void }, any> {
     public render() {
         const { chat } = this.props;
         return (
             <div>
                 <ListItem button
                     className={"chat-button " + (chat.unread ? "new-message" : "")}
-                    onClick={() => this.props.loadChat(chat.id)}
+                    onClick={() => this.props.loadChat(chat)}
                 >
                     {/*chat.image ?
                     <Avatar src={API.config.apiUrl + "chats/image?chatId=" + chat.id} className="avatar"/> :

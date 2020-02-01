@@ -27,7 +27,6 @@ export default class App extends React.Component<any, IState> {
 
     public componentDidMount() {
         Loaf.on("user", (user: I.IUser) => {
-            // console.log(user);
             this.setState({user, loading: false});
         });
         Loaf.on("userStatus", (status: number) => {
@@ -45,7 +44,7 @@ export default class App extends React.Component<any, IState> {
             return <Splash />;
         }
         if (user) {
-            return <Main cxt={user} />;
+            return <Main />;
         }
         if (register) {
             return <Register togglePage={this.togglePage} />;
@@ -57,7 +56,6 @@ export default class App extends React.Component<any, IState> {
         const loggedInUser = api.user.get();
 
         if (loggedInUser) {
-            // console.log(loggedInUser);
             return this.setState({ user: loggedInUser, loading: false});
         }
         api.user.load();

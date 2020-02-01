@@ -101,7 +101,7 @@ var startApp = function () { return __awaiter(void 0, void 0, void 0, function (
             }
             return false;
         });
-        EventInit.start();
+        EventInit.start(win.webContents);
         return [2 /*return*/];
     });
 }); };

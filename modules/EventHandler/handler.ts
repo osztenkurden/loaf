@@ -21,6 +21,6 @@ export const onAsync  = (eventName: string, handler: (...args: any[]) => Promise
     });
 };
 
-export const send = (eventName: string, ...args: any[]) => {
+export const register = (eventName: string, ...args: any[]) => {
     return ipcMain.emit(eventName, args);
 };
