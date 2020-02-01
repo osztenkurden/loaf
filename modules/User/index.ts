@@ -124,8 +124,8 @@ export class User {
     }
 
     private initInbox() {
-        if (!this.inbox) {
-            this.inbox = new Inbox(this.window);
+        if (!this.inbox && this.user.id) {
+            this.inbox = new Inbox(this.window, this.user.id, this.storage);
         }
         return this;
     }

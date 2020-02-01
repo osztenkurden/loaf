@@ -8,8 +8,10 @@ interface IRegisterResponse {
 
 export const api = {
     inbox: {
+        accept: (payload: any) => Loaf("chats/users", "PATCH", { messages: payload, chatId: payload.chatId}),
         addFriend: (userId: number) => Loaf("chats?private=true", "POST", { name: "", users: [userId]}),
         getChats: () => Loaf("chats"),
+        getReceivers: (chatId: number) => Loaf(`machines/${chatId}`),
     },
     messages:  {
       //
@@ -23,6 +25,7 @@ export const api = {
             }
             return null;
         },
+        getBundle: (userId: number) => Loaf("keys/bundle", "POST", { userId }),
         // tslint:disable-next-line:max-line-length
         login: (body: {username: string, password: string, machineId: number}) => Loaf("auth/login", "POST", body),
         register: async (payload: I.IRegisterPayload) => {

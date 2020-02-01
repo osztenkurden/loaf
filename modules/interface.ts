@@ -55,6 +55,11 @@ export interface ISignalEncrypted {
     body: string;
 }
 
+export interface IMachine {
+    userId: number;
+    machineId: number;
+}
+
 export interface IRegisterPayload {
     machineId: number;
     username: string;
