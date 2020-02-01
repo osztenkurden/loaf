@@ -1,7 +1,15 @@
 import * as I from "./../interface";
 import Loaf from "./LoafAPI";
 
+interface IRegisterResponse {
+    publicKey: Buffer;
+    id: number;
+}
+
 export const api = {
+    messages:  {
+      //
+    },
     user: {
         authenticate: (authcode: number, machineName: string) => Loaf("auth/auth", "POST", { authcode, machineName }),
         get: async (): Promise<I.IUser | null> => {
@@ -15,11 +23,13 @@ export const api = {
         login: (body: {username: string, password: string, machineId: number}) => Loaf("auth/login", "POST", body),
         register: async (payload: I.IRegisterPayload) => {
             const response = await Loaf("auth/register", "POST", payload);
-            //TODO: Add secret token processing for TOTP
-            return response.data || response.success;
-        }
+            if (!response.success) {
+                return null;
+            }
+            if (response.data && response.data.publicKey) {
+                response.data.publicKey = Buffer.from(response.data.publicKey, "hex");
+            }
+            return response.data as IRegisterResponse;
+        },
     },
-    messages:  {
-      //  
-    }
 };

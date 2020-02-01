@@ -41,6 +41,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 exports.__esModule = true;
 var LoafAPI_1 = __importDefault(require("./LoafAPI"));
 exports.api = {
+    messages: {
+    //
+    },
     user: {
         authenticate: function (authcode, machineName) { return LoafAPI_1["default"]("auth/auth", "POST", { authcode: authcode, machineName: machineName }); },
         get: function () { return __awaiter(void 0, void 0, void 0, function () {
@@ -58,6 +61,23 @@ exports.api = {
             });
         }); },
         // tslint:disable-next-line:max-line-length
-        login: function (body) { return LoafAPI_1["default"]("auth/login", "POST", body); }
+        login: function (body) { return LoafAPI_1["default"]("auth/login", "POST", body); },
+        register: function (payload) { return __awaiter(void 0, void 0, void 0, function () {
+            var response;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, LoafAPI_1["default"]("auth/register", "POST", payload)];
+                    case 1:
+                        response = _a.sent();
+                        if (!response.success) {
+                            return [2 /*return*/, null];
+                        }
+                        if (response.data && response.data.publicKey) {
+                            response.data.publicKey = Buffer.from(response.data.publicKey, "hex");
+                        }
+                        return [2 /*return*/, response.data];
+                }
+            });
+        }); }
     }
 };

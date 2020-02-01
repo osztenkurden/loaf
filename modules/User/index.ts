@@ -1,7 +1,9 @@
-import { generateKeys } from "./../Crypto/DiffieHellman";
+import crypto from "crypto";
+import base32 from "thirty-two";
 import * as I from "../interface";
 import Storage from "../Storage";
 import { api } from "./../API";
+import { generateKeys } from "./../Crypto/DiffieHellman";
 import * as Machine from "./../Machine";
 
 export class User {
@@ -54,6 +56,7 @@ export class User {
                      prime: keys.prime,
                      public: keys.public,
                  },
+                 machineId: Machine.getMachineId(),
                  password,
                  preKeys: storage.getPreKeys(),
                  registrationId: storage.getRegistrationId(),
@@ -65,15 +68,20 @@ export class User {
                 return false;
             }
 
-            // TODO: Mockup for saving user data after register, validate
-
-            const user = result.user;
+            const user = result;
 
             storage.setUserId(user.id).saveStoreToFile();
 
-            return true;
+            const diffieHellman = crypto.createDiffieHellman(keys.prime, "hex", keys.gen, "hex");
+            diffieHellman.setPrivateKey(keys.private, "hex");
+            diffieHellman.setPublicKey(keys.public, "hex");
+
+            const secret = diffieHellman.computeSecret(user.publicKey);
+
+            const token = base32.encode(secret).toString().replace(/=/g, "");
+
+            return token;
          } catch (e) {
-             console.log(e);
              return false;
          }
     }

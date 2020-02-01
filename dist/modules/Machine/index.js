@@ -25,7 +25,7 @@ exports.claimMachine = function () {
     fs.writeFileSync(path.join(exports.directories.user, "machine.loaf"), JSON.stringify(content));
 };
 exports.checkDirectories = function () {
-    Object.keys(exports.directories).forEach(function (dir) {
+    Object.values(exports.directories).forEach(function (dir) {
         if (!fs.existsSync(dir)) {
             fs.mkdirSync(dir);
         }

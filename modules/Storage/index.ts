@@ -91,10 +91,11 @@ export default class Storage {
 
     public saveStoreToFile() {
         const storePath = this.getStorePath();
-        if (!fs.existsSync(storePath)) {
+        if (!fs.existsSync(storePath) && !this.userId) {
             return this;
+        } else if (!fs.existsSync(storePath) && this.userId) {
+            this.createStoreFile();
         }
-
         fs.writeFileSync(storePath, this.store.getStore(), "utf8");
         return this;
     }

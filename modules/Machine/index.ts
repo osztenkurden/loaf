@@ -17,7 +17,7 @@ export const claimMachine = () => {
 };
 
 export const checkDirectories = () => {
-    Object.keys(directories).forEach((dir) => {
+    Object.values(directories).forEach((dir) => {
         if (!fs.existsSync(dir)) {
             fs.mkdirSync(dir);
         }

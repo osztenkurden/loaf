@@ -24,7 +24,7 @@ export const start = () => {
 
     Loaf.onAsync("register", async (username: string, password: string, name: string) => {
         const result = await User.register(username, password, name);
-        
+
         return { event: "userCreated", data: result };
     });
 

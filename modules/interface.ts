@@ -49,12 +49,13 @@ export interface IStatusListener {
     listener: () => void;
 }
 
-export interface SignalEncrypted {
+export interface ISignalEncrypted {
     type: number;
     body: string;
 }
 
 export interface IRegisterPayload {
+    machineId: number;
     username: string;
     password: string;
     firstName: string;
@@ -65,10 +66,10 @@ export interface IRegisterPayload {
         prime: string;
         public: string;
     };
-    preKeys: {
+    preKeys: Array<{
         pubKey: string;
         keyId: number;
-    }[];
+    }>;
     signedPreKey: {
         pubKey: string;
         signature: string;

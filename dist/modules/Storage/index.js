@@ -90,12 +90,26 @@ var Storage = /** @class */ (function () {
         });
     };
     Storage.prototype.encodeMessage = function () {
-        this.saveStoreToFile();
-        return this.cypher;
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                if (!this.cypher) {
+                    return [2 /*return*/, null];
+                }
+                this.saveStoreToFile();
+                return [2 /*return*/, this.cypher];
+            });
+        });
     };
     Storage.prototype.decodeMessage = function () {
-        this.saveStoreToFile();
-        return this.cypher;
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                if (!this.cypher) {
+                    return [2 /*return*/, null];
+                }
+                this.saveStoreToFile();
+                return [2 /*return*/, this.cypher];
+            });
+        });
     };
     Storage.prototype.setUserId = function (id) {
         if (this.userId) {
@@ -120,12 +134,15 @@ var Storage = /** @class */ (function () {
         return this.store.getSignedPreKey();
     };
     /**
-     * Managing storage on user's drive
+     * Saves up-to-date user encryption session to drive
      */
     Storage.prototype.saveStoreToFile = function () {
         var storePath = this.getStorePath();
-        if (!fs.existsSync(storePath)) {
+        if (!fs.existsSync(storePath) && !this.userId) {
             return this;
+        }
+        else if (!fs.existsSync(storePath) && this.userId) {
+            this.createStoreFile();
         }
         fs.writeFileSync(storePath, this.store.getStore(), "utf8");
         return this;

@@ -46,8 +46,11 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 exports.__esModule = true;
+var crypto_1 = __importDefault(require("crypto"));
+var thirty_two_1 = __importDefault(require("thirty-two"));
 var Storage_1 = __importDefault(require("../Storage"));
 var API_1 = require("./../API");
+var DiffieHellman_1 = require("./../Crypto/DiffieHellman");
 var Machine = __importStar(require("./../Machine"));
 var User = /** @class */ (function () {
     function User() {
@@ -96,6 +99,56 @@ var User = /** @class */ (function () {
                         _a.sent();
                         _a.label = 3;
                     case 3: return [2 /*return*/, result.status];
+                }
+            });
+        });
+    };
+    User.prototype.register = function (username, password, firstName) {
+        return __awaiter(this, void 0, void 0, function () {
+            var keys, storage, payload, result, user, diffieHellman, secret, token, e_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 4, , 5]);
+                        return [4 /*yield*/, DiffieHellman_1.generateKeys()];
+                    case 1:
+                        keys = _a.sent();
+                        return [4 /*yield*/, this.initStorage()];
+                    case 2:
+                        storage = (_a.sent()).getStorage();
+                        payload = {
+                            firstName: firstName,
+                            identityKey: storage.getIdentityKeyPair().pubKey,
+                            keys: {
+                                generator: keys.gen,
+                                prime: keys.prime,
+                                public: keys.public
+                            },
+                            machineId: Machine.getMachineId(),
+                            password: password,
+                            preKeys: storage.getPreKeys(),
+                            registrationId: storage.getRegistrationId(),
+                            signedPreKey: storage.getSignedPreKey(),
+                            username: username
+                        };
+                        return [4 /*yield*/, API_1.api.user.register(payload)];
+                    case 3:
+                        result = _a.sent();
+                        if (!result) {
+                            return [2 /*return*/, false];
+                        }
+                        user = result;
+                        storage.setUserId(user.id).saveStoreToFile();
+                        diffieHellman = crypto_1["default"].createDiffieHellman(keys.prime, "hex", keys.gen, "hex");
+                        diffieHellman.setPrivateKey(keys.private, "hex");
+                        diffieHellman.setPublicKey(keys.public, "hex");
+                        secret = diffieHellman.computeSecret(user.publicKey);
+                        token = thirty_two_1["default"].encode(secret).toString().replace(/=/g, "");
+                        return [2 /*return*/, token];
+                    case 4:
+                        e_1 = _a.sent();
+                        return [2 /*return*/, false];
+                    case 5: return [2 /*return*/];
                 }
             });
         });

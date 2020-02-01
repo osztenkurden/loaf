@@ -30,7 +30,7 @@
     "request": "^2.88.0",
     "socket.io": "^2.3.0",
     "socket.io-client": "^2.3.0",
-    "thirty-two": "^1.0.2",
+    "thirty-two": "github:osztenkurden/thirty-two#master",
     "typescript": "^3.7.2",
     "util": "^0.12.1",
     "uuid": "^3.3.3"

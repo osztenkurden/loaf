@@ -53,7 +53,7 @@ var Cypher = /** @class */ (function () {
     Cypher.prototype.decrypt = function (message, senderId, machineId, isFirst) {
         if (isFirst === void 0) { isFirst = false; }
         return __awaiter(this, void 0, void 0, function () {
-            var original, address, cipher, contentInit, content;
+            var original, address, cipher, decrypted, contentInit, content;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -64,11 +64,21 @@ var Cypher = /** @class */ (function () {
                         return [4 /*yield*/, cipher.decryptPreKeyWhisperMessage(original, "binary")];
                     case 1:
                         contentInit = _a.sent();
-                        return [2 /*return*/, Buffer.from(contentInit).toString()];
+                        decrypted = Buffer.from(contentInit).toString();
+                        return [3 /*break*/, 4];
                     case 2: return [4 /*yield*/, cipher.decryptWhisperMessage(original, "binary")];
                     case 3:
                         content = _a.sent();
-                        return [2 /*return*/, Buffer.from(content).toString()];
+                        decrypted = Buffer.from(content).toString();
+                        _a.label = 4;
+                    case 4:
+                        try {
+                            return [2 /*return*/, JSON.parse(decrypted)];
+                        }
+                        catch (_b) {
+                            return [2 /*return*/, decrypted];
+                        }
+                        return [2 /*return*/];
                 }
             });
         });

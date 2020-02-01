@@ -1,6 +1,5 @@
 import { app, App, BrowserWindow, Menu, Tray } from "electron";
 import path from "path";
-import { generateKeys } from "./modules/Crypto/DiffieHellman";
 import * as EventInit from "./modules/EventHandler";
 import * as Machine from "./modules/Machine";
 // import * as Storage from "./storage/storage";

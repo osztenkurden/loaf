@@ -32,9 +32,9 @@ export default class Cypher {
             decrypted = Buffer.from(content).toString();
         }
         try {
-            return <IMessageObjectSending>JSON.parse(decrypted);
+            return JSON.parse(decrypted) as IMessageObjectSending;
         } catch {
-            return <string>decrypted;
+            return decrypted as string;
         }
     }
 
