@@ -1,9 +1,12 @@
 import * as Machine from "./../Machine";
 import User from "./../User";
 import * as Loaf from "./handler";
+import * as I from "./../interface";
 
 export const start = (win: Electron.WebContents) => {
     User.assign(win);
+
+    // TODO: remove unnecessary event responses
 
     Loaf.on("getMachineId", () => {
         const machineId = Machine.getMachineId();
@@ -39,6 +42,12 @@ export const start = (win: Electron.WebContents) => {
 
         return { event: "chatsLoaded", data: true };
     });
+
+    Loaf.onAsync("sendMessage", async (chatId: number, message: I.IMessageContent) => {
+        const inbox = User.getInbox();
+        await inbox.sendToChat(chatId, message);
+        return null;
+    })
 
     Loaf.onAsync("register", async (username: string, password: string, name: string) => {
         const result = await User.register(username, password, name);

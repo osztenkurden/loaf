@@ -47,6 +47,7 @@ export interface IMessage {
     id?: number;
     senderId: number;
     content: IMessageContent;
+    chatId: number;
     my: boolean;
     date: string;
 }

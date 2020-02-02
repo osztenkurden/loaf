@@ -49,12 +49,29 @@ export default class Inbox {
         return this;
     }
 
-    public async sendMessage(msg: I.IMessagePayload, bundle?: I.IPreKeyBundle) {
+    public async sendToChat(chatId: number, msg: I.IMessageContent) {
+        const receivers = await this.getReceivers(chatId);
+        const entries: I.ISignalEncrypted[] = [];
+        for (const receiver of receivers) {
+            const payload: I.IMessagePayload = {
+                content: msg,
+                recipientId: receiver.userId,
+                machineId: receiver.machineId,
+            }
+            const entry = await this.prepareMessage(payload);
+            entries.push(entry);
+        }
 
-        const cypher = await this.storage.encodeMessage(msg.content, msg.recipientId, msg.machineId, bundle);
+        const result = await api.messages.send(chatId, entries, Machine.getMachineId());
 
-        // TODO: Send the encoded message to server
-        return true;
+        return result;
+    }
+
+    public async prepareMessage(msg: I.IMessagePayload, bundle?: I.IPreKeyBundle) {
+
+        const encrypted = await this.storage.encodeMessage(msg.content, msg.recipientId, msg.machineId, bundle);
+
+        return encrypted;
     }
 
     public async acceptChat(chatId: number) {

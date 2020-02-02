@@ -1,7 +1,7 @@
 
 import { AppBar, Avatar, ListItem, ListItemText, TextField, Toolbar } from "@material-ui/core";
 import React, { Component } from "react";
-// import * as API from './api';
+import api, * as API from './../../API';
 import Announcement from "../Message/Announcement";
 import Message from "../Message/Message";
 import * as I from "./../../../modules/interface";
@@ -65,7 +65,7 @@ export default class Chat extends Component<IProps, IState> {
                     /> : ""}
                     {chat.status === 2 ? chat.messages.map((message) => <Message message={message} />) : ""}
                 </div>
-                {this.props.chat.status === 2 ? <div className="text_sender">
+                {chat.status === 2 ? <div className="text_sender">
                     <TextField
                         onChange={this.handleChange}
                         name="textMessage"
@@ -86,6 +86,8 @@ export default class Chat extends Component<IProps, IState> {
     private handleKeyDown = (e: any) => {
         if (e.key === "Enter" && this.state.form.textMessage && this.props.chat) {
             // TODO: SEND MESSAGE
+            const content = this.state.form.textMessage;
+            api.message.send(this.props.chat.id, { type: "text", content });
             this.setState({ form: { textMessage: "" } });
         }
     }

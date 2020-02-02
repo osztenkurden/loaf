@@ -1,4 +1,5 @@
 import * as Loaf from "./Loaf";
+import * as I from "../../modules/interface";
 
 const api = {
     chats: {
@@ -7,7 +8,7 @@ const api = {
         get: () => Loaf.api("getChats", false),
     },
     message: {
-        send: (chatId: number, message: object) => Loaf.api("sendMessage", false, chatId, message),
+        send: (chatId: number, message: I.IMessageContent) => Loaf.api("sendMessage", false, chatId, message),
     },
     user: {
         add: (userId: number) => Loaf.api("addUser", false, userId),

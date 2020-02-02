@@ -130,7 +130,9 @@ export default class Storage {
         if (!bundle) {
             return false;
         }
-        const message = await cypher.encrypt({ type: "text", content: "Hello there!" }, userId, machineId, bundle);
+        const msg: I.IMessageContent = { type: "text", content: "Hello there!" };
+        const message = await this.encodeMessage(msg, userId, machineId, bundle);
+        
         return {
             content: message.body,
             machineId,

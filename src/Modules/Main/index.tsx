@@ -32,6 +32,15 @@ export default class Main extends Component<{}, IState> {
         Loaf.on("chats", (chats: I.IChat[]) => {
             this.setState({ chats });
         });
+        Loaf.on("messages", (messages: I.IMessage[], chatId: number, isNew?: boolean) => {
+            const chats = this.state.chats.map((chat) => {
+                if (chat.id !== chatId) {
+                    return chat;
+                }
+                chat.messages = messages;
+                return chat;
+            });
+        })
         api.chats.get();
     }
     public requestTestFriend = async () => {
