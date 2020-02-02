@@ -5,10 +5,48 @@ export interface IEventResponseObject {
 
 export type IEventResponse = IEventResponseObject | null;
 
+export interface IPreKeyBundle {
+    registrationId: number;
+    identityKey: ArrayBuffer;
+    signedPreKey: {
+        keyId: number;
+        publicKey: ArrayBuffer;
+        signature: ArrayBuffer;
+    },
+    preKey: {
+        keyId: number;
+        publicKey: ArrayBuffer;
+    }
+}
+
+export interface IMessagePayload {
+    content: IMessageContent;
+    recipientId: number;
+    machineId: number;
+}
+
+export interface IMessageContent {
+    type: "text",
+    content: string
+}
+
+export interface IMessageRaw {
+    id: number;
+    senderId: number;
+    recipientId: number;
+    chatId: number;
+    content: string;
+    type: number;
+    machineId: number;
+    read: boolean;
+    senderMachine: number;
+    entry: boolean;
+}
+
 export interface IMessage {
     id?: number;
     senderId: number;
-    content: any;
+    content: IMessageContent;
     my: boolean;
     date: string;
 }

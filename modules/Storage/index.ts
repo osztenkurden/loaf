@@ -42,22 +42,26 @@ export default class Storage {
         this.cypher = new Cypher(this.store);
     }
 
-    public async encodeMessage() {
+    public async encodeMessage(message: I.IMessageContent, recipientId: number, machineId: number, bundle?: any) {
         if (!this.cypher) {
             return null;
         }
 
+        const encrypted = await this.cypher.encrypt(message, recipientId, machineId, bundle);
+
         this.saveStoreToFile();
-        return this.cypher;
+        return encrypted;
     }
 
-    public async decodeMessage() {
+    public async decodeMessage(message: I.IMessageRaw) {
         if (!this.cypher) {
             return null;
         }
 
+        const content = await this.cypher.decrypt(message.content, message.senderId, message.senderMachine, message.type === 3);
+
         this.saveStoreToFile();
-        return this.cypher;
+        return content;
     }
 
     public setUserId(id: number) {
@@ -106,6 +110,14 @@ export default class Storage {
         return this.store;
     }
 
+    public async getUserBundle(userId: number) {
+        const response = await api.user.getBundle(userId);
+        if (!response || !response.data) {
+            return null;
+        }
+        return response.data as I.IPreKeyBundle;
+    }
+
     public async createSession(machine: I.IMachine) {
         const { store, cypher } = this;
         const { userId, machineId } = machine;
@@ -114,11 +126,7 @@ export default class Storage {
             return true;
         }
 
-        const response = await api.user.getBundle(userId);
-        if (!response || !response.data) {
-            return false;
-        }
-        const bundle = response.data;
+        const bundle = await this.getUserBundle(userId);
         if (!bundle) {
             return false;
         }

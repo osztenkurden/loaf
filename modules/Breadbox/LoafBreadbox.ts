@@ -1,3 +1,4 @@
+import * as I from "./../interface";
 import * as Keys from "./Keys";
 // import util from "util";
 
@@ -157,7 +158,7 @@ class LoafBreadbox {
         return this.remove(`25519KeysignedKey${keyId}`);
     }
 
-    public createSession = async (address: any, preKeyBundle: any) => {
+    public createSession = async (address: any, preKeyBundle: I.IPreKeyBundle) => {
         const sessionBuilder = new libsignal.sessionBuilder(this, address);
 
         try {

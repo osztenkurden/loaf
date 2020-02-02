@@ -49,6 +49,14 @@ export default class Inbox {
         return this;
     }
 
+    public async sendMessage(msg: I.IMessagePayload, bundle?: I.IPreKeyBundle) {
+
+        const cypher = await this.storage.encodeMessage(msg.content, msg.recipientId, msg.machineId, bundle);
+
+        // TODO: Send the encoded message to server
+        return true;
+    }
+
     public async acceptChat(chatId: number) {
         const receivers = await this.getReceivers(chatId);
         if (!receivers.length) {
@@ -93,7 +101,3 @@ export default class Inbox {
     }
 
 }
-
-// const localUser = new User();
-
-// export default localUser;

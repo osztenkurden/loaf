@@ -2,10 +2,6 @@ import path from "path";
 import fs from "fs";
 import { directories } from "./../Machine";
 import * as I from "./../interface";
-interface IMessageObjectSending {
-    type: string;
-    content: string;
-}
 
 export default class FileManager {
     userId: number;

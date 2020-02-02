@@ -4,11 +4,6 @@ import * as I from "./../interface";
 // tslint:disable-next-line:no-var-requires
 const libsignal = require("./../Breadcrumb/libsignal/index");
 
-interface IMessageObjectSending {
-    type: string;
-    content: string;
-}
-
 export default class Cypher {
     private store: Breadbox;
 
@@ -32,13 +27,13 @@ export default class Cypher {
             decrypted = Buffer.from(content).toString();
         }
         try {
-            return JSON.parse(decrypted) as IMessageObjectSending;
+            return JSON.parse(decrypted) as I.IMessageContent;
         } catch {
-            return decrypted as string;
+            return null;
         }
     }
 
-    public async encrypt(message: IMessageObjectSending, recipientId: number, machineId: number, bundle?: any) {
+    public async encrypt(message: I.IMessageContent, recipientId: number, machineId: number, bundle?: I.IPreKeyBundle) {
         const content = this.encodeMessage(message);
         const address = new libsignal.SignalProtocolAddress(recipientId, machineId);
 
@@ -52,7 +47,7 @@ export default class Cypher {
         return ciphered;
     }
 
-    private encodeMessage(message: IMessageObjectSending) {
+    private encodeMessage(message: I.IMessageContent) {
         const text = JSON.stringify(message);
         return ArrayBuffers.create(Buffer.from(text));
     }
