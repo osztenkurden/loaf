@@ -1,11 +1,6 @@
 import * as I from "./../interface";
 import Loaf from "./LoafAPI";
 
-interface IRegisterResponse {
-    publicKey: Buffer;
-    id: number;
-}
-
 export const api = {
     inbox: {
         accept: (payload: any) => Loaf("chats/users", "PATCH", { messages: payload, chatId: payload.chatId}),
@@ -36,7 +31,7 @@ export const api = {
             if (response.data && response.data.publicKey) {
                 response.data.publicKey = Buffer.from(response.data.publicKey, "hex");
             }
-            return response.data as IRegisterResponse;
+            return response.data as I.IRegisterResponse;
         },
     },
 };

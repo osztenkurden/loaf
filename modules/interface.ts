@@ -98,6 +98,18 @@ export interface IMachine {
     machineId: number;
 }
 
+export interface IKeyObject {
+    privKey: ArrayBuffer;
+    pubKey: ArrayBuffer;
+    signature?: ArrayBuffer;
+    keyId: number;
+}
+
+export interface IRegisterResponse {
+    publicKey: Buffer;
+    id: number;
+}
+
 export interface IRegisterPayload {
     machineId: number;
     username: string;

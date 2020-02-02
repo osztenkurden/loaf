@@ -30,14 +30,7 @@ function hexToAscii(hex: string) {
     return str;
 }
 
-interface IKeyObject {
-    privKey: ArrayBuffer;
-    pubKey: ArrayBuffer;
-    signature?: ArrayBuffer;
-    keyId: number;
-}
-
-function parseKeyObject(obj: IKeyObject) {
+function parseKeyObject(obj: I.IKeyObject) {
     const response = {
         keyId: obj.keyId,
         pubKey: Keys.toString(obj.pubKey),
