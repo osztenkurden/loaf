@@ -12,11 +12,11 @@ export interface IPreKeyBundle {
         keyId: number;
         publicKey: ArrayBuffer;
         signature: ArrayBuffer;
-    },
+    };
     preKey: {
         keyId: number;
         publicKey: ArrayBuffer;
-    }
+    };
 }
 
 export interface IMessagePayload {
@@ -26,8 +26,8 @@ export interface IMessagePayload {
 }
 
 export interface IMessageContent {
-    type: "text",
-    content: string
+    type: "text";
+    content: string;
 }
 
 export interface IMessageRaw {

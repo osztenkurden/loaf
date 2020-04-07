@@ -2,6 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { api } from "../API";
 import * as I from "../interface";
+import * as Keys from "./../Breadbox/Keys";
 import Breadbox from "./../Breadbox/LoafBreadbox";
 import Cypher from "./../Cypher";
 import * as Machine from "./../Machine";
@@ -53,12 +54,12 @@ export default class Storage {
         return encrypted;
     }
 
-    public async decodeMessage(message: I.IMessageRaw) {
+    public async decodeMessage(msg: I.IMessageRaw): Promise<I.IMessageContent | null> {
         if (!this.cypher) {
             return null;
         }
 
-        const content = await this.cypher.decrypt(message.content, message.senderId, message.senderMachine, message.type === 3);
+        const content = await this.cypher.decrypt(msg.content, msg.senderId, msg.senderMachine, msg.type === 3);
 
         this.saveStoreToFile();
         return content;
@@ -115,13 +116,30 @@ export default class Storage {
         if (!response || !response.data) {
             return null;
         }
-        return response.data as I.IPreKeyBundle;
+        const data = response.data;
+        const signedKeyPair = {
+            keyId: data.signedPreKey.keyId,
+            publicKey: Keys.toArrayBuffer(data.signedPreKey.pubKey),
+            signature: Keys.toArrayBuffer(data.signedPreKey.signature),
+        };
+        const preKeyPair = {
+            keyId: data.preKey.keyId,
+            publicKey: Keys.toArrayBuffer(data.preKey.pubKey),
+        };
+
+        const bundle = {
+            identityKey: Keys.toArrayBuffer(data.identityKey),
+            preKey: preKeyPair,
+            registrationId: data.registrationId,
+            signedPreKey: signedKeyPair,
+        };
+        return bundle as I.IPreKeyBundle;
     }
 
     public async createSession(machine: I.IMachine) {
         const { store, cypher } = this;
         const { userId, machineId } = machine;
-        const session = store.loadSession(`${userId}.${machineId}`);
+        const session = await store.loadSession(`${userId}.${machineId}`);
         if (session) {
             return true;
         }
@@ -132,7 +150,7 @@ export default class Storage {
         }
         const msg: I.IMessageContent = { type: "text", content: "Hello there!" };
         const message = await this.encodeMessage(msg, userId, machineId, bundle);
-        
+
         return {
             content: message.body,
             machineId,

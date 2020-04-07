@@ -9,8 +9,9 @@ export const api = {
         getReceivers: (chatId: number) => Loaf(`machines/${chatId}`),
     },
     messages:  {
-      send: (chatId: number, entries: I.ISignalEncrypted[], senderMachine: number) =>
-        Loaf(`messages/${chatId}`, "POST", {chatId, entries, senderMachine}),
+        get: (chatId: number, machineId: number) => Loaf(`messages/${chatId}?machineId=${machineId}`),
+        send: (chatId: number, entries: I.ISignalEncrypted[], senderMachine: number) =>
+            Loaf(`messages/${chatId}`, "POST", {chatId, entries, senderMachine}),
     },
     user: {
         authenticate: (authcode: number, machineName: string) => Loaf("auth/auth", "POST", { authcode, machineName }),

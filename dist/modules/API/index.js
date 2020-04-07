@@ -42,11 +42,16 @@ exports.__esModule = true;
 var LoafAPI_1 = __importDefault(require("./LoafAPI"));
 exports.api = {
     inbox: {
+        accept: function (payload) { return LoafAPI_1["default"]("chats/users", "PATCH", { messages: payload, chatId: payload.chatId }); },
         addFriend: function (userId) { return LoafAPI_1["default"]("chats?private=true", "POST", { name: "", users: [userId] }); },
-        getChats: function () { return LoafAPI_1["default"]("chats"); }
+        getChats: function () { return LoafAPI_1["default"]("chats"); },
+        getReceivers: function (chatId) { return LoafAPI_1["default"]("machines/" + chatId); }
     },
     messages: {
-    //
+        get: function (chatId, machineId) { return LoafAPI_1["default"]("messages/" + chatId + "?machineId=" + machineId); },
+        send: function (chatId, entries, senderMachine) {
+            return LoafAPI_1["default"]("messages/" + chatId, "POST", { chatId: chatId, entries: entries, senderMachine: senderMachine });
+        }
     },
     user: {
         authenticate: function (authcode, machineName) { return LoafAPI_1["default"]("auth/auth", "POST", { authcode: authcode, machineName: machineName }); },
@@ -64,6 +69,7 @@ exports.api = {
                 }
             });
         }); },
+        getBundle: function (userId) { return LoafAPI_1["default"]("keys/bundle", "POST", { userId: userId }); },
         // tslint:disable-next-line:max-line-length
         login: function (body) { return LoafAPI_1["default"]("auth/login", "POST", body); },
         register: function (payload) { return __awaiter(void 0, void 0, void 0, function () {

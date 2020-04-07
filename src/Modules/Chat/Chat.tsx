@@ -1,10 +1,10 @@
 
 import { AppBar, Avatar, ListItem, ListItemText, TextField, Toolbar } from "@material-ui/core";
 import React, { Component } from "react";
-import api, * as API from './../../API';
 import Announcement from "../Message/Announcement";
 import Message from "../Message/Message";
 import * as I from "./../../../modules/interface";
+import api, * as API from "./../../API";
 
 interface IProps {
     chat: I.IChat | null;

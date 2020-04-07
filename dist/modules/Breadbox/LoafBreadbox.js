@@ -89,6 +89,7 @@ function parseKeyObject(obj) {
     };
     return response;
 }
+exports.parseKeyObject = parseKeyObject;
 var LoafBreadbox = /** @class */ (function () {
     function LoafBreadbox() {
         var _this = this;
@@ -109,10 +110,10 @@ var LoafBreadbox = /** @class */ (function () {
             return defaultValue;
         };
         this.getIdentityKeyPair = function () {
-            return parseKeyObject(_this.get("identityKey"));
+            return Promise.resolve((_this.get("identityKey")));
         };
         this.getLocalRegistrationId = function () {
-            return _this.get("registrationId");
+            return Promise.resolve(_this.get("registrationId"));
         };
         this.remove = function (key) {
             if (key === null || key === undefined)
@@ -128,14 +129,14 @@ var LoafBreadbox = /** @class */ (function () {
             }
             var trusted = _this.get("identityKey" + identifier);
             if (trusted === undefined) {
-                return true;
+                return Promise.resolve(true);
             }
-            return identityKey.toString() === trusted.toString();
+            return Promise.resolve(Buffer.from(identityKey).toString() === Buffer.from(trusted).toString());
         };
         this.loadIdentityKey = function (identifier) {
             if (identifier === null || identifier === undefined)
                 throw new Error("Tried to get identity key for undefined/null key");
-            return _this.get("identityKey" + identifier);
+            return Promise.resolve(_this.get("identityKey" + identifier));
         };
         this.saveIdentity = function (identifier, identityKey) {
             if (identifier === null || identifier === undefined)
@@ -144,51 +145,53 @@ var LoafBreadbox = /** @class */ (function () {
             var existing = _this.get("identityKey" + address.getName());
             _this.put("identityKey" + address.getName(), identityKey);
             if (existing && identityKey.toString() !== existing.toString()) {
-                return true;
+                return Promise.resolve(true);
             }
-            return false;
+            return Promise.resolve(false);
         };
         this.loadPreKey = function (keyId) {
             var res = _this.get("25519KeypreKey" + keyId);
             if (res !== undefined) {
                 return { pubKey: res.pubKey, privKey: res.privKey };
             }
-            return res;
+            return Promise.resolve(res);
         };
         this.storePreKey = function (keyId, keyPair) {
-            return _this.put("25519KeypreKey" + keyId, keyPair);
+            return Promise.resolve(_this.put("25519KeypreKey" + keyId, keyPair));
         };
         this.removePreKey = function (keyId) {
-            return _this.remove("25519KeypreKey" + keyId);
+            return Promise.resolve(_this.remove("25519KeypreKey" + keyId));
         };
         this.loadSignedPreKey = function (keyId) {
             var res = _this.get("25519KeysignedKey" + keyId);
             if (res !== undefined) {
                 return { pubKey: res.pubKey, privKey: res.privKey, signature: res.signature };
             }
-            return res;
+            return Promise.resolve(res);
         };
         this.storeSignedPreKey = function (keyId, keyPair) {
-            return _this.put("25519KeysignedKey" + keyId, keyPair);
+            return Promise.resolve(_this.put("25519KeysignedKey" + keyId, keyPair));
         };
         this.removeSignedPreKey = function (keyId) {
-            return _this.remove("25519KeysignedKey" + keyId);
+            return Promise.resolve(_this.remove("25519KeysignedKey" + keyId));
         };
         this.createSession = function (address, preKeyBundle) { return __awaiter(_this, void 0, void 0, function () {
-            var sessionBuilder, _a;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
+            var sessionBuilder, e_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
                     case 0:
-                        sessionBuilder = new libsignal.sessionBuilder(this, address);
-                        _b.label = 1;
+                        sessionBuilder = new libsignal.SessionBuilder(this, address);
+                        _a.label = 1;
                     case 1:
-                        _b.trys.push([1, 3, , 4]);
+                        _a.trys.push([1, 3, , 4]);
                         return [4 /*yield*/, sessionBuilder.processPreKey(preKeyBundle)];
                     case 2:
-                        _b.sent();
+                        _a.sent();
                         return [2 /*return*/, true];
                     case 3:
-                        _a = _b.sent();
+                        e_1 = _a.sent();
+                        console.error("ERROR");
+                        console.error(e_1);
                         return [2 /*return*/, false];
                     case 4: return [2 /*return*/];
                 }
@@ -215,28 +218,30 @@ var LoafBreadbox = /** @class */ (function () {
                         i = 0;
                         _a.label = 1;
                     case 1:
-                        if (!(i < preKeysAmount)) return [3 /*break*/, 4];
+                        if (!(i < preKeysAmount)) return [3 /*break*/, 5];
                         return [4 /*yield*/, keyHelper.generatePreKey(randomIds[i])];
                     case 2:
                         preKey = _a.sent();
                         preKeys.push(preKey);
-                        this.storePreKey(preKey.keyId, __assign(__assign({}, preKey.keyPair), { keyId: preKey.keyId }));
-                        _a.label = 3;
+                        return [4 /*yield*/, this.storePreKey(preKey.keyId, __assign(__assign({}, preKey.keyPair), { keyId: preKey.keyId }))];
                     case 3:
+                        _a.sent();
+                        _a.label = 4;
+                    case 4:
                         i++;
                         return [3 /*break*/, 1];
-                    case 4: return [2 /*return*/, preKeys];
+                    case 5: return [2 /*return*/, preKeys];
                 }
             });
         }); };
         this.loadSession = function (identifier) {
-            return _this.get("session" + identifier);
+            return Promise.resolve(_this.get("session" + identifier));
         };
         this.storeSession = function (identifier, record) {
-            return _this.put("session" + identifier, record);
+            return Promise.resolve(_this.put("session" + identifier, record));
         };
         this.removeSession = function (identifier) {
-            return _this.remove("session" + identifier);
+            return Promise.resolve(_this.remove("session" + identifier));
         };
         this.removeAllSessions = function (identifier) {
             for (var id in _this.store) {
@@ -244,6 +249,7 @@ var LoafBreadbox = /** @class */ (function () {
                     delete _this.store[id];
                 }
             }
+            return Promise.resolve();
         };
         this.isValidKeyPair = function (keyPair) {
             return (keyPair.pubKey && keyPair.privKey
@@ -270,7 +276,7 @@ var LoafBreadbox = /** @class */ (function () {
                         };
                         _this.put(i, inStoreKeyPair);
                     }
-                    else if (typeof store[i] === "string" && (i.startsWith("identityKey") || i.startsWith("session"))) {
+                    else if (i.startsWith("session")) {
                         _this.put(i, store[i]);
                     }
                     else if (i === "registrationId" && Number.isInteger(store[i])) {
@@ -357,7 +363,10 @@ var LoafBreadbox = /** @class */ (function () {
                         signedPreKey = __assign({ keyId: signedPreKeys.keyId, signature: signedPreKeys.signature }, signedPreKeys.keyPair);
                         this.put("identityKey", identityKeyPair);
                         this.put("registrationId", registrationId);
-                        this.storeSignedPreKey(signedPreKey.keyId, signedPreKey);
+                        console.log(this.store);
+                        return [4 /*yield*/, this.storeSignedPreKey(signedPreKey.keyId, signedPreKey)];
+                    case 5:
+                        _a.sent();
                         return [2 /*return*/];
                 }
             });

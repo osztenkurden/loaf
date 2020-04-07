@@ -17,7 +17,8 @@ var path = __importStar(require("path"));
 var LoafBreadbox_1 = require("./../Breadbox/LoafBreadbox");
 exports.directories = {
     db: path.join(electron_1.app.getPath("userData"), "database"),
-    user: electron_1.app.getPath("userData")
+    user: electron_1.app.getPath("userData"),
+    messages: path.join(electron_1.app.getPath("userData"), "database", "messages")
 };
 exports.claimMachine = function () {
     var machineId = LoafBreadbox_1.generateId()[0];

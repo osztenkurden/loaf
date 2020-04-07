@@ -30,7 +30,7 @@ function hexToAscii(hex: string) {
     return str;
 }
 
-function parseKeyObject(obj: I.IKeyObject) {
+export function parseKeyObject(obj: I.IKeyObject) {
     const response = {
         keyId: obj.keyId,
         pubKey: Keys.toString(obj.pubKey),
@@ -71,12 +71,12 @@ class LoafBreadbox {
         return defaultValue;
     }
 
-    public getIdentityKeyPair = () => {
-        return parseKeyObject(this.get("identityKey"));
+    public getIdentityKeyPair = (): Promise<I.IKeyObject> => {
+        return Promise.resolve((this.get("identityKey")));
     }
 
-    public getLocalRegistrationId = () => {
-        return this.get("registrationId");
+    public getLocalRegistrationId = (): Promise<any> => {
+        return Promise.resolve(this.get("registrationId"));
     }
 
     public remove = (key: string) => {
@@ -94,15 +94,15 @@ class LoafBreadbox {
         }
         const trusted = this.get(`identityKey${identifier}`);
         if (trusted === undefined) {
-            return true;
+            return Promise.resolve(true);
         }
-        return identityKey.toString() === trusted.toString();
+        return Promise.resolve(Buffer.from(identityKey).toString() === Buffer.from(trusted).toString());
     }
 
     public loadIdentityKey = (identifier: string) => {
         if (identifier === null || identifier === undefined)
             throw new Error("Tried to get identity key for undefined/null key");
-        return this.get(`identityKey${identifier}`);
+        return Promise.resolve(this.get(`identityKey${identifier}`));
     }
 
     public saveIdentity = (identifier: string, identityKey: ArrayBuffer) => {
@@ -114,9 +114,9 @@ class LoafBreadbox {
         this.put(`identityKey${address.getName()}`, identityKey);
 
         if (existing && identityKey.toString() !== existing.toString()) {
-            return true;
+            return Promise.resolve(true);
         }
-        return false;
+        return Promise.resolve(false);
     }
 
     public loadPreKey = (keyId: string) => {
@@ -124,15 +124,15 @@ class LoafBreadbox {
         if (res !== undefined) {
             return { pubKey: res.pubKey, privKey: res.privKey };
         }
-        return res;
+        return Promise.resolve(res);
     }
 
     public storePreKey = (keyId: string, keyPair: any) => {
-        return this.put(`25519KeypreKey${keyId}`, keyPair);
+        return Promise.resolve(this.put(`25519KeypreKey${keyId}`, keyPair));
     }
 
     public removePreKey = (keyId: string) => {
-        return this.remove(`25519KeypreKey${keyId}`);
+        return Promise.resolve(this.remove(`25519KeypreKey${keyId}`));
     }
 
     public loadSignedPreKey = (keyId: string) => {
@@ -140,24 +140,26 @@ class LoafBreadbox {
         if (res !== undefined) {
             return { pubKey: res.pubKey, privKey: res.privKey, signature: res.signature };
         }
-        return res;
+        return Promise.resolve(res);
     }
 
     public storeSignedPreKey = (keyId: string, keyPair: any) => {
-        return this.put(`25519KeysignedKey${keyId}`, keyPair);
+        return Promise.resolve(this.put(`25519KeysignedKey${keyId}`, keyPair));
     }
 
     public removeSignedPreKey = (keyId: string) => {
-        return this.remove(`25519KeysignedKey${keyId}`);
+        return Promise.resolve(this.remove(`25519KeysignedKey${keyId}`));
     }
 
     public createSession = async (address: any, preKeyBundle: I.IPreKeyBundle) => {
-        const sessionBuilder = new libsignal.sessionBuilder(this, address);
+        const sessionBuilder = new libsignal.SessionBuilder(this, address);
 
         try {
             await sessionBuilder.processPreKey(preKeyBundle);
             return true;
-        } catch {
+        } catch (e) {
+            console.error("ERROR")
+            console.error(e)
             return false;
         }
     }
@@ -181,22 +183,22 @@ class LoafBreadbox {
         for (let i = 0; i < preKeysAmount; i++) {
             const preKey = await keyHelper.generatePreKey(randomIds[i]);
             preKeys.push(preKey);
-            this.storePreKey(preKey.keyId, { ...preKey.keyPair, keyId: preKey.keyId });
+            await this.storePreKey(preKey.keyId, { ...preKey.keyPair, keyId: preKey.keyId });
         }
         return preKeys;
 
     }
 
     public loadSession = (identifier: string) => {
-        return this.get(`session${identifier}`);
+        return Promise.resolve(this.get(`session${identifier}`));
     }
 
     public storeSession = (identifier: string, record: any) => {
-        return this.put(`session${identifier}`, record);
+        return Promise.resolve(this.put(`session${identifier}`, record));
     }
 
     public removeSession = (identifier: string) => {
-        return this.remove(`session${identifier}`);
+        return Promise.resolve(this.remove(`session${identifier}`));
     }
 
     public removeAllSessions = (identifier: string) => {
@@ -205,6 +207,7 @@ class LoafBreadbox {
                 delete this.store[id];
             }
         }
+        return Promise.resolve();
     }
 
     public isValidKeyPair = (keyPair: any) => {
@@ -232,7 +235,7 @@ class LoafBreadbox {
                         signature: store[i].signature ? Keys.toArrayBuffer(store[i].signature) : undefined,
                     };
                     this.put(i, inStoreKeyPair);
-                } else if (typeof store[i] === "string" && (i.startsWith("identityKey") || i.startsWith("session"))) {
+                } else if (i.startsWith("session")) {
                     this.put(i, store[i]);
                 } else if (i === "registrationId" && Number.isInteger(store[i])) {
                     this.put(i, store[i]);
@@ -308,8 +311,9 @@ class LoafBreadbox {
 
         this.put("identityKey", identityKeyPair);
         this.put("registrationId", registrationId);
+        console.log(this.store);
 
-        this.storeSignedPreKey(signedPreKey.keyId, signedPreKey);
+        await this.storeSignedPreKey(signedPreKey.keyId, signedPreKey);
     }
 }
 

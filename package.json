@@ -8,6 +8,7 @@
   "dependencies": {
     "@material-ui/core": "^4.9.0",
     "@material-ui/icons": "^4.5.1",
+    "@peculiar/webcrypto": "^1.0.27",
     "@types/jest": "24.0.18",
     "@types/react": "16.9.4",
     "@types/react-dom": "16.9.1",
@@ -31,6 +32,7 @@
     "socket.io": "^2.3.0",
     "socket.io-client": "^2.3.0",
     "thirty-two": "github:osztenkurden/thirty-two#master",
+    "tough-cookie": "^3.0.1",
     "typescript": "^3.7.2",
     "util": "^0.12.1",
     "uuid": "^3.3.3"
@@ -71,6 +73,7 @@
     "dev": "concurrently \"cross-env BROWSER=none npm start\" \"npm run electron\"",
     "eject": "react-scripts eject",
     "dist": "electron-builder",
+    "postinstall": "electron-builder install-app-deps",
     "pack": "electron-builder --dir",
     "compile": "npm run build && npm run pack"
   },
@@ -100,6 +103,7 @@
     "@types/request": "^2.48.3",
     "@types/socket.io": "^2.1.4",
     "@types/socket.io-client": "^1.4.32",
+    "@types/tough-cookie": "^2.3.6",
     "concurrently": "^4.1.2",
     "electron": "^6.1.2",
     "electron-builder": "^21.2.0",

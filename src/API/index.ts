@@ -1,5 +1,5 @@
-import * as Loaf from "./Loaf";
 import * as I from "../../modules/interface";
+import * as Loaf from "./Loaf";
 
 const api = {
     chats: {

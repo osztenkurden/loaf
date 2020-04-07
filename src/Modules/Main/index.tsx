@@ -32,7 +32,7 @@ export default class Main extends Component<{}, IState> {
         Loaf.on("chats", (chats: I.IChat[]) => {
             this.setState({ chats });
         });
-        Loaf.on("messages", (messages: I.IMessage[], chatId: number, isNew?: boolean) => {
+        /*Loaf.on("messages", (messages: I.IMessage[], chatId: number, isNew?: boolean) => {
             const chats = this.state.chats.map((chat) => {
                 if (chat.id !== chatId) {
                     return chat;
@@ -40,11 +40,11 @@ export default class Main extends Component<{}, IState> {
                 chat.messages = messages;
                 return chat;
             });
-        })
+        });*/
         api.chats.get();
     }
     public requestTestFriend = async () => {
-        api.user.add(1);
+        api.user.add(2);
     }
     public acceptInvitation = async (chatId: number) => {
         // await api.chats.accept(chatId, this.props.cxt);

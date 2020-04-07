@@ -5,6 +5,7 @@ import * as I from "../interface";
 import * as Machine from "../Machine";
 import Storage from "../Storage";
 import * as Loaf from "./../EventHandler/handler";
+
 // import * as Machine from "../Machine";
 
 export default class Inbox {
@@ -55,23 +56,20 @@ export default class Inbox {
         for (const receiver of receivers) {
             const payload: I.IMessagePayload = {
                 content: msg,
-                recipientId: receiver.userId,
                 machineId: receiver.machineId,
-            }
+                recipientId: receiver.userId,
+            };
             const entry = await this.prepareMessage(payload);
             entries.push(entry);
         }
 
         const result = await api.messages.send(chatId, entries, Machine.getMachineId());
 
+        if (result.success) {
+            this.content.send("chats", this.chats);
+        }
+
         return result;
-    }
-
-    public async prepareMessage(msg: I.IMessagePayload, bundle?: I.IPreKeyBundle) {
-
-        const encrypted = await this.storage.encodeMessage(msg.content, msg.recipientId, msg.machineId, bundle);
-
-        return encrypted;
     }
 
     public async acceptChat(chatId: number) {
@@ -102,6 +100,40 @@ export default class Inbox {
             return true;
         }
         return false;
+    }
+
+    public async loadMessages(chatId: number) {
+        await this.loadChats();
+        const response = await api.messages.get(chatId, Machine.getMachineId());
+        if (!response.success || !response.data) {
+            return null;
+        }
+        const messages = (response.data.messages || []) as I.IMessageRaw[];
+        const current = this.messages.get(chatId) || [];
+        for (const rawMessage of messages) {
+            const decrypted = await this.storage.decodeMessage(rawMessage);
+            if (!decrypted) {
+                continue;
+            }
+            const message: I.IMessage = {
+                chatId,
+                content: decrypted,
+                date: "rawMessage.",
+                my: rawMessage.senderId === this.userId,
+                senderId: rawMessage.senderId,
+            };
+            current.push(message);
+        }
+        this.messages.set(chatId, current);
+
+        this.loadChats();
+    }
+
+    private async prepareMessage(msg: I.IMessagePayload, bundle?: I.IPreKeyBundle) {
+
+        const encrypted = await this.storage.encodeMessage(msg.content, msg.recipientId, msg.machineId, bundle);
+
+        return encrypted;
     }
 
     private async getReceivers(chatId: number) {

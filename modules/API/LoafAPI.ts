@@ -1,11 +1,19 @@
 import fetchHandler from "fetch-cookie";
 import nodeFetch from "node-fetch";
+import toughCookie from "tough-cookie";
 import * as I from "../interface";
-const fetch = fetchHandler(nodeFetch);
+
+const cookieJar = new toughCookie.CookieJar();
+const fetch = fetchHandler(nodeFetch, cookieJar);
 
 const config = {
     apiURL: "http://localhost:5000",
 };
+
+export const getCookie = () => {
+    const cookieString = cookieJar.getCookieStringSync(config.apiURL);
+    return cookieString;
+}
 
 export default async function apiV2(url: string, method = "GET", body?: object): Promise<I.IServerResponse> {
     const options: RequestInit = {

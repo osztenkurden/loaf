@@ -51,7 +51,9 @@ var thirty_two_1 = __importDefault(require("thirty-two"));
 var Inbox_1 = __importDefault(require("../Inbox"));
 var Storage_1 = __importDefault(require("../Storage"));
 var API_1 = require("./../API");
+var LoafBreadbox_1 = require("./../Breadbox/LoafBreadbox");
 var DiffieHellman_1 = require("./../Crypto/DiffieHellman");
+var EventHandler_1 = require("./../EventHandler");
 var Machine = __importStar(require("./../Machine"));
 var User = /** @class */ (function () {
     function User() {
@@ -79,6 +81,7 @@ var User = /** @class */ (function () {
                     case 2:
                         _a.sent();
                         this.initInbox();
+                        EventHandler_1.initSockets();
                         /*
                         const storage = new Storage();
                 
@@ -111,35 +114,41 @@ var User = /** @class */ (function () {
     };
     User.prototype.register = function (username, password, firstName) {
         return __awaiter(this, void 0, void 0, function () {
-            var keys, storage, payload, result, user, diffieHellman, secret, token, e_1;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
+            var keys, storage, payload, _a, _b, result, user, diffieHellman, secret, token, e_1;
+            return __generator(this, function (_c) {
+                switch (_c.label) {
                     case 0:
-                        _a.trys.push([0, 4, , 5]);
+                        _c.trys.push([0, 6, , 7]);
                         return [4 /*yield*/, DiffieHellman_1.generateKeys()];
                     case 1:
-                        keys = _a.sent();
+                        keys = _c.sent();
                         return [4 /*yield*/, this.initStorage()];
                     case 2:
-                        storage = (_a.sent()).getStorage();
-                        payload = {
-                            firstName: firstName,
-                            identityKey: storage.getIdentityKeyPair().pubKey,
-                            keys: {
+                        storage = (_c.sent()).getStorage();
+                        _a = {
+                            firstName: firstName
+                        };
+                        _b = LoafBreadbox_1.parseKeyObject;
+                        return [4 /*yield*/, storage.getIdentityKeyPair()];
+                    case 3:
+                        _a.identityKey = _b.apply(void 0, [_c.sent()]).pubKey,
+                            _a.keys = {
                                 generator: keys.gen,
                                 prime: keys.prime,
                                 public: keys.public
                             },
-                            machineId: Machine.getMachineId(),
-                            password: password,
-                            preKeys: storage.getPreKeys(),
-                            registrationId: storage.getRegistrationId(),
-                            signedPreKey: storage.getSignedPreKey(),
-                            username: username
-                        };
+                            _a.machineId = Machine.getMachineId(),
+                            _a.password = password,
+                            _a.preKeys = storage.getPreKeys();
+                        return [4 /*yield*/, storage.getRegistrationId()];
+                    case 4:
+                        payload = (_a.registrationId = _c.sent(),
+                            _a.signedPreKey = storage.getSignedPreKey(),
+                            _a.username = username,
+                            _a);
                         return [4 /*yield*/, API_1.api.user.register(payload)];
-                    case 3:
-                        result = _a.sent();
+                    case 5:
+                        result = _c.sent();
                         if (!result) {
                             return [2 /*return*/, false];
                         }
@@ -151,10 +160,10 @@ var User = /** @class */ (function () {
                         secret = diffieHellman.computeSecret(user.publicKey);
                         token = thirty_two_1["default"].encode(secret).toString().replace(/=/g, "");
                         return [2 /*return*/, token];
-                    case 4:
-                        e_1 = _a.sent();
+                    case 6:
+                        e_1 = _c.sent();
                         return [2 /*return*/, false];
-                    case 5: return [2 /*return*/];
+                    case 7: return [2 /*return*/];
                 }
             });
         });
@@ -203,8 +212,8 @@ var User = /** @class */ (function () {
         return this.user;
     };
     User.prototype.initInbox = function () {
-        if (!this.inbox) {
-            this.inbox = new Inbox_1["default"](this.window);
+        if (!this.inbox && this.user.id) {
+            this.inbox = new Inbox_1["default"](this.window, this.user.id, this.storage);
         }
         return this;
     };

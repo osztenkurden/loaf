@@ -1,15 +1,4 @@
 "use strict";
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -46,11 +35,19 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
 exports.__esModule = true;
 var API_1 = require("../API");
+var Machine = __importStar(require("../Machine"));
 // import * as Machine from "../Machine";
 var Inbox = /** @class */ (function () {
-    function Inbox(content) {
+    function Inbox(content, userId, storage) {
         var _this = this;
         this.addFriend = function (userId) { return __awaiter(_this, void 0, void 0, function () {
             var response;
@@ -63,28 +60,25 @@ var Inbox = /** @class */ (function () {
                 }
             });
         }); };
-        this.getChats = function () { return __awaiter(_this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        if (!!this.chats.length) return [3 /*break*/, 2];
-                        return [4 /*yield*/, this.loadChats()];
-                    case 1:
-                        _a.sent();
-                        _a.label = 2;
-                    case 2: return [2 /*return*/, this.chats];
-                }
-            });
-        }); };
         this.loadChats = function () { return __awaiter(_this, void 0, void 0, function () {
-            var response;
+            var response, chats, _i, chats_1, chat, messages;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, API_1.api.inbox.getChats()];
                     case 1:
                         response = _a.sent();
                         if (response.success && response.data) {
-                            this.chats = response.data.chats.map(function (chats) { return (__assign(__assign({}, chats), { messages: [] })); });
+                            chats = response.data.chats;
+                            for (_i = 0, chats_1 = chats; _i < chats_1.length; _i++) {
+                                chat = chats_1[_i];
+                                messages = this.messages.get(chat.id);
+                                if (!messages) {
+                                    this.messages.set(chat.id, []);
+                                    messages = [];
+                                }
+                                chat.messages = messages;
+                            }
+                            this.chats = chats;
                         }
                         this.content.send("chats", this.chats);
                         // Loaf.send("chats", this.chats);
@@ -94,10 +88,177 @@ var Inbox = /** @class */ (function () {
         }); };
         this.chats = [];
         this.content = content;
+        this.userId = userId;
+        this.storage = storage;
+        this.messages = new Map();
         this.loadChats();
     }
+    Inbox.prototype.sendToChat = function (chatId, msg) {
+        return __awaiter(this, void 0, void 0, function () {
+            var receivers, entries, _i, receivers_1, receiver, payload, entry, result;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.getReceivers(chatId)];
+                    case 1:
+                        receivers = _a.sent();
+                        entries = [];
+                        _i = 0, receivers_1 = receivers;
+                        _a.label = 2;
+                    case 2:
+                        if (!(_i < receivers_1.length)) return [3 /*break*/, 5];
+                        receiver = receivers_1[_i];
+                        payload = {
+                            content: msg,
+                            machineId: receiver.machineId,
+                            recipientId: receiver.userId
+                        };
+                        return [4 /*yield*/, this.prepareMessage(payload)];
+                    case 3:
+                        entry = _a.sent();
+                        entries.push(entry);
+                        _a.label = 4;
+                    case 4:
+                        _i++;
+                        return [3 /*break*/, 2];
+                    case 5: return [4 /*yield*/, API_1.api.messages.send(chatId, entries, Machine.getMachineId())];
+                    case 6:
+                        result = _a.sent();
+                        if (result.success) {
+                            this.content.send("chats", this.chats);
+                        }
+                        return [2 /*return*/, result];
+                }
+            });
+        });
+    };
+    Inbox.prototype.acceptChat = function (chatId) {
+        return __awaiter(this, void 0, void 0, function () {
+            var receivers, messages, machineId, _i, receivers_2, machine, message, payload, result;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.getReceivers(chatId)];
+                    case 1:
+                        receivers = _a.sent();
+                        if (!receivers.length) {
+                            return [2 /*return*/, false];
+                        }
+                        messages = [];
+                        machineId = Machine.getMachineId();
+                        _i = 0, receivers_2 = receivers;
+                        _a.label = 2;
+                    case 2:
+                        if (!(_i < receivers_2.length)) return [3 /*break*/, 5];
+                        machine = receivers_2[_i];
+                        return [4 /*yield*/, this.storage.createSession(machine)];
+                    case 3:
+                        message = _a.sent();
+                        if (typeof message !== "boolean") {
+                            messages.push(message);
+                        }
+                        _a.label = 4;
+                    case 4:
+                        _i++;
+                        return [3 /*break*/, 2];
+                    case 5:
+                        payload = {
+                            chatId: chatId,
+                            entries: messages,
+                            senderId: this.userId,
+                            senderMachine: machineId
+                        };
+                        return [4 /*yield*/, API_1.api.inbox.accept(payload)];
+                    case 6:
+                        result = _a.sent();
+                        if (result.success) {
+                            this.loadChats();
+                            return [2 /*return*/, true];
+                        }
+                        return [2 /*return*/, false];
+                }
+            });
+        });
+    };
+    Inbox.prototype.loadMessages = function (chatId) {
+        return __awaiter(this, void 0, void 0, function () {
+            var response, messages, current, _i, messages_1, rawMessage, decrypted, message;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.loadChats()];
+                    case 1:
+                        _a.sent();
+                        return [4 /*yield*/, API_1.api.messages.get(chatId, Machine.getMachineId())];
+                    case 2:
+                        response = _a.sent();
+                        if (!response.success || !response.data) {
+                            return [2 /*return*/, null];
+                        }
+                        messages = (response.data.messages || []);
+                        current = this.messages.get(chatId) || [];
+                        _i = 0, messages_1 = messages;
+                        _a.label = 3;
+                    case 3:
+                        if (!(_i < messages_1.length)) return [3 /*break*/, 6];
+                        rawMessage = messages_1[_i];
+                        return [4 /*yield*/, this.storage.decodeMessage(rawMessage)];
+                    case 4:
+                        decrypted = _a.sent();
+                        if (!decrypted) {
+                            return [3 /*break*/, 5];
+                        }
+                        message = {
+                            chatId: chatId,
+                            content: decrypted,
+                            date: "rawMessage.",
+                            my: rawMessage.senderId === this.userId,
+                            senderId: rawMessage.senderId
+                        };
+                        current.push(message);
+                        _a.label = 5;
+                    case 5:
+                        _i++;
+                        return [3 /*break*/, 3];
+                    case 6:
+                        this.messages.set(chatId, current);
+                        this.loadChats();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    Inbox.prototype.prepareMessage = function (msg, bundle) {
+        return __awaiter(this, void 0, void 0, function () {
+            var encrypted;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.storage.encodeMessage(msg.content, msg.recipientId, msg.machineId, bundle)];
+                    case 1:
+                        encrypted = _a.sent();
+                        return [2 /*return*/, encrypted];
+                }
+            });
+        });
+    };
+    Inbox.prototype.getReceivers = function (chatId) {
+        return __awaiter(this, void 0, void 0, function () {
+            var response, store, machineId, machines, receivers;
+            var _this = this;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, API_1.api.inbox.getReceivers(chatId)];
+                    case 1:
+                        response = _a.sent();
+                        if (!response.status || !response.data) {
+                            return [2 /*return*/, []];
+                        }
+                        store = this.storage.getStore();
+                        machineId = Machine.getMachineId();
+                        machines = response.data.machines;
+                        receivers = machines.filter(function (mch) { return mch.userId !== _this.userId || mch.machineId !== machineId; });
+                        return [2 /*return*/, receivers];
+                }
+            });
+        });
+    };
     return Inbox;
 }());
 exports["default"] = Inbox;
-// const localUser = new User();
-// export default localUser;

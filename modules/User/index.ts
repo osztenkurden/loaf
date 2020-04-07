@@ -4,7 +4,9 @@ import Inbox from "../Inbox";
 import * as I from "../interface";
 import Storage from "../Storage";
 import { api } from "./../API";
+import { parseKeyObject } from "./../Breadbox/LoafBreadbox";
 import { generateKeys } from "./../Crypto/DiffieHellman";
+import { initSockets } from "./../EventHandler";
 import * as Machine from "./../Machine";
 
 export class User {
@@ -35,6 +37,7 @@ export class User {
 
         await this.initStorage(user.id);
         this.initInbox();
+        initSockets();
         /*
         const storage = new Storage();
 
@@ -59,7 +62,7 @@ export class User {
             const storage = (await this.initStorage()).getStorage();
             const payload: I.IRegisterPayload = {
                  firstName,
-                 identityKey: storage.getIdentityKeyPair().pubKey,
+                 identityKey: parseKeyObject(await storage.getIdentityKeyPair()).pubKey,
                  keys: {
                      generator: keys.gen,
                      prime: keys.prime,
@@ -68,7 +71,7 @@ export class User {
                  machineId: Machine.getMachineId(),
                  password,
                  preKeys: storage.getPreKeys(),
-                 registrationId: storage.getRegistrationId(),
+                 registrationId: await storage.getRegistrationId(),
                  signedPreKey: storage.getSignedPreKey(),
                  username,
             };

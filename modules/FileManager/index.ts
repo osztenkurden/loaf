@@ -1,10 +1,10 @@
-import path from "path";
 import fs from "fs";
-import { directories } from "./../Machine";
+import path from "path";
 import * as I from "./../interface";
+import { directories } from "./../Machine";
 
 export default class FileManager {
-    userId: number;
+    private userId: number;
 
     constructor(userId: number) {
         this.userId = userId;

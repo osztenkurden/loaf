@@ -48,6 +48,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 exports.__esModule = true;
 var fs = __importStar(require("fs"));
 var path = __importStar(require("path"));
+var API_1 = require("../API");
+var Keys = __importStar(require("./../Breadbox/Keys"));
 var LoafBreadbox_1 = __importDefault(require("./../Breadbox/LoafBreadbox"));
 var Cypher_1 = __importDefault(require("./../Cypher"));
 var Machine = __importStar(require("./../Machine"));
@@ -89,25 +91,39 @@ var Storage = /** @class */ (function () {
             });
         });
     };
-    Storage.prototype.encodeMessage = function () {
+    Storage.prototype.encodeMessage = function (message, recipientId, machineId, bundle) {
         return __awaiter(this, void 0, void 0, function () {
+            var encrypted;
             return __generator(this, function (_a) {
-                if (!this.cypher) {
-                    return [2 /*return*/, null];
+                switch (_a.label) {
+                    case 0:
+                        if (!this.cypher) {
+                            return [2 /*return*/, null];
+                        }
+                        return [4 /*yield*/, this.cypher.encrypt(message, recipientId, machineId, bundle)];
+                    case 1:
+                        encrypted = _a.sent();
+                        this.saveStoreToFile();
+                        return [2 /*return*/, encrypted];
                 }
-                this.saveStoreToFile();
-                return [2 /*return*/, this.cypher];
             });
         });
     };
-    Storage.prototype.decodeMessage = function () {
+    Storage.prototype.decodeMessage = function (msg) {
         return __awaiter(this, void 0, void 0, function () {
+            var content;
             return __generator(this, function (_a) {
-                if (!this.cypher) {
-                    return [2 /*return*/, null];
+                switch (_a.label) {
+                    case 0:
+                        if (!this.cypher) {
+                            return [2 /*return*/, null];
+                        }
+                        return [4 /*yield*/, this.cypher.decrypt(msg.content, msg.senderId, msg.senderMachine, msg.type === 3)];
+                    case 1:
+                        content = _a.sent();
+                        this.saveStoreToFile();
+                        return [2 /*return*/, content];
                 }
-                this.saveStoreToFile();
-                return [2 /*return*/, this.cypher];
             });
         });
     };
@@ -146,6 +162,75 @@ var Storage = /** @class */ (function () {
         }
         fs.writeFileSync(storePath, this.store.getStore(), "utf8");
         return this;
+    };
+    Storage.prototype.getStore = function () {
+        return this.store;
+    };
+    Storage.prototype.getUserBundle = function (userId) {
+        return __awaiter(this, void 0, void 0, function () {
+            var response, data, signedKeyPair, preKeyPair, bundle;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, API_1.api.user.getBundle(userId)];
+                    case 1:
+                        response = _a.sent();
+                        if (!response || !response.data) {
+                            return [2 /*return*/, null];
+                        }
+                        data = response.data;
+                        signedKeyPair = {
+                            keyId: data.signedPreKey.keyId,
+                            publicKey: Keys.toArrayBuffer(data.signedPreKey.pubKey),
+                            signature: Keys.toArrayBuffer(data.signedPreKey.signature)
+                        };
+                        preKeyPair = {
+                            keyId: data.preKey.keyId,
+                            publicKey: Keys.toArrayBuffer(data.preKey.pubKey)
+                        };
+                        bundle = {
+                            identityKey: Keys.toArrayBuffer(data.identityKey),
+                            preKey: preKeyPair,
+                            registrationId: data.registrationId,
+                            signedPreKey: signedKeyPair
+                        };
+                        return [2 /*return*/, bundle];
+                }
+            });
+        });
+    };
+    Storage.prototype.createSession = function (machine) {
+        return __awaiter(this, void 0, void 0, function () {
+            var _a, store, cypher, userId, machineId, session, bundle, msg, message;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        _a = this, store = _a.store, cypher = _a.cypher;
+                        userId = machine.userId, machineId = machine.machineId;
+                        return [4 /*yield*/, store.loadSession(userId + "." + machineId)];
+                    case 1:
+                        session = _b.sent();
+                        if (session) {
+                            return [2 /*return*/, true];
+                        }
+                        return [4 /*yield*/, this.getUserBundle(userId)];
+                    case 2:
+                        bundle = _b.sent();
+                        if (!bundle) {
+                            return [2 /*return*/, false];
+                        }
+                        msg = { type: "text", content: "Hello there!" };
+                        return [4 /*yield*/, this.encodeMessage(msg, userId, machineId, bundle)];
+                    case 3:
+                        message = _b.sent();
+                        return [2 /*return*/, {
+                                content: message.body,
+                                machineId: machineId,
+                                recipientId: userId,
+                                type: message.type
+                            }];
+                }
+            });
+        });
     };
     Storage.prototype.getStorePath = function () {
         var storePath = path.join(Machine.directories.db, "user-" + this.userId + ".loaf");

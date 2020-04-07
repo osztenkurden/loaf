@@ -41,9 +41,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 exports.__esModule = true;
 var fetch_cookie_1 = __importDefault(require("fetch-cookie"));
 var node_fetch_1 = __importDefault(require("node-fetch"));
-var fetch = fetch_cookie_1["default"](node_fetch_1["default"]);
+var tough_cookie_1 = __importDefault(require("tough-cookie"));
+var cookieJar = new tough_cookie_1["default"].CookieJar();
+var fetch = fetch_cookie_1["default"](node_fetch_1["default"], cookieJar);
 var config = {
     apiURL: "http://localhost:5000"
+};
+exports.getCookie = function () {
+    var cookieString = cookieJar.getCookieStringSync(config.apiURL);
+    return cookieString;
 };
 function apiV2(url, method, body) {
     if (method === void 0) { method = "GET"; }

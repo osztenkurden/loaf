@@ -1,7 +1,48 @@
+import socketio from "socket.io-client";
+import { getCookie } from "./../API/LoafAPI";
+import * as I from "./../interface";
 import * as Machine from "./../Machine";
 import User from "./../User";
 import * as Loaf from "./handler";
-import * as I from "./../interface";
+
+export function initSockets() {
+    const socketOpts: SocketIOClient.ConnectOpts = {
+        transportOptions: {
+            polling: {
+                extraHeaders: {
+                    Cookie: getCookie(),
+                },
+            },
+        },
+    };
+    const socket = socketio("http://localhost:5000", socketOpts);
+
+    socket.on("disconnect", () => {
+        console.log("DISCONNECTION");
+    });
+
+    socket.on("connect", () => {
+        console.log("CONNECTED TO SERVER");
+    });
+
+    socket.on("chat", () => {
+        console.log("CHATS");
+        const inbox = User.getInbox();
+
+        if (inbox) {
+            inbox.loadChats();
+        }
+    });
+
+    socket.on("message", async (data: any) => {
+        console.log("messages");
+        const inbox = User.getInbox();
+
+        if (inbox && data.chatId) {
+            inbox.loadMessages(data.chatId);
+        }
+    });
+}
 
 export const start = (win: Electron.WebContents) => {
     User.assign(win);
@@ -47,7 +88,7 @@ export const start = (win: Electron.WebContents) => {
         const inbox = User.getInbox();
         await inbox.sendToChat(chatId, message);
         return null;
-    })
+    });
 
     Loaf.onAsync("register", async (username: string, password: string, name: string) => {
         const result = await User.register(username, password, name);

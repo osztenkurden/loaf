@@ -35,6 +35,9 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
@@ -42,23 +45,56 @@ var __importStar = (this && this.__importStar) || function (mod) {
     result["default"] = mod;
     return result;
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 exports.__esModule = true;
+var socket_io_client_1 = __importDefault(require("socket.io-client"));
+var LoafAPI_1 = require("./../API/LoafAPI");
 var Machine = __importStar(require("./../Machine"));
 var User_1 = __importDefault(require("./../User"));
 var Loaf = __importStar(require("./handler"));
+function initSockets() {
+    var _this = this;
+    var socketOpts = {
+        transportOptions: {
+            polling: {
+                extraHeaders: {
+                    Cookie: LoafAPI_1.getCookie()
+                }
+            }
+        }
+    };
+    var socket = socket_io_client_1["default"]("http://localhost:5000", socketOpts);
+    socket.on("disconnect", function () {
+        console.log("DISCONNECTION");
+    });
+    socket.on("connect", function () {
+        console.log("CONNECTED TO SERVER");
+    });
+    socket.on("chat", function () {
+        console.log("CHATS");
+        var inbox = User_1["default"].getInbox();
+        if (inbox) {
+            inbox.loadChats();
+        }
+    });
+    socket.on("message", function (data) { return __awaiter(_this, void 0, void 0, function () {
+        var inbox;
+        return __generator(this, function (_a) {
+            console.log("messages");
+            inbox = User_1["default"].getInbox();
+            if (inbox && data.chatId) {
+                inbox.loadMessages(data.chatId);
+            }
+            return [2 /*return*/];
+        });
+    }); });
+}
+exports.initSockets = initSockets;
 exports.start = function (win) {
     User_1["default"].assign(win);
+    // TODO: remove unnecessary event responses
     Loaf.on("getMachineId", function () {
         var machineId = Machine.getMachineId();
         return { event: "getMachineId", data: machineId };
-    });
-    Loaf.on("createKeys", function () {
-        // TODO: Add child process for creating keys
-        // PRETODO: Make sure it is actually necessary to call this from frontend
-        return null;
     });
     Loaf.on("getUser", function () {
         return { event: "user", data: User_1["default"].getUser() };
@@ -76,6 +112,24 @@ exports.start = function (win) {
             }
         });
     }); });
+    Loaf.onAsync("acceptChat", function (chatId) { return __awaiter(void 0, void 0, void 0, function () {
+        var inbox, result;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    inbox = User_1["default"].getInbox();
+                    return [4 /*yield*/, inbox.acceptChat(chatId)];
+                case 1:
+                    result = _a.sent();
+                    if (!result) return [3 /*break*/, 3];
+                    return [4 /*yield*/, inbox.loadChats()];
+                case 2:
+                    _a.sent();
+                    _a.label = 3;
+                case 3: return [2 /*return*/, { event: "acceptInvitation", data: null }];
+            }
+        });
+    }); });
     Loaf.onAsync("getChats", function () { return __awaiter(void 0, void 0, void 0, function () {
         var inbox;
         return __generator(this, function (_a) {
@@ -86,6 +140,19 @@ exports.start = function (win) {
                 case 1:
                     _a.sent();
                     return [2 /*return*/, { event: "chatsLoaded", data: true }];
+            }
+        });
+    }); });
+    Loaf.onAsync("sendMessage", function (chatId, message) { return __awaiter(void 0, void 0, void 0, function () {
+        var inbox;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    inbox = User_1["default"].getInbox();
+                    return [4 /*yield*/, inbox.sendToChat(chatId, message)];
+                case 1:
+                    _a.sent();
+                    return [2 /*return*/, null];
             }
         });
     }); });
