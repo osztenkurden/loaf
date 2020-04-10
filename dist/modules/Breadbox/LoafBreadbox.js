@@ -61,6 +61,7 @@ var Keys = __importStar(require("./Keys"));
 var libsignal = require("./../Breadcrumb/libsignal/index");
 // tslint:disable-next-line:no-var-requires
 var crypto = require("./../Breadcrumb/libsignal/crypto/index").crypto;
+var util = {};
 exports.generateId = function (amount) {
     if (amount === void 0) { amount = 1; }
     var array = new Uint32Array(amount);
@@ -131,7 +132,7 @@ var LoafBreadbox = /** @class */ (function () {
             if (trusted === undefined) {
                 return Promise.resolve(true);
             }
-            return Promise.resolve(Buffer.from(identityKey).toString() === Buffer.from(trusted).toString());
+            return Promise.resolve(util.toString(identityKey) === util.toString(trusted));
         };
         this.loadIdentityKey = function (identifier) {
             if (identifier === null || identifier === undefined)
@@ -144,7 +145,7 @@ var LoafBreadbox = /** @class */ (function () {
             var address = new libsignal.SignalProtocolAddress.fromString(identifier);
             var existing = _this.get("identityKey" + address.getName());
             _this.put("identityKey" + address.getName(), identityKey);
-            if (existing && identityKey.toString() !== existing.toString()) {
+            if (existing && util.toString(identityKey) !== util.toString(existing)) {
                 return Promise.resolve(true);
             }
             return Promise.resolve(false);
@@ -363,7 +364,6 @@ var LoafBreadbox = /** @class */ (function () {
                         signedPreKey = __assign({ keyId: signedPreKeys.keyId, signature: signedPreKeys.signature }, signedPreKeys.keyPair);
                         this.put("identityKey", identityKeyPair);
                         this.put("registrationId", registrationId);
-                        console.log(this.store);
                         return [4 /*yield*/, this.storeSignedPreKey(signedPreKey.keyId, signedPreKey)];
                     case 5:
                         _a.sent();

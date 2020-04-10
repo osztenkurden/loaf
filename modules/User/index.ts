@@ -58,16 +58,12 @@ export class User {
 
     public async register(username: string, password: string, firstName: string) {
         try {
-            const keys = await generateKeys();
+            const keys: any = await generateKeys();
             const storage = (await this.initStorage()).getStorage();
             const payload: I.IRegisterPayload = {
                  firstName,
                  identityKey: parseKeyObject(await storage.getIdentityKeyPair()).pubKey,
-                 keys: {
-                     generator: keys.gen,
-                     prime: keys.prime,
-                     public: keys.public,
-                 },
+                 keys: this.getKeys(keys),
                  machineId: Machine.getMachineId(),
                  password,
                  preKeys: storage.getPreKeys(),
@@ -84,6 +80,11 @@ export class User {
 
             storage.setUserId(user.id).saveStoreToFile();
 
+            if(keys.token){
+                console.log(`${username} registered`)
+                return base32.encode(keys.token).toString().replace(/=/g, "");;
+            }
+
             const diffieHellman = crypto.createDiffieHellman(keys.prime, "hex", keys.gen, "hex");
             diffieHellman.setPrivateKey(keys.private, "hex");
             diffieHellman.setPublicKey(keys.public, "hex");
@@ -91,7 +92,6 @@ export class User {
             const secret = diffieHellman.computeSecret(user.publicKey);
 
             const token = base32.encode(secret).toString().replace(/=/g, "");
-
             return token;
          } catch (e) {
              return false;
@@ -131,6 +131,22 @@ export class User {
             this.inbox = new Inbox(this.window, this.user.id, this.storage);
         }
         return this;
+    }
+
+    private getKeys(keys: any) {
+        if(keys.token){
+            const key: I.IDebugKeys = {
+                token: keys.token
+            }
+
+            return key;
+        }
+        const key: I.IKeys = {
+            generator: keys.gen,
+            prime: keys.prime,
+            public: keys.public
+        }
+        return key;
     }
 }
 

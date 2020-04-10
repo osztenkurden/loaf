@@ -62,10 +62,20 @@ export default class Inbox {
             const entry = await this.prepareMessage(payload);
             entries.push(entry);
         }
+        const message: I.IMessage = {
+            senderId: this.userId,
+            content: msg,
+            chatId,
+            my: true,
+            date: (new Date()).toISOString()
+        }
 
         const result = await api.messages.send(chatId, entries, Machine.getMachineId());
-
+        
         if (result.success) {
+            const current = this.messages.get(chatId);
+            current.push(message);
+            this.messages.set(chatId, current);
             this.content.send("chats", this.chats);
         }
 
@@ -115,10 +125,11 @@ export default class Inbox {
             if (!decrypted) {
                 continue;
             }
+
             const message: I.IMessage = {
                 chatId,
                 content: decrypted,
-                date: "rawMessage.",
+                date: (new Date()).toISOString(),
                 my: rawMessage.senderId === this.userId,
                 senderId: rawMessage.senderId,
             };

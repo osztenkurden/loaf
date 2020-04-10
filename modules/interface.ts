@@ -91,7 +91,11 @@ export interface IStatusListener {
 
 export interface ISignalEncrypted {
     type: number;
+    content: string;
     body: string;
+    recipientId: number;
+    machineId: number;
+    entry: boolean;
 }
 
 export interface IMachine {
@@ -111,6 +115,17 @@ export interface IRegisterResponse {
     id: number;
 }
 
+
+export interface IKeys {
+    generator: string;
+    prime: string;
+    public: string;
+}
+
+export interface IDebugKeys {
+    token: string
+}
+
 export interface IRegisterPayload {
     machineId: number;
     username: string;
@@ -118,11 +133,7 @@ export interface IRegisterPayload {
     firstName: string;
     identityKey: string;
     registrationId: number;
-    keys: {
-        generator: string;
-        prime: string;
-        public: string;
-    };
+    keys: IKeys | IDebugKeys;
     preKeys: Array<{
         pubKey: string;
         keyId: number;

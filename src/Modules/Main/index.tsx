@@ -30,7 +30,14 @@ export default class Main extends Component<{}, IState> {
     }
     public async componentDidMount() {
         Loaf.on("chats", (chats: I.IChat[]) => {
-            this.setState({ chats });
+            this.setState({ chats }, () => {
+                if(!this.state.currentChat) return;
+                for(const chat of chats){
+                    if(chat.id === this.state.currentChat.id){
+                        this.setState({currentChat: chat})
+                    }
+                }
+            });
         });
         /*Loaf.on("messages", (messages: I.IMessage[], chatId: number, isNew?: boolean) => {
             const chats = this.state.chats.map((chat) => {

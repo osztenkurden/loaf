@@ -103,6 +103,10 @@ var Cypher = /** @class */ (function () {
                     case 3:
                         ciphered = _a.sent();
                         ciphered.body = Buffer.from(ciphered.body, "ucs-2").toString("hex");
+                        ciphered.content = ciphered.body;
+                        ciphered.recipientId = recipientId;
+                        ciphered.machineId = machineId;
+                        ciphered.entry = ciphered.type == 3;
                         return [2 /*return*/, ciphered];
                 }
             });

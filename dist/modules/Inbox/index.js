@@ -95,7 +95,7 @@ var Inbox = /** @class */ (function () {
     }
     Inbox.prototype.sendToChat = function (chatId, msg) {
         return __awaiter(this, void 0, void 0, function () {
-            var receivers, entries, _i, receivers_1, receiver, payload, entry, result;
+            var receivers, entries, _i, receivers_1, receiver, payload, entry, message, result, current;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this.getReceivers(chatId)];
@@ -120,10 +120,21 @@ var Inbox = /** @class */ (function () {
                     case 4:
                         _i++;
                         return [3 /*break*/, 2];
-                    case 5: return [4 /*yield*/, API_1.api.messages.send(chatId, entries, Machine.getMachineId())];
+                    case 5:
+                        message = {
+                            senderId: this.userId,
+                            content: msg,
+                            chatId: chatId,
+                            my: true,
+                            date: (new Date()).toISOString()
+                        };
+                        return [4 /*yield*/, API_1.api.messages.send(chatId, entries, Machine.getMachineId())];
                     case 6:
                         result = _a.sent();
                         if (result.success) {
+                            current = this.messages.get(chatId);
+                            current.push(message);
+                            this.messages.set(chatId, current);
                             this.content.send("chats", this.chats);
                         }
                         return [2 /*return*/, result];
@@ -208,7 +219,7 @@ var Inbox = /** @class */ (function () {
                         message = {
                             chatId: chatId,
                             content: decrypted,
-                            date: "rawMessage.",
+                            date: (new Date()).toISOString(),
                             my: rawMessage.senderId === this.userId,
                             senderId: rawMessage.senderId
                         };

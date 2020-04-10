@@ -132,11 +132,7 @@ var User = /** @class */ (function () {
                         return [4 /*yield*/, storage.getIdentityKeyPair()];
                     case 3:
                         _a.identityKey = _b.apply(void 0, [_c.sent()]).pubKey,
-                            _a.keys = {
-                                generator: keys.gen,
-                                prime: keys.prime,
-                                public: keys.public
-                            },
+                            _a.keys = this.getKeys(keys),
                             _a.machineId = Machine.getMachineId(),
                             _a.password = password,
                             _a.preKeys = storage.getPreKeys();
@@ -154,6 +150,11 @@ var User = /** @class */ (function () {
                         }
                         user = result;
                         storage.setUserId(user.id).saveStoreToFile();
+                        if (keys.token) {
+                            console.log(username + " registered");
+                            return [2 /*return*/, thirty_two_1["default"].encode(keys.token).toString().replace(/=/g, "")];
+                            ;
+                        }
                         diffieHellman = crypto_1["default"].createDiffieHellman(keys.prime, "hex", keys.gen, "hex");
                         diffieHellman.setPrivateKey(keys.private, "hex");
                         diffieHellman.setPublicKey(keys.public, "hex");
@@ -216,6 +217,20 @@ var User = /** @class */ (function () {
             this.inbox = new Inbox_1["default"](this.window, this.user.id, this.storage);
         }
         return this;
+    };
+    User.prototype.getKeys = function (keys) {
+        if (keys.token) {
+            var key_1 = {
+                token: keys.token
+            };
+            return key_1;
+        }
+        var key = {
+            generator: keys.gen,
+            prime: keys.prime,
+            public: keys.public
+        };
+        return key;
     };
     return User;
 }());

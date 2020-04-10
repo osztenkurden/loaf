@@ -30,12 +30,13 @@ export default class Chat extends Component<IProps, IState> {
             return <div className="chat_container">Choose chat</div>;
         }
         const { chat } = this.props;
+        console.log(chat.messages)
         // console.log(this.props.messages)
         return (
             <div className="chat_container">
                 <AppBar position="relative" >
                     <Toolbar className="bar">
-                        <ListItem>
+                        <ListItem style={{paddingTop:0,paddingBottom:0}}>
                             {/*chat.image ?
                             <Avatar src={API.config.apiUrl + 'chats/image?chatId=' + chat.id} className='avatar' /> :
                             <Avatar className="avatar" style={{ backgroundColor: textToRGB(chat.name) }}>
@@ -77,6 +78,9 @@ export default class Chat extends Component<IProps, IState> {
                         variant="outlined"
                         InputLabelProps={{
                             shrink: true,
+                        }}
+                        inputProps={{
+                            style:{color: 'white'}
                         }}
                     />
                 </div> : ""}

@@ -139,6 +139,9 @@ body {
     letter-spacing: 0.5pt;
     display:flex;
 }
+.chat-list .text-item {
+    padding-left:16px;
+}
 .chat-name-text {
     font-weight:bold;
     color:white;
@@ -364,6 +367,7 @@ li > hr.separator {
 }
 
 .message {
+    box-shadow: 0px 6px 15px #00000085;
     background-color: #242b2f;
     border-bottom: 2px solid transparent;
     border-image: linear-gradient(to right, #ffd66b, #ff8b84) 3;
@@ -393,6 +397,7 @@ li > hr.separator {
     width: 100%;
     flex: 1;
     display: flex;
+    overflow:auto;
     flex-direction: column;
 }
 
@@ -401,7 +406,7 @@ li > hr.separator {
 }
 .text_sender{
     background-color:#242b2f;
-    height:45pt;
+    height:56px;
     border-top: 2px solid transparent;
     border-image: linear-gradient(to right, #ffd66b, #ff8b84) 3;
 }
