@@ -4,6 +4,7 @@ import React, { Component } from "react";
 // import * as API from "./api";
 import { textToRGB} from './../Utils';
 import * as I from "./../../../modules/interface";
+import { Chat } from "@material-ui/icons";
 
 function getSubText(chat: I.IChat, last: I.IMessage | null) {
     switch (chat.status) {
@@ -18,7 +19,13 @@ function getSubText(chat: I.IChat, last: I.IMessage | null) {
     }
 }
 
-export default class ChatsListEntry extends Component<{ chat: I.IChat, loadChat: (chat: I.IChat) => void }, any> {
+interface IProps {
+    chat: I.IChat;
+    loadChat: (chat: I.IChat) => void;
+    isCurrent: boolean;
+}
+
+export default class ChatsListEntry extends Component<IProps> {
     getLast = () => {
         const { chat } = this.props;
         if(!chat) return null;
@@ -26,11 +33,23 @@ export default class ChatsListEntry extends Component<{ chat: I.IChat, loadChat:
         if(!chat.messages.length) return null;
         return chat.messages[chat.messages.length-1];
     }
-    public render() {
+
+    getLastTag = () => {
         const { chat } = this.props;
         const last = this.getLast();
+        if(!last) return null;
+        if(!last.my && chat.private) return '';
+        if(last.my){
+            return <span className="you">You:</span>;
+        }
+        return <span className="you">{last.senderId}</span>
+    }
+
+    public render() {
+        const { chat, isCurrent } = this.props;
+        const last = this.getLast();
         return (
-            <div>
+            <div className={`chat-list-entry ${isCurrent && 'current' || ''}`}>
                 <ListItem button
                     className={"chat-button " + (chat.unread ? "new-message" : "")}
                     onClick={() => this.props.loadChat(chat)}
@@ -53,7 +72,7 @@ export default class ChatsListEntry extends Component<{ chat: I.IChat, loadChat:
                         secondary={
                             <div className="chat-last-message">
                                 <div className="text">
-                                    {last?.my ? <span className="you">You:</span> : ""} {getSubText(chat, last)}
+                                    {this.getLastTag()} {getSubText(chat, last)}
                                 </div>
                                 <div className={"last-text-status " /*+ (chat.lastYours ? chat.status : '')*/}></div>
                             </div>

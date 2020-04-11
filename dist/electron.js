@@ -62,6 +62,7 @@ var startApp = function () { return __awaiter(void 0, void 0, void 0, function (
             minHeight: 600,
             minWidth: 400,
             show: false,
+            frame: false,
             title: "Loaf",
             webPreferences: {
                 backgroundThrottling: false,

@@ -48,6 +48,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 exports.__esModule = true;
 var socket_io_client_1 = __importDefault(require("socket.io-client"));
 var LoafAPI_1 = require("./../API/LoafAPI");
+var API_1 = require("./../API");
 var Machine = __importStar(require("./../Machine"));
 var User_1 = __importDefault(require("./../User"));
 var Loaf = __importStar(require("./handler"));
@@ -68,6 +69,9 @@ function initSockets() {
     });
     socket.on("connect", function () {
         console.log("CONNECTED TO SERVER");
+    });
+    socket.on("disconnection", function () {
+        console.log("DISCONNECTION #2");
     });
     socket.on("chat", function () {
         console.log("CHATS");
@@ -100,15 +104,56 @@ exports.start = function (win) {
         return { event: "user", data: User_1["default"].getUser() };
     });
     Loaf.onAsync("addUser", function (userId) { return __awaiter(void 0, void 0, void 0, function () {
-        var inbox;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
+        var inbox, response, data, id;
+        var _a;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
                 case 0:
                     inbox = User_1["default"].getInbox();
+                    if (!(typeof userId === "number")) return [3 /*break*/, 2];
                     return [4 /*yield*/, inbox.addFriend(userId)];
                 case 1:
-                    _a.sent();
-                    return [2 /*return*/, { event: "userAdded", data: true }];
+                    _b.sent();
+                    return [3 /*break*/, 5];
+                case 2: return [4 /*yield*/, API_1.api.user.getByName(userId)];
+                case 3:
+                    response = _b.sent();
+                    data = response.data;
+                    if (!data) {
+                        return [2 /*return*/, { event: "userAdded", data: false }];
+                    }
+                    id = (_a = data.user) === null || _a === void 0 ? void 0 : _a.id;
+                    if (!Number.isInteger(id)) {
+                        return [2 /*return*/, { event: "userAdded", data: false }];
+                    }
+                    return [4 /*yield*/, inbox.addFriend(id)];
+                case 4:
+                    _b.sent();
+                    _b.label = 5;
+                case 5: return [2 /*return*/, { event: "userAdded", data: true }];
+            }
+        });
+    }); });
+    Loaf.onAsync("createChatTest", function () { return __awaiter(void 0, void 0, void 0, function () {
+        var response;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, API_1.api.inbox.createTestChat()];
+                case 1:
+                    response = _a.sent();
+                    console.log(response);
+                    return [2 /*return*/, { event: 'createdChat', data: response.data }];
+            }
+        });
+    }); });
+    Loaf.onAsync("getUserByName", function (name) { return __awaiter(void 0, void 0, void 0, function () {
+        var response;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, API_1.api.user.getByName(name)];
+                case 1:
+                    response = _a.sent();
+                    return [2 /*return*/, { event: "userData", data: response.data }];
             }
         });
     }); });
@@ -199,4 +244,19 @@ exports.start = function (win) {
             }
         });
     }); });
+    var devMode = function () { return __awaiter(void 0, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            if (process.env.DEVUSER1) {
+                User_1["default"].register('osztenkurden', 'LeMoni@da1', 'Hubert');
+            }
+            if (process.env.DEVUSER2) {
+                User_1["default"].register('hubertwalczak8', 'LeMoni@da1', 'Hubert');
+            }
+            if (process.env.DEVUSER3) {
+                User_1["default"].register('oszten', 'LeMoni@da1', 'Hubert');
+            }
+            return [2 /*return*/];
+        });
+    }); };
+    devMode();
 };

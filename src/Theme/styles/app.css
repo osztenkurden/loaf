@@ -60,6 +60,48 @@ body {
 .loaf-app, .loaf-app-logging{
     width:100%;
 }
+.text-field-container > div::after {
+    border-bottom: 2px solid rgba(255, 255, 255, 0.84) !important;
+}
+.menu span.menu-entry {
+    font-size:15px;
+    letter-spacing: 0.5px;
+}
+.contact-input::before {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.42) !important;
+}
+.new-contact-adornment p {
+    color: #ffffff70;
+    position: relative;
+    left: 4px;
+    bottom: 1px;
+}
+.new-contact-modal {
+
+}
+.modal-container{
+    --height: 189px;
+    height:var(--height);
+    width:350px;
+    outline:none;
+    margin: auto;
+    margin-top: calc(50vh - var(--height)/2);
+    background-color: var(--primaryColor600) !important;
+}
+.drawer-content {
+    background-color: var(--primaryColor600) !important;
+    background-image: url('./../assets/loaf-bg.svg');
+    background-position: bottom 25px center;
+    background-repeat: no-repeat;
+}
+.menu .menu-icon {
+    justify-content: center;
+    margin-left: -4px;
+}
+.menu .menu-icon svg {
+    width: 0.85em;
+    height: 0.85em;
+}
 .loaf-app-logging {
     display:flex;
     justify-content: center;
@@ -68,13 +110,18 @@ body {
     position:absolute;
 }
 #login-page {
-    align-items:center;
-    display:flex;   
+    align-items: center;
+    display: flex;
     flex-direction: column;
     width: 400px;
     max-width: 90vw;
     background-color: rgba(0,0,0,0.23);
-    padding:20px;
+    padding: 20px;
+    background-image:url('./../assets/loaf_newlogo.svg');
+    background-position: top 33px center;
+    background-repeat: no-repeat;
+    background-size: 140px;
+    padding-top: 140px;
 }
 #splash-backdrop {
     z-index: 1;
@@ -139,7 +186,7 @@ body {
     letter-spacing: 0.5pt;
     display:flex;
 }
-.chat-list .text-item {
+.chat-list .text-item, .chat_container .chat-text-item {
     padding-left:16px;
 }
 .chat-name-text {
@@ -227,7 +274,6 @@ body {
 .sidenav .userView {
     position: relative;
     padding: 64px 32px 12px;
-    margin-bottom: 8px;
     box-shadow: inset 0 0 4px 0px rgba(0,0,0,0.7);
     letter-spacing: 0.7px;
 }
@@ -260,8 +306,9 @@ body {
     font-size: 13px;
     line-height: 24px;
     color: white;
-    font-weight: 700;
+    font-weight: 600;
     text-shadow: 0 0 5px black;
+    letter-spacing: 1.5px;
 }
 .sidenav a.firstName {
     padding:0;
@@ -319,6 +366,15 @@ body {
     display:flex;
     flex-direction: column;
 }
+.chat-list-entry.current {
+    background-color:#6ce6f11a;
+}
+.chat_container.empty {
+    background-image: url('./../assets/loaf_newlogo.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size:200px;
+}
 .logo-wrapper{
     display:flex !important;
     align-items: center;
@@ -367,7 +423,6 @@ li > hr.separator {
 }
 
 .message {
-    box-shadow: 0px 6px 15px #00000085;
     background-color: #242b2f;
     border-bottom: 2px solid transparent;
     border-image: linear-gradient(to right, #ffd66b, #ff8b84) 3;

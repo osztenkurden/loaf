@@ -15,9 +15,9 @@ export default class Request extends Component<IProps> {
                 <p>You've got a request from <strong>{chat.name}</strong>. Accept?</p>
                 <p>
                     <CheckCircleRounded
-                        style={{ color: "#49a249" }}
+                        style={{ color: "#2fc52f", cursor: 'pointer' }}
                         onClick={() => accept(chat.id)} />
-                    <BlockRounded style={{ color: "red" }} />
+                    <BlockRounded style={{ color: "red", cursor: 'pointer' }} />
                 </p>
             </div>
         </div>;

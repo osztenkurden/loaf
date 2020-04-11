@@ -32,11 +32,11 @@ const theme = createMuiTheme({
                 marginRight: "72px",
             },
         },
-        MuiDrawer: {
+        /*MuiDrawer: {
             paper: {
                 backgroundColor: "#2e2a27 !important",
             },
-        },
+        },*/
         MuiListItem: {
             button: {
                 transition: "none !important",

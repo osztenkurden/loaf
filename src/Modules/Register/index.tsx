@@ -50,7 +50,7 @@ export default class Register extends Component<IProps, IState> {
                 <div id="login-page">
                     {this.renderError()}
                     {this.renderForm()}
-                    <LoafButton big onClick={this.props.togglePage}>Log In</LoafButton>
+                    <LoafButton big onClick={this.props.togglePage}>Sign In</LoafButton>
                 </div>
                 <Backdrop id="splash-backdrop" open={this.state.loading}>
                     <CircularProgress color="inherit" />
@@ -99,7 +99,7 @@ export default class Register extends Component<IProps, IState> {
                 type="password"
                 disabled={this.state.loading}
             />
-            <LoafButton main big onClick={this.register}>Register</LoafButton>
+            <LoafButton main big onClick={this.register} style={{marginTop:'24px'}}>Register</LoafButton>
         </React.Fragment>;
     }
 

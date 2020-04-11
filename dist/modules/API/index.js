@@ -45,6 +45,7 @@ exports.api = {
         accept: function (payload) { return LoafAPI_1["default"]("chats/users", "PATCH", { messages: payload, chatId: payload.chatId }); },
         addFriend: function (userId) { return LoafAPI_1["default"]("chats?private=true", "POST", { name: "", users: [userId] }); },
         getChats: function () { return LoafAPI_1["default"]("chats"); },
+        createTestChat: function () { return LoafAPI_1["default"]("chats", "POST", { name: "Bakery", users: [1, 2, 3] }); },
         getReceivers: function (chatId) { return LoafAPI_1["default"]("machines/" + chatId); }
     },
     messages: {
@@ -69,6 +70,7 @@ exports.api = {
                 }
             });
         }); },
+        getByName: function (name) { return LoafAPI_1["default"]("user/" + name); },
         getBundle: function (userId) { return LoafAPI_1["default"]("keys/bundle", "POST", { userId: userId }); },
         // tslint:disable-next-line:max-line-length
         login: function (body) { return LoafAPI_1["default"]("auth/login", "POST", body); },

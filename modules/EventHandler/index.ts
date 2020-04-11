@@ -1,5 +1,6 @@
 import socketio from "socket.io-client";
 import { getCookie } from "./../API/LoafAPI";
+import { api } from "./../API";
 import * as I from "./../interface";
 import * as Machine from "./../Machine";
 import User from "./../User";
@@ -24,6 +25,10 @@ export function initSockets() {
     socket.on("connect", () => {
         console.log("CONNECTED TO SERVER");
     });
+
+    socket.on("disconnection", () => {
+        console.log("DISCONNECTION #2");
+    })
 
     socket.on("chat", () => {
         console.log("CHATS");
@@ -60,12 +65,36 @@ export const start = (win: Electron.WebContents) => {
         return { event: "user", data: User.getUser() };
     });
 
-    Loaf.onAsync("addUser", async (userId: number) => {
+    Loaf.onAsync("addUser", async (userId: number | string) => {
         const inbox = User.getInbox();
-
-        await inbox.addFriend(userId);
+        if(typeof userId === "number"){
+            await inbox.addFriend(userId);
+        } else {
+            const response = await api.user.getByName(userId);
+            const data = response.data;
+            if(!data){
+                return { event: "userAdded", data: false };
+            }
+            const id = data.user?.id;
+            if(!Number.isInteger(id)){
+                return { event: "userAdded", data: false };
+            }
+            await inbox.addFriend(id);
+        }
 
         return { event: "userAdded", data: true };
+    });
+
+    Loaf.onAsync("createChatTest", async () => {
+        const response = await api.inbox.createTestChat();
+        console.log(response);
+
+        return { event: 'createdChat', data: response.data };
+    })
+
+    Loaf.onAsync("getUserByName", async (name: string) => {
+        const response = await api.user.getByName(name);
+        return { event: "userData", data: response.data };
     });
 
     Loaf.onAsync("acceptChat", async (chatId: number) => {
@@ -112,4 +141,18 @@ export const start = (win: Electron.WebContents) => {
         await User.loadUser();
         return { event: "user", data: User.getUser() };
     });
+    const devMode = async () => {
+
+        if(process.env.DEVUSER1){
+            User.register('osztenkurden', 'LeMoni@da1', 'Hubert');
+        }
+    
+        if(process.env.DEVUSER2){
+            User.register('hubertwalczak8', 'LeMoni@da1', 'Hubert');
+        }
+        if(process.env.DEVUSER3){
+            User.register('oszten', 'LeMoni@da1', 'Hubert');
+        }
+    }
+    devMode();
 };

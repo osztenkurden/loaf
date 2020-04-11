@@ -5,6 +5,7 @@ import Announcement from "../Message/Announcement";
 import Message from "../Message/Message";
 import * as I from "./../../../modules/interface";
 import api, * as API from "./../../API";
+import { textToRGB} from './../Utils';
 
 interface IProps {
     chat: I.IChat | null;
@@ -27,21 +28,20 @@ export default class Chat extends Component<IProps, IState> {
     }
     public render() {
         if (!this.props.chat) {
-            return <div className="chat_container">Choose chat</div>;
+            return <div className={`chat_container empty`}></div>;
         }
         const { chat } = this.props;
-        console.log(chat.messages)
-        // console.log(this.props.messages)
         return (
             <div className="chat_container">
                 <AppBar position="relative" >
                     <Toolbar className="bar">
                         <ListItem style={{paddingTop:0,paddingBottom:0}}>
-                            {/*chat.image ?
-                            <Avatar src={API.config.apiUrl + 'chats/image?chatId=' + chat.id} className='avatar' /> :
+                            {chat.image ?
+                            <Avatar src={'http://localhost:5000/chats/image?chatId=' + chat.id} className='avatar' /> :
                             <Avatar className="avatar" style={{ backgroundColor: textToRGB(chat.name) }}>
-                            {chat.name.charAt(0) && chat.name.charAt(0).toUpperCase() || '#'}</Avatar>*/}
+                            {chat.name.charAt(0) && chat.name.charAt(0).toUpperCase() || '#'}</Avatar>}
                             <ListItemText inset
+                                className="chat-text-item"
                                 primary={
                                     <div className={"chat-name"}>
                                         <div className="chat-name-text">{chat.name}</div>
