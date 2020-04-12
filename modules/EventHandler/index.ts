@@ -65,6 +65,18 @@ export const start = (win: Electron.WebContents) => {
         return { event: "user", data: User.getUser() };
     });
 
+    Loaf.on("getCookie", () => {
+        return { event: "cookie", data: getCookie() };
+    });
+
+    Loaf.onAsync("loadImage", async (chatId) => {
+        const res = await api.chats.loadImage(chatId);
+        if(!res.data || !res.data.image){
+            return { event: "imageLoaded", data: {id:chatId, image: null}};
+        }
+        return { event: "imageLoaded", data: {id:chatId, image: res.data.image}};
+    })
+
     Loaf.onAsync("addUser", async (userId: number | string) => {
         const inbox = User.getInbox();
         if(typeof userId === "number"){

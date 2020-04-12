@@ -41,6 +41,11 @@ export interface IMessageRaw {
     read: boolean;
     senderMachine: number;
     entry: boolean;
+    sender?: {
+        id: number;
+        username: string;
+        avatar: string | null;
+    }
 }
 
 export interface IMessage {
@@ -50,6 +55,11 @@ export interface IMessage {
     chatId: number;
     my: boolean;
     date: string;
+    sender?: {
+        id: number;
+        username: string;
+        avatar: string | null;
+    }
 }
 
 export interface IChat {

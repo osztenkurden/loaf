@@ -9,6 +9,9 @@ export const api = {
         createTestChat: () => Loaf("chats", "POST", {name: "Bakery", users: [1,2,3]}),
         getReceivers: (chatId: number) => Loaf(`machines/${chatId}`),
     },
+    chats: {
+        loadImage: (chatId:number) => Loaf(`chats/image/base64?chatId=${chatId}`)
+    },
     messages:  {
         get: (chatId: number, machineId: number) => Loaf(`messages/${chatId}?machineId=${machineId}`),
         send: (chatId: number, entries: I.ISignalEncrypted[], senderMachine: number) =>

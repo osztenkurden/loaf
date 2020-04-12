@@ -103,6 +103,23 @@ exports.start = function (win) {
     Loaf.on("getUser", function () {
         return { event: "user", data: User_1["default"].getUser() };
     });
+    Loaf.on("getCookie", function () {
+        return { event: "cookie", data: LoafAPI_1.getCookie() };
+    });
+    Loaf.onAsync("loadImage", function (chatId) { return __awaiter(void 0, void 0, void 0, function () {
+        var res;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, API_1.api.chats.loadImage(chatId)];
+                case 1:
+                    res = _a.sent();
+                    if (!res.data || !res.data.image) {
+                        return [2 /*return*/, { event: "imageLoaded", data: { id: chatId, image: null } }];
+                    }
+                    return [2 /*return*/, { event: "imageLoaded", data: { id: chatId, image: res.data.image } }];
+            }
+        });
+    }); });
     Loaf.onAsync("addUser", function (userId) { return __awaiter(void 0, void 0, void 0, function () {
         var inbox, response, data, id;
         var _a;

@@ -6,9 +6,12 @@ import Message from "../Message/Message";
 import * as I from "./../../../modules/interface";
 import api, * as API from "./../../API";
 import { textToRGB} from './../Utils';
+import ChatImageStorage from "./../../API/ChatImages";
 
 interface IProps {
     chat: I.IChat | null;
+    storage: ChatImageStorage;
+    hash: string;
 }
 
 interface IState {
@@ -26,18 +29,20 @@ export default class Chat extends Component<IProps, IState> {
             },
         };
     }
+
+
     public render() {
-        if (!this.props.chat) {
+        const { chat, storage } = this.props;
+        if (!chat) {
             return <div className={`chat_container empty`}></div>;
         }
-        const { chat } = this.props;
         return (
             <div className="chat_container">
                 <AppBar position="relative" >
                     <Toolbar className="bar">
                         <ListItem style={{paddingTop:0,paddingBottom:0}}>
                             {chat.image ?
-                            <Avatar src={'http://localhost:5000/chats/image?chatId=' + chat.id} className='avatar' /> :
+                            <Avatar src={`data:image/jpeg;base64,${storage.get(chat.id)}`} className='avatar' /> :
                             <Avatar className="avatar" style={{ backgroundColor: textToRGB(chat.name) }}>
                             {chat.name.charAt(0) && chat.name.charAt(0).toUpperCase() || '#'}</Avatar>}
                             <ListItemText inset
@@ -64,7 +69,7 @@ export default class Chat extends Component<IProps, IState> {
                         chat={chat}
                         /* manager={this.props.manager}*/
                     /> : ""}
-                    {chat.status === 2 ? chat.messages.map((message) => <Message message={message} />) : ""}
+                    {chat.status === 2 ? chat.messages.map((message) => <Message key={message.id} message={message} chatName={chat.name} />) : ""}
                 </div>
                 {chat.status === 2 ? <div className="text_sender">
                     <TextField

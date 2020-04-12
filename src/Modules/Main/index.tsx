@@ -9,12 +9,15 @@ import logo from "./../../Theme/assets/load_icon.svg";
 import Chat from "./../Chat/Chat";
 import ChatList from "./../Chat/ChatsList";
 import NewContact from "./../NewContact";
+import ChatImageStorage from "./../../API/ChatImages";
 
 interface IState {
     drawer: boolean;
     chats: I.IChat[];
     currentChat: I.IChat | null;
     newContactModal: boolean;
+    storage: ChatImageStorage;
+    hash: string
 }
 
 export default class Main extends Component<{}, IState> {
@@ -24,7 +27,9 @@ export default class Main extends Component<{}, IState> {
             chats: [],
             currentChat: null,
             drawer: false,
-            newContactModal: false
+            newContactModal: false,
+            storage: new ChatImageStorage(() => this.setState({hash: (new Date()).toISOString()})),
+            hash: ''
         };
     }
     public async componentDidMount() {
@@ -78,8 +83,8 @@ export default class Main extends Component<{}, IState> {
                     <NewContact onClose={this.setContactModal(false)} closeDrawer={this.toggleDrawer}/>
                 </Modal>
                 <div className="playground">
-                    <ChatList chats={this.state.chats} currentChat={this.state.currentChat} loadChat={this.loadChat}/>
-                    <Chat chat={this.state.currentChat} />
+                    <ChatList chats={this.state.chats} currentChat={this.state.currentChat} loadChat={this.loadChat}  storage={this.state.storage}/>
+                    <Chat chat={this.state.currentChat} storage={this.state.storage} hash={this.state.hash} />
                 </div>
             </div>
         );

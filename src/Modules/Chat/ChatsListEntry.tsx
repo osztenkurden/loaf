@@ -21,6 +21,7 @@ function getSubText(chat: I.IChat, last: I.IMessage | null) {
 
 interface IProps {
     chat: I.IChat;
+    chatImage: string | null;
     loadChat: (chat: I.IChat) => void;
     isCurrent: boolean;
 }
@@ -42,7 +43,7 @@ export default class ChatsListEntry extends Component<IProps> {
         if(last.my){
             return <span className="you">You:</span>;
         }
-        return <span className="you">{last.senderId}</span>
+        return <span className="you">{last.sender?.username || last.senderId}:</span>
     }
 
     public render() {
@@ -55,7 +56,7 @@ export default class ChatsListEntry extends Component<IProps> {
                     onClick={() => this.props.loadChat(chat)}
                 >
                     {chat.image ?
-                    <Avatar src={"http://localhost:5000/chats/image?chatId=" + chat.id} className="avatar"/> :
+                    <Avatar src={`data:image/jpeg;base64,${this.props.chatImage}`} className="avatar"/> :
                     <Avatar className="avatar" style={{backgroundColor: textToRGB(chat.name)}}>
                     {chat.name.charAt(0) && chat.name.charAt(0).toUpperCase() || "#"}
                     </Avatar>}

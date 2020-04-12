@@ -2,11 +2,15 @@ import * as I from "../../modules/interface";
 import * as Loaf from "./Loaf";
 
 const api = {
+    session: {
+        getCookie: () => Loaf.api("getCookie", true)
+    },
     chats: {
         accept: (chatId: number) => Loaf.api("acceptChat", false, chatId),
         create: (name: string, users: number[]) => Loaf.api("createGroup", false, name, users),
         createTest: () => Loaf.api("createChatTest", false),
         get: () => Loaf.api("getChats", false),
+        loadImage: (chatId: number) => Loaf.api("loadImage", false, chatId),
     },
     message: {
         send: (chatId: number, message: I.IMessageContent) => Loaf.api("sendMessage", false, chatId, message),

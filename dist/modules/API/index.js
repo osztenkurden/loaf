@@ -48,6 +48,9 @@ exports.api = {
         createTestChat: function () { return LoafAPI_1["default"]("chats", "POST", { name: "Bakery", users: [1, 2, 3] }); },
         getReceivers: function (chatId) { return LoafAPI_1["default"]("machines/" + chatId); }
     },
+    chats: {
+        loadImage: function (chatId) { return LoafAPI_1["default"]("chats/image/base64?chatId=" + chatId); }
+    },
     messages: {
         get: function (chatId, machineId) { return LoafAPI_1["default"]("messages/" + chatId + "?machineId=" + machineId); },
         send: function (chatId, entries, senderMachine) {

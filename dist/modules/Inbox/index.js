@@ -150,6 +150,8 @@ var Inbox = /** @class */ (function () {
                     case 0: return [4 /*yield*/, this.getReceivers(chatId)];
                     case 1:
                         receivers = _a.sent();
+                        console.log('RECEIVERS:');
+                        console.log(receivers);
                         if (!receivers.length) {
                             return [2 /*return*/, false];
                         }
@@ -163,6 +165,8 @@ var Inbox = /** @class */ (function () {
                         return [4 /*yield*/, this.storage.createSession(machine)];
                     case 3:
                         message = _a.sent();
+                        console.log('message for ' + machine.userId + '-' + machine.machineId);
+                        console.log(message);
                         if (typeof message !== "boolean") {
                             messages.push(message);
                         }
@@ -204,6 +208,7 @@ var Inbox = /** @class */ (function () {
                             return [2 /*return*/, null];
                         }
                         messages = (response.data.messages || []);
+                        console.log(messages);
                         current = this.messages.get(chatId) || [];
                         _i = 0, messages_1 = messages;
                         _a.label = 3;
@@ -221,7 +226,8 @@ var Inbox = /** @class */ (function () {
                             content: decrypted,
                             date: (new Date()).toISOString(),
                             my: rawMessage.senderId === this.userId,
-                            senderId: rawMessage.senderId
+                            senderId: rawMessage.senderId,
+                            sender: rawMessage.sender
                         };
                         current.push(message);
                         _a.label = 5;

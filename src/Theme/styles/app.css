@@ -319,7 +319,6 @@ body {
 .avatar img {
     border-radius:50%;
     width:auto;
-    box-shadow: rgba(0, 0, 0, 0.2) 0px 1px 5px 0px, rgba(0, 0, 0, 0.14) 0px 2px 2px 0px, rgba(0, 0, 0, 0.12) 0px 3px 1px -2px;
 }
 
 /*.chat-button.new-message .avatar::before{
@@ -421,7 +420,9 @@ li > hr.separator {
 .bold {
     font-weight:700;
 }
-
+.message:not(.friend){
+    align-self: flex-end;
+}
 .message {
     background-color: #242b2f;
     border-bottom: 2px solid transparent;
@@ -435,6 +436,10 @@ li > hr.separator {
     margin-top: 5pt;
     margin-bottom: 5pt;
 }
+.message.friend {
+    display: flex;
+    flex-direction: row;
+}
 .message.announcement {
     align-self: center;
 }
@@ -444,9 +449,20 @@ li > hr.separator {
 .message p {
     padding: 1em;
     margin:0;
+    text-align: left;
 }
-.message p:nth-child(2){
+.message.friend p {
+    align-self: center;
     padding-top:0;
+}
+.message-sender-name {
+    text-align: left;
+    padding-left: 17px;
+    font-size: 12px;
+    color: #00b1e6;
+    margin-right: 1em;
+    margin-top: 15px;
+    margin-bottom: 2px;
 }
 .message_container{
     width: 100%;
@@ -454,6 +470,11 @@ li > hr.separator {
     display: flex;
     overflow:auto;
     flex-direction: column;
+}
+.message .avatar {
+    margin-left: 8px;
+    margin-top: 13px;
+    margin-bottom: 8px;
 }
 
 .message_container.request {
