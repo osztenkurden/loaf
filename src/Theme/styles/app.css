@@ -5,8 +5,11 @@
     --primaryColor700:#5a2700;
     --secondaryColor:#0e4380;
 }*/
-html, body, #root, .loaf-app, .loaf-app-logging, .playground, .loaf-app-splash {
+html, body, #root,.playground  {
     height:100%;
+}
+.loaf-app, .loaf-app-logging,  .loaf-app-splash {
+    height: calc(100% - 20px);
 }
 body {
     line-height: inherit;
@@ -59,6 +62,19 @@ body {
 }
 .loaf-app, .loaf-app-logging{
     width:100%;
+}
+.window-app {
+    width: 100%;
+}
+.window-bar  {
+    width:100%;
+    height:20px;
+    display:flex;
+    color:white;
+}
+.window-bar .window-drag-bar{
+    flex:1;
+    -webkit-app-region: drag;
 }
 .text-field-container > div::after {
     border-bottom: 2px solid rgba(255, 255, 255, 0.84) !important;
@@ -360,7 +376,6 @@ body {
 .chat_container{
     /*margin-top: 56px !important;*/
     width: 66%;
-    border-left: 1px solid rgba(70, 70, 70, 0.2);
     background-color: rgba(0,0,0,0.2);
     display:flex;
     flex-direction: column;

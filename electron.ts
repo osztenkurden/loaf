@@ -22,6 +22,7 @@ const startApp = async () => {
         minWidth: 400,
         show: false,
         title: "Loaf",
+        frame: false,
         webPreferences: {
             backgroundThrottling: false,
             // preload: __dirname + "/preload.js",

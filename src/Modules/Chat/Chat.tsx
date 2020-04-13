@@ -150,13 +150,29 @@ export default class Chat extends Component<IProps, IState> {
         if(!images.length || !this.props.chat){
             return console.log("NO IMAGES OR NO CHAT");
         }
-        const image = this.state.form.images[0];
-        const message: I.IMessageContent = {
-            type: "image",
-            content: image
-        };
-        api.message.send(this.props.chat.id, message);
-        this.setState({ form: { textMessage: "", images: [] } });
+        if(images.length === 1) {
+            const image = this.state.form.images[0];
+            const message: I.IMessageContent = {
+                type: "image",
+                content: image
+            };
+            api.message.send(this.props.chat.id, message);
+            this.setState({ form: { textMessage: "", images: [] } });
+        } else {
+            const message: I.IMessageContentMixed = {
+                type: "mixed",
+                content: []
+            }
+            for(const img of images){
+                const imgPayload: I.IMessageContentImage = {
+                    type: "image",
+                    content: img
+                }
+                message.content.push(imgPayload);
+            }
+            api.message.send(this.props.chat.id, message);
+            this.setState({ form: { textMessage: "", images: [] } });
+        }
     }
     private handleChange = (e: any) => {
         const { form } = this.state;

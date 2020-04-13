@@ -54,7 +54,7 @@ export default class Main extends Component<{}, IState> {
     public render() {
         return (
             <div className="loaf-app">
-                <AppBar position="fixed" >
+                <AppBar position="fixed" style={{top:'20px'}} >
                     <Toolbar className="bar">
                         <IconButton className="menuButton" color="inherit" aria-label="Open drawer"  onClick={this.toggleDrawer}>
                             <MenuIcon />

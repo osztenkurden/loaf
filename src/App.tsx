@@ -6,6 +6,7 @@ import * as Loaf from "./API/Loaf";
 import Login from "./Modules/Login";
 import Register from "./Modules/Register";
 import Splash from "./Modules/Splash";
+const { remote} = window.require('electron');
 
 interface IState {
     user: I.IUser | null;
@@ -14,7 +15,7 @@ interface IState {
     register: boolean;
 }
 
-export default class App extends React.Component<any, IState> {
+export class App extends React.Component<any, IState> {
     constructor(props: any) {
         super(props);
         this.state = {
@@ -63,5 +64,28 @@ export default class App extends React.Component<any, IState> {
 
     private togglePage = () => {
         this.setState((state) => ({...state, register: !state.register}));
+    }
+}
+
+export default class WindowApp extends React.Component {
+    minimize = () => {
+        remote.getCurrentWindow().minimize();
+    }
+    maximize = () => {
+        remote.getCurrentWindow().maximize();
+    }
+    close = () => {
+        remote.getCurrentWindow().close();
+    }
+    render(){
+        return <>
+            <div className="window-bar">
+                <div className="window-drag-bar"></div>
+                <div onClick={this.minimize}>_</div>
+                <div onClick={this.maximize}>O</div>
+                <div onClick={this.close}>X</div>
+            </div>
+            <App />
+        </>
     }
 }

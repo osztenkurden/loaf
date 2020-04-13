@@ -32,22 +32,22 @@ export interface IMessageContent {
 
 export type IMessageContent = IMessageContentText | IMessageContentImage | IMessageContentMixed;
 
-interface IMessageContentText {
+export interface IMessageContentText {
     type: "text";
     content: string;
 }
 
-interface IMessageContentImage {
+export interface IMessageContentImage {
     type: "image";
     content: string;
 }
 
-interface IMessageContentMixed {
+export interface IMessageContentMixed {
     type: "mixed";
     content: IMessageContentPackage[]
 }
 
-type IMessageContentPackage = IMessageContentImage | IMessageContentText;
+export type IMessageContentPackage = IMessageContentImage | IMessageContentText;
 
 export interface IMessageRaw {
     id: number;
@@ -63,7 +63,7 @@ export interface IMessageRaw {
     sender?: {
         id: number;
         username: string;
-        avatar: string | null;
+        avatar: Buffer | null;
     }
 }
 
@@ -77,7 +77,7 @@ export interface IMessage {
     sender?: {
         id: number;
         username: string;
-        avatar: string | null;
+        avatar: Buffer | null;
     }
 }
 
