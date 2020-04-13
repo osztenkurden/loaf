@@ -38,7 +38,6 @@ export default class Cypher {
         const address = new libsignal.SignalProtocolAddress(recipientId, machineId);
 
         if (bundle) {
-            console.log("We create the session");
             await this.store.createSession(address, bundle);
         }
 

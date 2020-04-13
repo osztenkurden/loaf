@@ -74,7 +74,6 @@ function initSockets() {
         console.log("DISCONNECTION #2");
     });
     socket.on("chat", function () {
-        console.log("CHATS");
         var inbox = User_1["default"].getInbox();
         if (inbox) {
             inbox.loadChats();
@@ -83,7 +82,6 @@ function initSockets() {
     socket.on("message", function (data) { return __awaiter(_this, void 0, void 0, function () {
         var inbox;
         return __generator(this, function (_a) {
-            console.log("messages");
             inbox = User_1["default"].getInbox();
             if (inbox && data.chatId) {
                 inbox.loadMessages(data.chatId);
@@ -158,7 +156,6 @@ exports.start = function (win) {
                 case 0: return [4 /*yield*/, API_1.api.inbox.createTestChat()];
                 case 1:
                     response = _a.sent();
-                    console.log(response);
                     return [2 /*return*/, { event: 'createdChat', data: response.data }];
             }
         });

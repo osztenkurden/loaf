@@ -84,8 +84,6 @@ export default class Inbox {
 
     public async acceptChat(chatId: number) {
         const receivers = await this.getReceivers(chatId);
-        console.log('RECEIVERS:')
-        console.log(receivers);
         if (!receivers.length) {
             return false;
         }
@@ -94,8 +92,6 @@ export default class Inbox {
 
         for (const machine of receivers) {
             const message = await this.storage.createSession(machine);
-            console.log('message for ' + machine.userId + '-'+machine.machineId);
-            console.log(message);
             if (typeof message !== "boolean") {
                 messages.push(message);
             }
@@ -123,7 +119,7 @@ export default class Inbox {
             return null;
         }
         const messages = (response.data.messages || []) as I.IMessageRaw[];
-        console.log(messages);
+        
         const current = this.messages.get(chatId) || [];
         for (const rawMessage of messages) {
             const decrypted = await this.storage.decodeMessage(rawMessage);

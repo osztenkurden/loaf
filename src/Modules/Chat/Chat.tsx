@@ -1,12 +1,13 @@
-
-import { AppBar, Avatar, ListItem, ListItemText, TextField, Toolbar } from "@material-ui/core";
+import { Avatar, ListItem, ListItemText, TextField, Toolbar } from "@material-ui/core";
 import React, { Component } from "react";
+import { CloudUpload } from "@material-ui/icons";
 import Announcement from "../Message/Announcement";
 import Message from "../Message/Message";
 import * as I from "./../../../modules/interface";
 import api, * as API from "./../../API";
 import { textToRGB} from './../Utils';
 import ChatImageStorage from "./../../API/ChatImages";
+import AppBar from './AppBar';
 
 interface IProps {
     chat: I.IChat | null;
@@ -17,7 +18,9 @@ interface IProps {
 interface IState {
     form: {
         textMessage: string;
+        images: string[]
     };
+    highlight: boolean;
 }
 
 export default class Chat extends Component<IProps, IState> {
@@ -26,10 +29,60 @@ export default class Chat extends Component<IProps, IState> {
         this.state = {
             form: {
                 textMessage: "",
+                images: []
             },
+            highlight: false
         };
     }
 
+    allow = (e: any) => {  
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    whileOver = (evt: React.DragEvent<HTMLDivElement>) => {
+        let highlight = false;
+        if(evt.type === "dragenter" || evt.type === "dragover"){
+            highlight = true;
+        }
+        if(this.state.highlight !== highlight){
+            this.setState({ highlight })
+        }
+    }
+
+    drop = (evt: React.DragEvent<HTMLDivElement>) => {
+        if(evt.dataTransfer)
+            this.handleImages(evt.dataTransfer.files);
+        
+        this.setState({highlight: false});
+    }
+
+    public handleImages = (files: FileList) => {
+        if(!files || !files.length) return;
+        const images: string[] = [];
+
+        const readFile = (index: number, file?: File) => {
+            console.log(file);
+            if(!file){
+                return this.setState(state => {
+                    state.form.images = images;
+                    return state;
+                }, () => console.log(this.state));
+            }
+            let reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => {
+                if(typeof reader.result !== "string"){
+                    return readFile(index+1, files[index+1]);;
+                }
+                const img = reader.result.replace(/^data:([a-z]+)\/([a-z0-9]+);base64,/, '');
+                images.push(img);
+                return readFile(index+1, files[index+1]);
+            }
+        }
+
+        readFile(0, files[0]);
+    }
 
     public render() {
         const { chat, storage } = this.props;
@@ -38,31 +91,15 @@ export default class Chat extends Component<IProps, IState> {
         }
         return (
             <div className="chat_container">
-                <AppBar position="relative" >
-                    <Toolbar className="bar">
-                        <ListItem style={{paddingTop:0,paddingBottom:0}}>
-                            {chat.image ?
-                            <Avatar src={`data:image/jpeg;base64,${storage.get(chat.id)}`} className='avatar' /> :
-                            <Avatar className="avatar" style={{ backgroundColor: textToRGB(chat.name) }}>
-                            {chat.name.charAt(0) && chat.name.charAt(0).toUpperCase() || '#'}</Avatar>}
-                            <ListItemText inset
-                                className="chat-text-item"
-                                primary={
-                                    <div className={"chat-name"}>
-                                        <div className="chat-name-text">{chat.name}</div>
-                                    </div>
-                                } secondary={
-
-                                    <div className="chat-last-message">
-                                        <div className="text">
-                                            { chat.last?.my ?
-                                                <span className="you">Ty:</span>
-                                            : "" } Last seen 10 minutes ago</div>
-                                    </div>} />
-                        </ListItem>
-                    </Toolbar>
-                </AppBar>
-                <div className={"message_container"}>
+                <AppBar chat={chat} storage={storage}/>
+                <div className={`message_container ${this.state.highlight ? 'highlight-drag':''} ${this.state.form.images.length ? 'upload':''}`}
+                    onDragOver={this.allow}
+                    onDragEnter={this.whileOver}
+                    onDragOverCapture={this.whileOver}
+                    onDragEnd={this.whileOver}
+                    onDragLeave={this.whileOver}
+                    onDrop={this.drop}
+                >   
                     { chat.status === 1 || !chat.messages.length ?
                     <Announcement
                         request={chat.status === 1}
@@ -70,6 +107,14 @@ export default class Chat extends Component<IProps, IState> {
                         /* manager={this.props.manager}*/
                     /> : ""}
                     {chat.status === 2 ? chat.messages.map((message) => <Message key={message.id} message={message} chatName={chat.name} />) : ""}
+                </div>
+                <div className="drag-show">
+                    <div className="drag-window">
+                        {this.state.form.images.length ? <div>
+                            {this.state.form.images.map(src => <img src={`data:image/jpeg;base64,${src}`} className="drag-file-img-preview" alt={'Preview'} />)}
+                            <div onClick={this.sendImage}>SEEEND</div>
+                        </div> : <CloudUpload />}
+                    </div>
                 </div>
                 {chat.status === 2 ? <div className="text_sender">
                     <TextField
@@ -97,8 +142,21 @@ export default class Chat extends Component<IProps, IState> {
             // TODO: SEND MESSAGE
             const content = this.state.form.textMessage;
             api.message.send(this.props.chat.id, { type: "text", content });
-            this.setState({ form: { textMessage: "" } });
+            this.setState({ form: { textMessage: "", images: [] } });
         }
+    }
+    private sendImage = () => {
+        const images = this.state.form.images;
+        if(!images.length || !this.props.chat){
+            return console.log("NO IMAGES OR NO CHAT");
+        }
+        const image = this.state.form.images[0];
+        const message: I.IMessageContent = {
+            type: "image",
+            content: image
+        };
+        api.message.send(this.props.chat.id, message);
+        this.setState({ form: { textMessage: "", images: [] } });
     }
     private handleChange = (e: any) => {
         const { form } = this.state;

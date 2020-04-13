@@ -92,7 +92,6 @@ var Cypher = /** @class */ (function () {
                         content = this.encodeMessage(message);
                         address = new libsignal.SignalProtocolAddress(recipientId, machineId);
                         if (!bundle) return [3 /*break*/, 2];
-                        console.log("We create the session");
                         return [4 /*yield*/, this.store.createSession(address, bundle)];
                     case 1:
                         _a.sent();

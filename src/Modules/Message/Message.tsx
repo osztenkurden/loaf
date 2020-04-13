@@ -6,7 +6,7 @@ import * as I from "./../../../modules/interface";
 class FriendMessage extends Component<{message: I.IMessage, sender: { username: string, id: number, avatar: string | null}}>{
     public render(){
         const { message, sender } = this.props;
-        return <div className={"message friend"}>
+        return <div className={`message friend ${message.content.type}`}>
             <Avatar className="avatar" style={{ backgroundColor: textToRGB(sender.username) }}>
                 {sender.username?.charAt(0).toUpperCase() || `#${sender.id}`}
             
@@ -15,7 +15,12 @@ class FriendMessage extends Component<{message: I.IMessage, sender: { username: 
                 <div className="message-sender-name">
                     {sender.username}
                 </div>
+                {message.content.type === "image" ? <div className="">
+                    <img src={`data:image/jpeg;base64,${message.content.content}`}/>
+                </div>
+                :
                 <p>{message.content.content}</p>
+                }
             </div>
         </div>;
     }
@@ -24,10 +29,17 @@ class FriendMessage extends Component<{message: I.IMessage, sender: { username: 
 export default class Message extends Component<{message: I.IMessage, chatName: string}, any> {
     public render() {
         const { message, chatName } = this.props;
-        console.log(message)
+        if(message.content.type === "mixed") return <div className={"message"}>
+            <p>Not supported yet</p>
+        </div>;
         if(!message.my && message.sender) return <FriendMessage message={message} sender={message.sender}/>
+        if(message.content.type === "image"){
+            return <div className={"message"}>
+                <div><img src={`data:image/jpeg;base64,${message.content.content}`}/></div>
+            </div>;
+        }
         return <div className={"message"}>
-            <p>{this.props.message.content.content}</p>
+            <p>{message.content.content}</p>
         </div>;
     }
 }

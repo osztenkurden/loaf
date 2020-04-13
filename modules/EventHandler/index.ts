@@ -31,7 +31,6 @@ export function initSockets() {
     })
 
     socket.on("chat", () => {
-        console.log("CHATS");
         const inbox = User.getInbox();
 
         if (inbox) {
@@ -40,7 +39,6 @@ export function initSockets() {
     });
 
     socket.on("message", async (data: any) => {
-        console.log("messages");
         const inbox = User.getInbox();
 
         if (inbox && data.chatId) {
@@ -99,7 +97,6 @@ export const start = (win: Electron.WebContents) => {
 
     Loaf.onAsync("createChatTest", async () => {
         const response = await api.inbox.createTestChat();
-        console.log(response);
 
         return { event: 'createdChat', data: response.data };
     })

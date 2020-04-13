@@ -24,11 +24,30 @@ export interface IMessagePayload {
     recipientId: number;
     machineId: number;
 }
-
+/*
 export interface IMessageContent {
+    type: "text" | "image";
+    content: string;
+}*/
+
+export type IMessageContent = IMessageContentText | IMessageContentImage | IMessageContentMixed;
+
+interface IMessageContentText {
     type: "text";
     content: string;
 }
+
+interface IMessageContentImage {
+    type: "image";
+    content: string;
+}
+
+interface IMessageContentMixed {
+    type: "mixed";
+    content: IMessageContentPackage[]
+}
+
+type IMessageContentPackage = IMessageContentImage | IMessageContentText;
 
 export interface IMessageRaw {
     id: number;
