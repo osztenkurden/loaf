@@ -42,6 +42,9 @@ exports.__esModule = true;
 var fetch_cookie_1 = __importDefault(require("fetch-cookie"));
 var node_fetch_1 = __importDefault(require("node-fetch"));
 var tough_cookie_1 = __importDefault(require("tough-cookie"));
+var Machine_1 = require("./../Machine");
+var fs_1 = __importDefault(require("fs"));
+var path_1 = __importDefault(require("path"));
 var cookieJar = new tough_cookie_1["default"].CookieJar();
 var fetch = fetch_cookie_1["default"](node_fetch_1["default"], cookieJar);
 var config = {
@@ -54,7 +57,7 @@ exports.getCookie = function () {
 function apiV2(url, method, body) {
     if (method === void 0) { method = "GET"; }
     return __awaiter(this, void 0, void 0, function () {
-        var options, res, response, _a, _b;
+        var options, res, e_1, errorContent, response, _a, _b;
         return __generator(this, function (_c) {
             switch (_c.label) {
                 case 0:
@@ -65,25 +68,34 @@ function apiV2(url, method, body) {
                     if (body) {
                         options.body = JSON.stringify(body);
                     }
-                    return [4 /*yield*/, fetch(config.apiURL + "/" + url, options)];
+                    _c.label = 1;
                 case 1:
-                    res = _c.sent();
-                    _c.label = 2;
+                    _c.trys.push([1, 3, , 4]);
+                    return [4 /*yield*/, fetch(config.apiURL + "/" + url, options)];
                 case 2:
-                    _c.trys.push([2, 4, , 5]);
+                    res = _c.sent();
+                    return [3 /*break*/, 4];
+                case 3:
+                    e_1 = _c.sent();
+                    errorContent = "\n            URL: " + url + "\n            METHOD: " + method + "\n            ERROR: " + e_1 + "\n            BODY: " + options.body + "\n        ";
+                    console.log('Error has been saved');
+                    fs_1["default"].writeFileSync(path_1["default"].join(Machine_1.directories.db, "error.txt"), errorContent);
+                    return [2 /*return*/, { status: 500, success: false }];
+                case 4:
+                    _c.trys.push([4, 6, , 7]);
                     _a = {};
                     return [4 /*yield*/, res.json()];
-                case 3:
+                case 5:
                     response = (_a.data = _c.sent(),
                         _a.status = res.status,
                         _a.success = res.status < 300,
                         _a);
                     return [2 /*return*/, response];
-                case 4:
+                case 6:
                     _b = _c.sent();
                     // Checks if status was successfull (HTTP200-HTTP299)
                     return [2 /*return*/, { status: res.status, success: res.status < 300 }];
-                case 5: return [2 /*return*/];
+                case 7: return [2 /*return*/];
             }
         });
     });

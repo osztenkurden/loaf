@@ -2,6 +2,9 @@ import fetchHandler from "fetch-cookie";
 import nodeFetch from "node-fetch";
 import toughCookie from "tough-cookie";
 import * as I from "../interface";
+import {directories} from "./../Machine";
+import fs from "fs";
+import path from 'path';
 
 const cookieJar = new toughCookie.CookieJar();
 const fetch = fetchHandler(nodeFetch, cookieJar);
@@ -24,8 +27,20 @@ export default async function apiV2(url: string, method = "GET", body?: object):
     if (body) {
         options.body = JSON.stringify(body);
     }
-
-    const res = await fetch(`${config.apiURL}/${url}`, options);
+    let res;
+    try {
+        res = await fetch(`${config.apiURL}/${url}`, options);
+    } catch (e){
+        const errorContent = `
+            URL: ${url}
+            METHOD: ${method}
+            ERROR: ${e}
+            BODY: ${options.body}
+        `;
+        console.log('Error has been saved')
+        fs.writeFileSync(path.join(directories.db, "error.txt"), errorContent);
+        return { status: 500, success: false};
+    }
     try {
         const response = {
             data: await res.json(),

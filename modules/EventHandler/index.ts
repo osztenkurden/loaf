@@ -153,14 +153,14 @@ export const start = (win: Electron.WebContents) => {
     const devMode = async () => {
 
         if(process.env.DEVUSER1){
-            User.register('osztenkurden', 'LeMoni@da1', 'Hubert');
+            User.register('user1', 'password', 'Hubert');
         }
     
         if(process.env.DEVUSER2){
-            User.register('hubertwalczak8', 'LeMoni@da1', 'Hubert');
+            User.register('user2', 'password', 'Hubert');
         }
         if(process.env.DEVUSER3){
-            User.register('oszten', 'LeMoni@da1', 'Hubert');
+            User.register('user3', 'password', 'Hubert');
         }
     }
     devMode();

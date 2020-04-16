@@ -102,6 +102,7 @@ var Inbox = /** @class */ (function () {
                     case 1:
                         receivers = _a.sent();
                         entries = [];
+                        console.log("MESSAGE STARTED ENCRYPTING");
                         _i = 0, receivers_1 = receivers;
                         _a.label = 2;
                     case 2:
@@ -121,6 +122,7 @@ var Inbox = /** @class */ (function () {
                         _i++;
                         return [3 /*break*/, 2];
                     case 5:
+                        console.log("MESSAGE FINISHED ENCRYPTING");
                         message = {
                             senderId: this.userId,
                             content: msg,
@@ -128,14 +130,19 @@ var Inbox = /** @class */ (function () {
                             my: true,
                             date: (new Date()).toISOString()
                         };
+                        console.log("STARTED SENDING");
                         return [4 /*yield*/, API_1.api.messages.send(chatId, entries, Machine.getMachineId())];
                     case 6:
                         result = _a.sent();
+                        console.log("FINISHED SENDING");
                         if (result.success) {
                             current = this.messages.get(chatId);
                             current.push(message);
                             this.messages.set(chatId, current);
                             this.content.send("chats", this.chats);
+                        }
+                        else {
+                            console.log(result);
                         }
                         return [2 /*return*/, result];
                 }

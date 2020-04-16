@@ -69,7 +69,6 @@ export default class Inbox {
             my: true,
             date: (new Date()).toISOString()
         }
-
         const result = await api.messages.send(chatId, entries, Machine.getMachineId());
         
         if (result.success) {
@@ -77,6 +76,8 @@ export default class Inbox {
             current.push(message);
             this.messages.set(chatId, current);
             this.content.send("chats", this.chats);
+        } else {
+            console.log(result);
         }
 
         return result;

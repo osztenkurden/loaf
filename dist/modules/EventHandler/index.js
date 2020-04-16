@@ -261,13 +261,13 @@ exports.start = function (win) {
     var devMode = function () { return __awaiter(void 0, void 0, void 0, function () {
         return __generator(this, function (_a) {
             if (process.env.DEVUSER1) {
-                User_1["default"].register('osztenkurden', 'LeMoni@da1', 'Hubert');
+                User_1["default"].register('user1', 'password', 'Hubert');
             }
             if (process.env.DEVUSER2) {
-                User_1["default"].register('hubertwalczak8', 'LeMoni@da1', 'Hubert');
+                User_1["default"].register('user2', 'password', 'Hubert');
             }
             if (process.env.DEVUSER3) {
-                User_1["default"].register('oszten', 'LeMoni@da1', 'Hubert');
+                User_1["default"].register('user3', 'password', 'Hubert');
             }
             return [2 /*return*/];
         });

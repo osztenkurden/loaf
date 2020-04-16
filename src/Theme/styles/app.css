@@ -383,6 +383,14 @@ body {
 .chat-list-entry.current {
     background-color:#6ce6f11a;
 }
+.chat-list-entry.current.new-convo {
+    background-color:rgba(108, 230, 241, 0.3);
+}
+.chat-list-entry.new-convo .chat-name-text{
+    text-transform: uppercase;
+    font-weight:600;
+    letter-spacing: 2.5px;
+}
 .chat_container.empty {
     background-image: url('./../assets/loaf_newlogo.svg');
     background-repeat: no-repeat;
