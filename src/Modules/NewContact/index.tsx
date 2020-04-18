@@ -37,7 +37,7 @@ export default class NewContact extends Component<IProps, IState> {
     }
 
     addContact = () => {
-        this.setState({loading: true}, () => api.user.add(this.state.name));
+        if(!this.state.loading) this.setState({loading: true}, () => api.user.add(this.state.name));
     }
 
     render(){
@@ -50,6 +50,7 @@ export default class NewContact extends Component<IProps, IState> {
                     className="text-field-container"
                     value={this.state.name}
                     onChange={this.onChange}
+                    disabled={this.state.loading}
                     placeholder="Username"
                     InputProps={{
                         className:'contact-input',

@@ -45,6 +45,7 @@ exports.api = {
         accept: function (payload) { return LoafAPI_1["default"]("chats/users", "PATCH", { messages: payload, chatId: payload.chatId }); },
         addFriend: function (userId) { return LoafAPI_1["default"]("chats?private=true", "POST", { name: "", users: [userId] }); },
         getChats: function () { return LoafAPI_1["default"]("chats"); },
+        createGroup: function (name, users) { return LoafAPI_1["default"]("chats", "POST", { name: name, users: users }); },
         createTestChat: function () { return LoafAPI_1["default"]("chats", "POST", { name: "Bakery", users: [1, 2, 3] }); },
         getReceivers: function (chatId) { return LoafAPI_1["default"]("machines/" + chatId); }
     },

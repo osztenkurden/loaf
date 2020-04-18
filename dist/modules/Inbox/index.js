@@ -60,7 +60,7 @@ var Inbox = /** @class */ (function () {
                 }
             });
         }); };
-        this.loadChats = function () { return __awaiter(_this, void 0, void 0, function () {
+        this.loadChats = function (init) { return __awaiter(_this, void 0, void 0, function () {
             var response, chats, _i, chats_1, chat, messages;
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -81,6 +81,9 @@ var Inbox = /** @class */ (function () {
                             this.chats = chats;
                         }
                         this.content.send("chats", this.chats);
+                        if (init) {
+                            this.loadAllMessages();
+                        }
                         // Loaf.send("chats", this.chats);
                         return [2 /*return*/, this];
                 }
@@ -91,7 +94,7 @@ var Inbox = /** @class */ (function () {
         this.userId = userId;
         this.storage = storage;
         this.messages = new Map();
-        this.loadChats();
+        this.loadChats(true);
     }
     Inbox.prototype.sendToChat = function (chatId, msg) {
         return __awaiter(this, void 0, void 0, function () {
@@ -102,7 +105,6 @@ var Inbox = /** @class */ (function () {
                     case 1:
                         receivers = _a.sent();
                         entries = [];
-                        console.log("MESSAGE STARTED ENCRYPTING");
                         _i = 0, receivers_1 = receivers;
                         _a.label = 2;
                     case 2:
@@ -122,7 +124,6 @@ var Inbox = /** @class */ (function () {
                         _i++;
                         return [3 /*break*/, 2];
                     case 5:
-                        console.log("MESSAGE FINISHED ENCRYPTING");
                         message = {
                             senderId: this.userId,
                             content: msg,
@@ -130,11 +131,9 @@ var Inbox = /** @class */ (function () {
                             my: true,
                             date: (new Date()).toISOString()
                         };
-                        console.log("STARTED SENDING");
                         return [4 /*yield*/, API_1.api.messages.send(chatId, entries, Machine.getMachineId())];
                     case 6:
                         result = _a.sent();
-                        console.log("FINISHED SENDING");
                         if (result.success) {
                             current = this.messages.get(chatId);
                             current.push(message);
@@ -192,6 +191,29 @@ var Inbox = /** @class */ (function () {
                             return [2 /*return*/, true];
                         }
                         return [2 /*return*/, false];
+                }
+            });
+        });
+    };
+    Inbox.prototype.loadAllMessages = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var _i, _a, chat;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        _i = 0, _a = this.chats;
+                        _b.label = 1;
+                    case 1:
+                        if (!(_i < _a.length)) return [3 /*break*/, 4];
+                        chat = _a[_i];
+                        return [4 /*yield*/, this.loadMessages(chat.id)];
+                    case 2:
+                        _b.sent();
+                        _b.label = 3;
+                    case 3:
+                        _i++;
+                        return [3 /*break*/, 1];
+                    case 4: return [2 /*return*/];
                 }
             });
         });

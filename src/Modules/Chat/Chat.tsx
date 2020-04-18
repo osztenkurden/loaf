@@ -62,7 +62,9 @@ export default class Chat extends Component<IProps, IState> {
         const images: string[] = [];
 
         const readFile = (index: number, file?: File) => {
-            console.log(file);
+            if(file && !file.type?.startsWith("image/")){
+                return;
+            }
             if(!file){
                 return this.setState(state => {
                     state.form.images = images;
@@ -122,7 +124,7 @@ export default class Chat extends Component<IProps, IState> {
                         name="textMessage"
                         onKeyDown={this.handleKeyDown}
                         id="full-width"
-                        placeholder="Placeholder"
+                        placeholder="Type in a message..."
                         fullWidth
                         value={this.state.form.textMessage}
                         variant="outlined"

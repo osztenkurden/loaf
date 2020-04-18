@@ -104,6 +104,21 @@ body {
     margin-top: calc(50vh - var(--height)/2);
     background-color: var(--primaryColor600) !important;
 }
+.visible-name, .main-identifier {
+    color: white;
+}
+.new-conversation-entry.selected {
+    background: rgba(255,255,255,0.1);
+}
+.modal-container.new-conversation {
+    --height: 389px;
+    height:var(--height);
+    width:350px;
+    outline:none;
+    margin: auto;
+    margin-top: calc(50vh - var(--height)/2);
+    background-color: var(--primaryColor600) !important;
+}
 .drawer-content {
     background-color: var(--primaryColor600) !important;
     background-image: url('./../assets/loaf-bg.svg');

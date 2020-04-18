@@ -149,6 +149,24 @@ exports.start = function (win) {
             }
         });
     }); });
+    Loaf.onAsync("createGroup", function (name, users) { return __awaiter(void 0, void 0, void 0, function () {
+        var user, response;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    user = User_1["default"].getUser();
+                    if (!user.id)
+                        return [2 /*return*/, null];
+                    if (!users.includes(user.id)) {
+                        users.push(user.id);
+                    }
+                    return [4 /*yield*/, API_1.api.inbox.createGroup(name, users)];
+                case 1:
+                    response = _a.sent();
+                    return [2 /*return*/, { event: 'createdChat', data: response.data }];
+            }
+        });
+    }); });
     Loaf.onAsync("createChatTest", function () { return __awaiter(void 0, void 0, void 0, function () {
         var response;
         return __generator(this, function (_a) {

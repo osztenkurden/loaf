@@ -21,7 +21,7 @@ export default class Inbox {
         this.userId = userId;
         this.storage = storage;
         this.messages = new Map();
-        this.loadChats();
+        this.loadChats(true);
     }
 
     public addFriend = async (userId: number) => {
@@ -30,7 +30,7 @@ export default class Inbox {
         return this;
     }
 
-    public loadChats = async () => {
+    public loadChats = async (init?: boolean) => {
         const response = await api.inbox.getChats();
         if (response.success && response.data) {
             const chats = response.data.chats as I.IChat[];
@@ -46,6 +46,9 @@ export default class Inbox {
             this.chats = chats;
         }
         this.content.send("chats", this.chats);
+        if(init){
+            this.loadAllMessages();
+        }
         // Loaf.send("chats", this.chats);
         return this;
     }
@@ -67,7 +70,7 @@ export default class Inbox {
             content: msg,
             chatId,
             my: true,
-            date: (new Date()).toISOString()
+            date: (new Date()).toISOString(),
         }
         const result = await api.messages.send(chatId, entries, Machine.getMachineId());
         
@@ -113,6 +116,12 @@ export default class Inbox {
         return false;
     }
 
+    public async loadAllMessages() {
+        for(const chat of this.chats){
+            await this.loadMessages(chat.id);
+        }
+    }
+
     public async loadMessages(chatId: number) {
         await this.loadChats();
         const response = await api.messages.get(chatId, Machine.getMachineId());
@@ -134,7 +143,7 @@ export default class Inbox {
                 date: (new Date()).toISOString(),
                 my: rawMessage.senderId === this.userId,
                 senderId: rawMessage.senderId,
-                sender: rawMessage.sender
+                sender: rawMessage.sender,
             };
             current.push(message);
         }

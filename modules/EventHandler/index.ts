@@ -95,6 +95,16 @@ export const start = (win: Electron.WebContents) => {
         return { event: "userAdded", data: true };
     });
 
+    Loaf.onAsync("createGroup", async (name: string, users: number[]) => {
+        const user = User.getUser();
+        if(!user.id) return null;
+        if(!users.includes(user.id)){
+            users.push(user.id);
+        }
+        const response = await api.inbox.createGroup(name, users);
+        return { event: 'createdChat', data: response.data };
+    })
+
     Loaf.onAsync("createChatTest", async () => {
         const response = await api.inbox.createTestChat();
 

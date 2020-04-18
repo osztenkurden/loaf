@@ -24,6 +24,12 @@ export default class Login extends Component<IProps, IState> {
         };
     }
 
+    keyPress = (event: any) => {
+        if(event.key === "Enter"){
+            this.logIn();
+        }
+    }
+
     public render() {
         if (this.props.authentication) {
             return (
@@ -51,6 +57,7 @@ export default class Login extends Component<IProps, IState> {
                         placeholder="Username"
                         color="primary"
                         value={this.state.username}
+                        onKeyPress={this.keyPress}
                         onChange={this.handleChange("username")}
                         required
                     />
@@ -58,6 +65,7 @@ export default class Login extends Component<IProps, IState> {
                         className="password-input"
                         placeholder="Password"
                         required
+                        onKeyPress={this.keyPress}
                         value={this.state.password}
                         onChange={this.handleChange("password")}
                         type="password"

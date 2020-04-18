@@ -7,7 +7,7 @@ const api = {
     },
     chats: {
         accept: (chatId: number) => Loaf.api("acceptChat", false, chatId),
-        create: (name: string, users: number[]) => Loaf.api("createGroup", false, name, users),
+        createGroup: (name: string, users: number[]) => Loaf.api("createGroup", false, name, users),
         createTest: () => Loaf.api("createChatTest", false),
         get: () => Loaf.api("getChats", false),
         loadImage: (chatId: number) => Loaf.api("loadImage", false, chatId),

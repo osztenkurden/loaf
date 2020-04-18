@@ -89,6 +89,7 @@ export interface IChat {
     creatorId: number;
     private: boolean;
     status: number;
+    users: IUser[];
     unread: boolean;
     messages: IMessage[];
 }

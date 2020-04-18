@@ -22,7 +22,7 @@ const startApp = async () => {
         minWidth: 400,
         show: false,
         title: "Loaf",
-        transparent:true,
+        //transparent:true,
         frame: false,
         webPreferences: {
             backgroundThrottling: false,

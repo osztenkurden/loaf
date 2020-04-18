@@ -7,11 +7,13 @@ import ChatImageStorage from "API/ChatImages";
 import { textToRGB } from "Modules/Utils";
 import moment from "moment";
 
+
 interface IProps {
     chats: I.IChat[];
     storage: ChatImageStorage;
     currentChat: I.IChat | null;
     loadChat: (chat: I.IChat) => void;
+    newConversation: () => void;
 }
 
 
@@ -20,13 +22,13 @@ export default class ChatsList extends Component<IProps> {
         api.chats.createTest();
     }
     public render() {
-        const { chats } = this.props;
+        const { chats, newConversation } = this.props;
         return <div className="chat-list">
             <List>
             <div className={`chat-list-entry current new-convo`}>
                 <ListItem button
                     className={"chat-button"}
-                    onClick={() => {}}
+                    onClick={newConversation}
                 >
                     <Avatar className="avatar">+</Avatar>
                     <ListItemText inset
@@ -50,11 +52,11 @@ export default class ChatsList extends Component<IProps> {
                     chat={chat}
                     chatImage={this.props.storage.get(chat.id)}
                     loadChat={this.props.loadChat}
+                    storage={this.props.storage}
                     isCurrent={this.props.currentChat?.id === chat.id}
                 />)}
             </List>
             <div onClick={this.requestTestFriend}>Add Test Group</div>
-            <div /*onClick={/*() => this.loadMessages(1)}*/>Get messages</div>
         </div>;
     }
 }

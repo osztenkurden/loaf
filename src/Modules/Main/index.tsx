@@ -9,6 +9,7 @@ import logo from "./../../Theme/assets/load_icon.svg";
 import Chat from "./../Chat/Chat";
 import ChatList from "./../Chat/ChatsList";
 import NewContact from "./../NewContact";
+import NewConversation from "./../NewConversation";
 import ChatImageStorage from "./../../API/ChatImages";
 
 interface IState {
@@ -16,6 +17,7 @@ interface IState {
     chats: I.IChat[];
     currentChat: I.IChat | null;
     newContactModal: boolean;
+    newConversationModal: boolean;
     storage: ChatImageStorage;
     hash: string
 }
@@ -28,6 +30,7 @@ export default class Main extends Component<{}, IState> {
             currentChat: null,
             drawer: false,
             newContactModal: false,
+            newConversationModal: false,
             storage: new ChatImageStorage(() => this.setState({hash: (new Date()).toISOString()})),
             hash: ''
         };
@@ -47,6 +50,9 @@ export default class Main extends Component<{}, IState> {
     }
     public setContactModal = (state: boolean) => () => {
         this.setState({newContactModal: state});
+    }
+    public setConversationModal = (state: boolean) => () => {
+        this.setState({newConversationModal: state});
     }
     public toggleDrawer = () => {
         this.setState((state) => ({ ...state, drawer: !state.drawer }));
@@ -82,8 +88,26 @@ export default class Main extends Component<{}, IState> {
                     >
                     <NewContact onClose={this.setContactModal(false)} closeDrawer={this.toggleDrawer}/>
                 </Modal>
+                <Modal
+                    open={this.state.newConversationModal}
+                    onClose={this.setConversationModal(false)}
+                    >
+                    <NewConversation
+                    
+                        onClose={this.setConversationModal(false)}
+                        closeDrawer={this.toggleDrawer}
+                        chats={this.state.chats}
+                        storage={this.state.storage}
+                    />
+                </Modal>
                 <div className="playground">
-                    <ChatList chats={this.state.chats} currentChat={this.state.currentChat} loadChat={this.loadChat}  storage={this.state.storage}/>
+                    <ChatList
+                        chats={this.state.chats}
+                        currentChat={this.state.currentChat}
+                        loadChat={this.loadChat} 
+                        storage={this.state.storage}
+                        newConversation={this.setConversationModal(true)}
+                    />
                     <Chat chat={this.state.currentChat} storage={this.state.storage} hash={this.state.hash} />
                 </div>
             </div>
