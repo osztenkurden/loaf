@@ -7,7 +7,6 @@ export const api = {
         addFriend: (userId: number) => Loaf("chats?private=true", "POST", { name: "", users: [userId]}),
         getChats: () => Loaf("chats"),
         createGroup: (name: string, users: number[]) => Loaf("chats", "POST", { name, users }),
-        createTestChat: () => Loaf("chats", "POST", {name: "Bakery", users: [1,2,3]}),
         getReceivers: (chatId: number) => Loaf(`machines/${chatId}`),
     },
     chats: {

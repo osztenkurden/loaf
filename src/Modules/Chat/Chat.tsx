@@ -6,12 +6,10 @@ import Message from "../Message/Message";
 import * as I from "./../../../modules/interface";
 import api, * as API from "./../../API";
 import { textToRGB} from './../Utils';
-import ChatImageStorage from "./../../API/ChatImages";
 import AppBar from './AppBar';
 
 interface IProps {
     chat: I.IChat | null;
-    storage: ChatImageStorage;
     hash: string;
 }
 
@@ -87,13 +85,13 @@ export default class Chat extends Component<IProps, IState> {
     }
 
     public render() {
-        const { chat, storage } = this.props;
+        const { chat } = this.props;
         if (!chat) {
             return <div className={`chat_container empty`}></div>;
         }
         return (
             <div className="chat_container">
-                <AppBar chat={chat} storage={storage}/>
+                <AppBar chat={chat} />
                 <div className={`message_container ${this.state.highlight ? 'highlight-drag':''} ${this.state.form.images.length ? 'upload':''}`}
                     onDragOver={this.allow}
                     onDragEnter={this.whileOver}

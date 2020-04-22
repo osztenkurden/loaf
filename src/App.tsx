@@ -6,7 +6,16 @@ import * as Loaf from "./API/Loaf";
 import Login from "./Modules/Login";
 import Register from "./Modules/Register";
 import Splash from "./Modules/Splash";
-const { remote} = window.require('electron');
+/*declare let window: any;
+if(typeof window.require !== "function"){
+    window.require = () => ({remote: {}});
+}*/
+import fakeRequire from "./API/DevHandler";
+declare let window: any;
+if(process.env.REACT_APP_DEV === "true"){
+    window.require = fakeRequire;
+}
+const { remote } = window.require('electron');
 
 interface IState {
     user: I.IUser | null;
@@ -72,7 +81,11 @@ export default class WindowApp extends React.Component {
         remote.getCurrentWindow().minimize();
     }
     maximize = () => {
-        remote.getCurrentWindow().maximize();
+        if(remote.getCurrentWindow().isMaximized()){
+            remote.getCurrentWindow().restore();
+        } else {
+            remote.getCurrentWindow().maximize();
+        }
     }
     close = () => {
         remote.getCurrentWindow().close();
@@ -81,9 +94,9 @@ export default class WindowApp extends React.Component {
         return <>
             <div className="window-bar">
                 <div className="window-drag-bar"></div>
-                <div onClick={this.minimize}>_</div>
-                <div onClick={this.maximize}>O</div>
-                <div onClick={this.close}>X</div>
+                <div onClick={this.minimize} className="app-control">_</div>
+                <div onClick={this.maximize} className="app-control">O</div>
+                <div onClick={this.close} className="app-control close">X</div>
             </div>
             <App />
         </>

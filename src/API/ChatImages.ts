@@ -8,12 +8,18 @@ interface ChatImage {
 
 class ChatImageStorage {
     images: Map<number, ChatImage>;
-    constructor(onLoad?: () => void){
+    onLoad?: () => void;
+    constructor(){
         this.images = new Map();
+        this.onLoad = () => {}
         Loaf.on("imageLoaded", (data: {id: number, image: string|null}) => {
             this.images.set(data.id, {loading:false, image:data.image});
-            if(onLoad) onLoad();
+            if(this.onLoad) this.onLoad();
         });
+    }
+    set(onLoad: () => void){
+        this.onLoad = onLoad;
+        return this;
     }
     get(chatId: number){
         const img = this.images.get(chatId);
@@ -28,6 +34,7 @@ class ChatImageStorage {
         return null;
     }
 }
+const storage = new ChatImageStorage();
+export default storage;
 
-
-export default ChatImageStorage;
+export { ChatImageStorage };

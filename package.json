@@ -17,6 +17,7 @@
     "bytebuffer": "^5.0.1",
     "cors": "^2.8.5",
     "cross-env": "^6.0.3",
+    "dotenv": "^8.2.0",
     "electron-builder-squirrel-windows": "^22.3.3",
     "fetch-cookie": "^0.7.3",
     "ip": "^1.1.5",

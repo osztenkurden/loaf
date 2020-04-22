@@ -70,7 +70,24 @@ body {
     width:100%;
     height:20px;
     display:flex;
+}
+.window-bar .app-control {
+    width:20px;
+    height:20px;
+    display: flex;
+    align-items:center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    color:rgba(255, 255, 255, 0.50);
+    cursor: default;
+}
+.window-bar .app-control:hover {
     color:white;
+    background-color:#0093c7;
+}
+.window-bar .app-control.close:hover {
+    background-color:red;
 }
 .window-bar .window-drag-bar{
     flex:1;
@@ -293,6 +310,10 @@ body {
     overflow:visible !important;
     /*border-radius:0 !important;*/
 }
+.chat-list-entry .avatar {
+    height:50px;
+    width:50px;
+}
 /*.MuiDrawer-paper-97{
     background-color:var(--primaryColor600) !important;
 }*/
@@ -351,7 +372,9 @@ body {
     border-radius:50%;
     width:auto;
 }
-
+.bar .avatar img {
+    height:45px;
+}
 /*.chat-button.new-message .avatar::before{
     content:"";
     height:12px;

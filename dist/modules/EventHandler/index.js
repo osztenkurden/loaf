@@ -167,17 +167,6 @@ exports.start = function (win) {
             }
         });
     }); });
-    Loaf.onAsync("createChatTest", function () { return __awaiter(void 0, void 0, void 0, function () {
-        var response;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, API_1.api.inbox.createTestChat()];
-                case 1:
-                    response = _a.sent();
-                    return [2 /*return*/, { event: 'createdChat', data: response.data }];
-            }
-        });
-    }); });
     Loaf.onAsync("getUserByName", function (name) { return __awaiter(void 0, void 0, void 0, function () {
         var response;
         return __generator(this, function (_a) {

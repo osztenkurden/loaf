@@ -4,7 +4,6 @@ import Button from "./../../Theme/Components/LoafButton";
 import * as Loaf from "./../../API/Loaf";
 import api from "../../API";
 import * as I from "./../../../modules/interface";
-import ChatImageStorage from "./../../API/ChatImages";
 import LoafAvatar from "./../../Theme/Components/Avatar";
 import { Remove as RemoveIcon, Add as AddIcon } from '@material-ui/icons';
 
@@ -12,7 +11,6 @@ interface IProps {
     onClose: () => void;
     closeDrawer: () => void;
     chats: I.IChat[];
-    storage: ChatImageStorage;
 }
 
 interface IState {
@@ -65,11 +63,11 @@ export default class NewConversation extends Component<IProps, IState> {
     }
 
     render(){
-        const { chats, storage } = this.props;
+        const { chats } = this.props;
         const { selectedChats } = this.state;
         return(
           <Paper classes={{root:"modal-container new-conversation"}}>
-              <DialogTitle style={{color:'white'}}>Adding contact</DialogTitle>
+              <DialogTitle style={{color:'white'}}>Create group</DialogTitle>
               <DialogContent>
                   <TextField
                     style={{width:'100%'}}
@@ -87,7 +85,7 @@ export default class NewConversation extends Component<IProps, IState> {
                     {chats.filter(chat => chat.private).map(chat => <ListItem className={`new-conversation-entry ${selectedChats.includes(chat.id) ? 'selected':''}`}>
                         <ListItemAvatar>
                             <Avatar>
-                                <LoafAvatar chat={chat} storage={this.props.storage} />
+                                <LoafAvatar chat={chat}  />
                             </Avatar>
                         </ListItemAvatar>
                         <ListItemText

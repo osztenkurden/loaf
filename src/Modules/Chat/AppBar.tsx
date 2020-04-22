@@ -3,16 +3,15 @@ import { AppBar, Toolbar, ListItem, Avatar } from '@material-ui/core';
 import { textToRGB } from 'Modules/Utils';
 import * as I from "./../../../modules/interface";
 import { ListItemText } from '@material-ui/core';
-import ChatImageStorage from "./../../API/ChatImages";
+import storage from "./../../API/ChatImages";
 
 interface IProps {
     chat: I.IChat;
-    storage: ChatImageStorage;
 }
 
 export default class LoafAppBar extends React.Component<IProps> {
     public render(){
-        const { chat, storage } = this.props;
+        const { chat } = this.props;
         return <AppBar position="relative" >
             <Toolbar className="bar">
                 <ListItem style={{paddingTop:0,paddingBottom:0}}>

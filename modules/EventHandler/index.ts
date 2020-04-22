@@ -105,12 +105,6 @@ export const start = (win: Electron.WebContents) => {
         return { event: 'createdChat', data: response.data };
     })
 
-    Loaf.onAsync("createChatTest", async () => {
-        const response = await api.inbox.createTestChat();
-
-        return { event: 'createdChat', data: response.data };
-    })
-
     Loaf.onAsync("getUserByName", async (name: string) => {
         const response = await api.user.getByName(name);
         return { event: "userData", data: response.data };

@@ -10,7 +10,7 @@ import Chat from "./../Chat/Chat";
 import ChatList from "./../Chat/ChatsList";
 import NewContact from "./../NewContact";
 import NewConversation from "./../NewConversation";
-import ChatImageStorage from "./../../API/ChatImages";
+import storage, {ChatImageStorage} from "./../../API/ChatImages";
 
 interface IState {
     drawer: boolean;
@@ -31,7 +31,7 @@ export default class Main extends Component<{}, IState> {
             drawer: false,
             newContactModal: false,
             newConversationModal: false,
-            storage: new ChatImageStorage(() => this.setState({hash: (new Date()).toISOString()})),
+            storage: storage.set(() => this.setState({hash: (new Date()).toISOString()})),
             hash: ''
         };
     }
@@ -97,7 +97,6 @@ export default class Main extends Component<{}, IState> {
                         onClose={this.setConversationModal(false)}
                         closeDrawer={this.toggleDrawer}
                         chats={this.state.chats}
-                        storage={this.state.storage}
                     />
                 </Modal>
                 <div className="playground">
@@ -105,10 +104,9 @@ export default class Main extends Component<{}, IState> {
                         chats={this.state.chats}
                         currentChat={this.state.currentChat}
                         loadChat={this.loadChat} 
-                        storage={this.state.storage}
                         newConversation={this.setConversationModal(true)}
                     />
-                    <Chat chat={this.state.currentChat} storage={this.state.storage} hash={this.state.hash} />
+                    <Chat chat={this.state.currentChat}  hash={this.state.hash} />
                 </div>
             </div>
         );

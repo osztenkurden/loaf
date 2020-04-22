@@ -5,7 +5,6 @@ import React, { Component } from "react";
 import { textToRGB} from './../Utils';
 import * as I from "./../../../modules/interface";
 import { Chat } from "@material-ui/icons";
-import ChatImageStorage from "./../../API/ChatImages";
 import LoafAvatar from "./../../Theme/Components/Avatar";
 
 function getSubText(chat: I.IChat, last: I.IMessage | null) {
@@ -25,7 +24,6 @@ function getSubText(chat: I.IChat, last: I.IMessage | null) {
 interface IProps {
     chat: I.IChat;
     chatImage: string | null;
-    storage: ChatImageStorage;
     loadChat: (chat: I.IChat) => void;
     isCurrent: boolean;
 }
@@ -59,7 +57,7 @@ export default class ChatsListEntry extends Component<IProps> {
                     className={"chat-button " + (chat.unread ? "new-message" : "")}
                     onClick={() => this.props.loadChat(chat)}
                 >
-                    <LoafAvatar chat={chat} storage={this.props.storage}/>
+                    <LoafAvatar chat={chat} />
                     {/*chat.image ?
                     <Avatar src={`data:image/jpeg;base64,${this.props.chatImage}`} className="avatar"/> :
                     <Avatar className="avatar" style={{backgroundColor: textToRGB(chat.name)}}>
