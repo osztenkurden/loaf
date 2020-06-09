@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { ListItemIcon, List, Divider, ListItem, ListItemText } from '@material-ui/core';
-import { MoveToInbox, Mail, Group, Settings, GroupAdd, PersonAdd, Cancel, ContactSupport, PermMedia } from '@material-ui/icons';
+import { Settings, GroupAdd, PersonAdd, Cancel, ContactSupport, PermMedia } from '@material-ui/icons';
 
 interface IProps {
     newContact: () => void
@@ -17,7 +17,7 @@ export default class Drawer extends Component<IProps> {
             icon: PersonAdd,
             action: this.props.newContact
           }];
-          
+
           const secondMenu = [{
             text:"Media",
             icon:PermMedia
@@ -34,8 +34,8 @@ export default class Drawer extends Component<IProps> {
         return(<div className='sidenav'>
           <div className='userView'>
             <div className='background'></div>
-            <a href='#' className='firstName'><span>Hubert</span></a>
-            <a href='#' className='username'><span>@osztenkurden</span></a>
+              <span className='firstName'>Hubert</span>
+              <span className='username'>@osztenkurden</span>
           </div>
           <Divider />
           <List>

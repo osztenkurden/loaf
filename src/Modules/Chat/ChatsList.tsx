@@ -2,9 +2,7 @@ import { List, ListItem, Avatar, ListItemText, Divider } from "@material-ui/core
 import React, { Component } from "react";
 import * as I from "./../../../modules/interface";
 import ChatsListEntry from "./ChatsListEntry";
-import api from "./../../API";
-import { textToRGB } from "Modules/Utils";
-import moment from "moment";
+// import moment from "moment";
 import storage from './../../API/ChatImages';
 
 

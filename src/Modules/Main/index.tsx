@@ -66,7 +66,7 @@ export default class Main extends Component<{}, IState> {
                             <MenuIcon />
                         </IconButton>
                         <Typography variant="h6" color="inherit" noWrap className="logo-wrapper">
-                            <img src={logo} />
+                            <img src={logo} alt={'Loaf'} />
                         </Typography>
                         <div className="searchIcon">
                             <SearchIcon />
@@ -93,7 +93,6 @@ export default class Main extends Component<{}, IState> {
                     onClose={this.setConversationModal(false)}
                     >
                     <NewConversation
-                    
                         onClose={this.setConversationModal(false)}
                         closeDrawer={this.toggleDrawer}
                         chats={this.state.chats}
@@ -103,7 +102,7 @@ export default class Main extends Component<{}, IState> {
                     <ChatList
                         chats={this.state.chats}
                         currentChat={this.state.currentChat}
-                        loadChat={this.loadChat} 
+                        loadChat={this.loadChat}
                         newConversation={this.setConversationModal(true)}
                     />
                     <Chat chat={this.state.currentChat}  hash={this.state.hash} />

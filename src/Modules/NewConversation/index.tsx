@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Paper, DialogTitle, DialogContent, DialogActions, TextField, InputAdornment, List, ListItem, ListItemAvatar, Avatar, ListItemText, ListItemSecondaryAction, IconButton } from '@material-ui/core';
+import { Paper, DialogTitle, DialogContent, DialogActions, TextField, List, ListItem, ListItemAvatar, Avatar, ListItemText, ListItemSecondaryAction, IconButton } from '@material-ui/core';
 import Button from "./../../Theme/Components/LoafButton";
 import * as Loaf from "./../../API/Loaf";
 import api from "../../API";

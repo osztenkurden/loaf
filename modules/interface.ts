@@ -164,10 +164,10 @@ export interface IRegisterPayload {
     identityKey: string;
     registrationId: number;
     keys: IKeys | IDebugKeys;
-    preKeys: Array<{
+    preKeys: {
         pubKey: string;
         keyId: number;
-    }>;
+    }[];
     signedPreKey: {
         pubKey: string;
         signature: string;

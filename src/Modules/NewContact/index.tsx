@@ -3,7 +3,7 @@ import { Paper, DialogTitle, DialogContent, DialogActions, TextField, InputAdorn
 import Button from "./../../Theme/Components/LoafButton";
 import * as Loaf from "./../../API/Loaf";
 import api from "../../API";
-import { MoveToInbox, Mail, Group, Settings, GroupAdd, PersonAdd, Cancel, ContactSupport, PermMedia } from '@material-ui/icons';
+//import { MoveToInbox, Mail, Group, Settings, GroupAdd, PersonAdd, Cancel, ContactSupport, PermMedia } from '@material-ui/icons';
 
 interface IProps {
     onClose: () => void;

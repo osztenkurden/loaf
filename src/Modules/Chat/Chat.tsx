@@ -1,11 +1,10 @@
-import { Avatar, ListItem, ListItemText, TextField, Toolbar } from "@material-ui/core";
+import { TextField } from "@material-ui/core";
 import React, { Component } from "react";
 import { CloudUpload } from "@material-ui/icons";
 import Announcement from "../Message/Announcement";
 import Message from "../Message/Message";
 import * as I from "./../../../modules/interface";
-import api, * as API from "./../../API";
-import { textToRGB} from './../Utils';
+import api from "./../../API";
 import AppBar from './AppBar';
 
 interface IProps {

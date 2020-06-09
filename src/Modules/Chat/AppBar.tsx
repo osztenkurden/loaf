@@ -18,7 +18,7 @@ export default class LoafAppBar extends React.Component<IProps> {
                     {chat.image ?
                     <Avatar src={`data:image/jpeg;base64,${storage.get(chat.id)}`} className='avatar' /> :
                     <Avatar className="avatar" style={{ backgroundColor: textToRGB(chat.name) }}>
-                    {chat.name.charAt(0) && chat.name.charAt(0).toUpperCase() || '#'}</Avatar>}
+                    {chat.name.charAt(0)?.toUpperCase() || '#'}</Avatar>}
                     <ListItemText inset
                         className="chat-text-item"
                         primary={

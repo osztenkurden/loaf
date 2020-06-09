@@ -1,6 +1,5 @@
-import { Button, ExtendButtonBase, ButtonTypeMap } from "@material-ui/core";
-import React, { Component, ReactElement } from "react";
-import { DefaultComponentProps, OverridableTypeMap } from "@material-ui/core/OverridableComponent";
+import { Button } from "@material-ui/core";
+import React, { Component } from "react";
 
 interface IProps  {
     secondary?: boolean;

@@ -1,10 +1,8 @@
-import { Avatar, Divider, IconButton, ListItem, ListItemText } from "@material-ui/core";
+import { Divider, ListItem, ListItemText } from "@material-ui/core";
 import moment from "moment";
 import React, { Component } from "react";
 // import * as API from "./api";
-import { textToRGB} from './../Utils';
 import * as I from "./../../../modules/interface";
-import { Chat } from "@material-ui/icons";
 import LoafAvatar from "./../../Theme/Components/Avatar";
 
 function getSubText(chat: I.IChat, last: I.IMessage | null) {
@@ -13,7 +11,7 @@ function getSubText(chat: I.IChat, last: I.IMessage | null) {
             return "Waiting for response...";
         case 2:
             if(last?.content.type === "image" || last?.content.type === "mixed") return "sent an image";
-            return last && last.content.content || "No messages";
+            return last?.content.content || "No messages";
         case 1:
             return <span className="strong">requested your attention</span>;
         default:
@@ -52,7 +50,7 @@ export default class ChatsListEntry extends Component<IProps> {
         const { chat, isCurrent } = this.props;
         const last = this.getLast();
         return (
-            <div className={`chat-list-entry ${isCurrent && 'current' || ''}`}>
+            <div className={`chat-list-entry ${isCurrent ? 'current' : ''}`}>
                 <ListItem button
                     className={"chat-button " + (chat.unread ? "new-message" : "")}
                     onClick={() => this.props.loadChat(chat)}
