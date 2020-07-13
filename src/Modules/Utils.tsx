@@ -28,3 +28,20 @@ export function renderGallery(message: I.IMessageContentPackage[]){
         })}
     </div>
 }
+
+export function bytesToString(bytes: number){
+    function toHigherOrder(lowerBytes: number){
+        return (lowerBytes/1024);
+    }
+
+    const units = ["B", "KB", "MB", "GB", "TB"];
+
+    for(const unit of units){
+        if(bytes < 1024){
+            return `${bytes.toFixed(1)} ${unit}`;
+        }
+        bytes = toHigherOrder(bytes);
+    }
+
+    return `${bytes.toFixed(1)} PB`;
+}
