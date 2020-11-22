@@ -80,7 +80,10 @@ export default class Main extends Component<{}, IState> {
                     className="sidenav-container"
                     classes={{paper:'drawer-content'}}
                 >
-                    <DrawerContent newContact={this.setContactModal(true)}/>
+                    <DrawerContent
+                        newContact={this.setContactModal(true)}
+                        newConversation={this.setConversationModal(true)}
+                    />
                 </SwipeableDrawer>
                 <Modal
                     open={this.state.newContactModal}
@@ -103,7 +106,6 @@ export default class Main extends Component<{}, IState> {
                         chats={this.state.chats}
                         currentChat={this.state.currentChat}
                         loadChat={this.loadChat}
-                        newConversation={this.setConversationModal(true)}
                     />
                     <Chat chat={this.state.currentChat}  hash={this.state.hash} />
                 </div>

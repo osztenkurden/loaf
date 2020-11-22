@@ -30,16 +30,20 @@ export interface IMessageContent {
     content: string;
 }*/
 
-export type IMessageContent = IMessageContentText | IMessageContentImage | IMessageContentMixed;
+export type IMessageContent = IMessageContentText | IMessageContentFile | IMessageContentMixed;
 
 export interface IMessageContentText {
     type: "text";
     content: string;
 }
 
-export interface IMessageContentImage {
-    type: "image";
-    content: string;
+export interface IMessageContentFile {
+    type: "file";
+    content: {
+        data: string,
+        size: number,
+        name: string
+    };
 }
 
 export interface IMessageContentMixed {
@@ -47,7 +51,7 @@ export interface IMessageContentMixed {
     content: IMessageContentPackage[]
 }
 
-export type IMessageContentPackage = IMessageContentImage | IMessageContentText;
+export type IMessageContentPackage = IMessageContentFile | IMessageContentText;
 
 export interface IMessageRaw {
     id: number;

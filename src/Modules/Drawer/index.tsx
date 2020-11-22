@@ -3,7 +3,8 @@ import { ListItemIcon, List, Divider, ListItem, ListItemText } from '@material-u
 import { Settings, GroupAdd, PersonAdd, Cancel, ContactSupport, PermMedia } from '@material-ui/icons';
 
 interface IProps {
-    newContact: () => void
+    newContact: () => void,
+    newConversation: () => void,
 }
 
 
@@ -11,7 +12,8 @@ export default class Drawer extends Component<IProps> {
     render(){
         const menu = [{
             text:"New Conversation",
-            icon:GroupAdd
+            icon:GroupAdd,
+            action: this.props.newConversation
           },{
             text:"Add Contact",
             icon: PersonAdd,

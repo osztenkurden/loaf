@@ -7,7 +7,7 @@ import api from "./../../API";
 import AppBar from './AppBar';
 import DragUploadModal from './DragUploadModal';
 
-export interface ImagePayloadData {
+export interface FilePayloadData {
     data: string,
     size: number,
     name: string
@@ -21,7 +21,7 @@ interface IProps {
 interface IState {
     form: {
         textMessage: string;
-        images: ImagePayloadData[]
+        files: FilePayloadData[]
     };
     highlight: boolean;
 }
@@ -32,7 +32,7 @@ export default class Chat extends Component<IProps, IState> {
         this.state = {
             form: {
                 textMessage: "",
-                images: []
+                files: []
             },
             highlight: false
         };
@@ -56,21 +56,21 @@ export default class Chat extends Component<IProps, IState> {
     drop = (evt: React.DragEvent<HTMLDivElement>) => {
         evt.preventDefault();
         if(evt.dataTransfer)
-            this.handleImages(evt.dataTransfer.files);
+            this.handleFiles(evt.dataTransfer.files);
 
         this.setState({highlight: false});
     }
 
-    public handleImages = (files: FileList) => {
+    public handleFiles = (files: FileList) => {
         if(!files || !files.length) return;
-        const images: ImagePayloadData[] = [];
+        const filesToSend: FilePayloadData[] = [];
 
         const readFile = (index: number, file?: File) => {
-            if(file && !file.type?.startsWith("image/")){
+            /*if(file && !file.type?.startsWith("image/")){
                 return;
-            }
+            }*/
             if(!file){
-                return this.setImages(images);
+                return this.setFiles(filesToSend);
                 /*return this.setState(state => {
                     state.form.images = images;
                     return state;
@@ -82,9 +82,9 @@ export default class Chat extends Component<IProps, IState> {
                 if(typeof reader.result !== "string"){
                     return readFile(index+1, files[index+1]);;
                 }
-                const img = reader.result.replace(/^data:([a-z]+)\/([a-z0-9]+);base64,/, '');
+                const img = reader.result;
 
-                images.push({
+                filesToSend.push({
                     data: img,
                     name: file.name,
                     size: file.size,
@@ -101,10 +101,11 @@ export default class Chat extends Component<IProps, IState> {
         if (!chat) {
             return <div className={`chat_container empty`}></div>;
         }
+        if(this.state.form.files.length) console.log(this.state.form.files)
         return (
             <div className="chat_container">
                 <AppBar chat={chat} />
-                <div className={`message_container ${this.state.highlight ? 'highlight-drag':''} ${this.state.form.images.length ? 'upload':''}`}
+                <div className={`message_container ${this.state.highlight ? 'highlight-drag':''} ${this.state.form.files.length ? 'upload':''}`}
                     onDragOver={this.allow}
                     onDragEnter={this.whileOver}
                     onDragOverCapture={this.whileOver}
@@ -121,21 +122,10 @@ export default class Chat extends Component<IProps, IState> {
                     {chat.status === 2 ? chat.messages.map((message) => <Message key={message.id} message={message} chatName={chat.name} />) : ""}
                 </div>
                 <DragUploadModal
-                    images={this.state.form.images}
-                    setImages={this.setImages}
-                    sendImages={this.sendImage}
+                    images={this.state.form.files}
+                    setFiles={this.setFiles}
+                    sendFiles={this.sendFiles}
                 />
-                {/*<div className="drag-show">
-                    <div className="drag-window">
-                        {this.state.form.images.length ? <div>
-                            {this.state.form.images.map(src => <img src={`data:image/jpeg;base64,${src.data}`} className="drag-file-img-preview" alt={'Preview'} />)}
-                            <div onClick={this.sendImage}>SEEEND</div>
-                        </div> : <div className='drag-window-content'>
-                            <CloudUpload />
-                            Drop your images here
-                        </div>}
-                    </div>
-                        </div>*/}
                 {chat.status === 2 ? <div className="text_sender">
                     <TextField
                         onChange={this.handleChange}
@@ -163,9 +153,9 @@ export default class Chat extends Component<IProps, IState> {
         );
     }
 
-    private setImages = (images: ImagePayloadData[]) => {
+    private setFiles = (files: FilePayloadData[]) => {
         this.setState(state => {
-            state.form.images = images;
+            state.form.files = files;
             return state;
         });
     }
@@ -175,36 +165,36 @@ export default class Chat extends Component<IProps, IState> {
             // TODO: SEND MESSAGE
             const content = this.state.form.textMessage;
             api.message.send(this.props.chat.id, { type: "text", content });
-            this.setState({ form: { textMessage: "", images: [] } });
+            this.setState({ form: { textMessage: "", files: [] } });
         }
     }
-    private sendImage = () => {
-        const images = this.state.form.images;
-        if(!images.length || !this.props.chat){
-            return console.log("NO IMAGES OR NO CHAT");
+    private sendFiles = () => {
+        const files = this.state.form.files;
+        if(!files.length || !this.props.chat){
+            return console.log("NO files OR NO CHAT");
         }
-        if(images.length === 1) {
-            const image = this.state.form.images[0];
+        if(files.length === 1) {
+            const file = this.state.form.files[0];
             const message: I.IMessageContent = {
-                type: "image",
-                content: image.data
+                type: "file",
+                content: file
             };
             api.message.send(this.props.chat.id, message);
-            this.setState({ form: { textMessage: "", images: [] } });
+            this.setState({ form: { textMessage: "", files: [] } });
         } else {
             const message: I.IMessageContentMixed = {
                 type: "mixed",
                 content: []
             }
-            for(const img of images){
-                const imgPayload: I.IMessageContentImage = {
-                    type: "image",
-                    content: img.data
+            for(const file of files){
+                const filePayload: I.IMessageContentFile = {
+                    type: "file",
+                    content: file
                 }
-                message.content.push(imgPayload);
+                message.content.push(filePayload);
             }
             api.message.send(this.props.chat.id, message);
-            this.setState({ form: { textMessage: "", images: [] } });
+            this.setState({ form: { textMessage: "", files: [] } });
         }
     }
     private handleChange = (e: any) => {

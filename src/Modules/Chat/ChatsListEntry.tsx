@@ -10,7 +10,7 @@ function getSubText(chat: I.IChat, last: I.IMessage | null) {
         case 5:
             return "Waiting for response...";
         case 2:
-            if(last?.content.type === "image" || last?.content.type === "mixed") return "sent an image";
+            if(last?.content.type === "file" || last?.content.type === "mixed") return "sent an image";
             return last?.content.content || "No messages";
         case 1:
             return <span className="strong">requested your attention</span>;
@@ -56,11 +56,6 @@ export default class ChatsListEntry extends Component<IProps> {
                     onClick={() => this.props.loadChat(chat)}
                 >
                     <LoafAvatar chat={chat} />
-                    {/*chat.image ?
-                    <Avatar src={`data:image/jpeg;base64,${this.props.chatImage}`} className="avatar"/> :
-                    <Avatar className="avatar" style={{backgroundColor: textToRGB(chat.name)}}>
-                    {chat.name.charAt(0) && chat.name.charAt(0).toUpperCase() || "#"}
-                    </Avatar>*/}
                     <ListItemText inset
                         className="text-item"
                         primary={

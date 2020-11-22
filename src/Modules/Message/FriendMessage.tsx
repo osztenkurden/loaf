@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { textToRGB, renderGallery } from './../Utils';
+import { textToRGB, renderGallery, questionMark } from './../Utils';
 import { Avatar } from "@material-ui/core";
 import * as I from "./../../../modules/interface";
 
@@ -19,8 +19,8 @@ export default class FriendMessage extends Component<{message: I.IMessage, sende
         switch(message.content.type){
             case "text":
                 return <p>{message.content.content}</p>
-            case "image":
-                return <div><img src={`data:image/jpeg;base64,${message.content.content}`} alt={'Upload'}/></div>
+            case "file":
+                return <div><img src={message.content.content.data.startsWith('data:image') ? message.content.content.data : `data:image/jpeg;base64,${questionMark}`} alt={'Upload'}/></div>
             case "mixed":
                 return renderGallery(message.content.content);
         }
