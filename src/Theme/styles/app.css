@@ -417,6 +417,42 @@ body {
 
     width:34%;
 }
+.many-msg-types {
+    display: flex;
+    flex-direction: column;
+}
+.many-msg-types > * {
+    align-self: flex-start;
+}
+.file-preview {
+    display: flex;
+    padding: 10px;
+}
+.file-preview .file-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: #ffd66bc7;
+    border-radius: 50%;
+}
+.file-preview .file-data {
+    padding: 0 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.file-preview .file-data div {
+    text-align: left;
+}
+.file-preview .file-data .file-size {
+    opacity: 0.7;
+    font-size: 12px;
+}
+.file-preview > img {
+    align-self: flex-start;
+}
 .chat_container{
     /*margin-top: 56px !important;*/
     width: 66%;

@@ -50,12 +50,11 @@ var Inbox = /** @class */ (function () {
     function Inbox(content, userId, storage) {
         var _this = this;
         this.addFriend = function (userId) { return __awaiter(_this, void 0, void 0, function () {
-            var response;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, API_1.api.inbox.addFriend(userId)];
                     case 1:
-                        response = _a.sent();
+                        _a.sent();
                         return [2 /*return*/, this];
                 }
             });
@@ -206,28 +205,34 @@ var Inbox = /** @class */ (function () {
                     case 1:
                         if (!(_i < _a.length)) return [3 /*break*/, 4];
                         chat = _a[_i];
-                        return [4 /*yield*/, this.loadMessages(chat.id)];
+                        return [4 /*yield*/, this.loadMessages(chat.id, true)];
                     case 2:
                         _b.sent();
                         _b.label = 3;
                     case 3:
                         _i++;
                         return [3 /*break*/, 1];
-                    case 4: return [2 /*return*/];
+                    case 4:
+                        this.loadChats();
+                        return [2 /*return*/];
                 }
             });
         });
     };
-    Inbox.prototype.loadMessages = function (chatId) {
+    Inbox.prototype.loadMessages = function (chatId, init) {
+        if (init === void 0) { init = false; }
         return __awaiter(this, void 0, void 0, function () {
             var response, messages, current, _i, messages_1, rawMessage, decrypted, message;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.loadChats()];
+                    case 0:
+                        if (!!init) return [3 /*break*/, 2];
+                        return [4 /*yield*/, this.loadChats()];
                     case 1:
                         _a.sent();
-                        return [4 /*yield*/, API_1.api.messages.get(chatId, Machine.getMachineId())];
-                    case 2:
+                        _a.label = 2;
+                    case 2: return [4 /*yield*/, API_1.api.messages.get(chatId, Machine.getMachineId())];
+                    case 3:
                         response = _a.sent();
                         if (!response.success || !response.data) {
                             return [2 /*return*/, null];
@@ -235,15 +240,15 @@ var Inbox = /** @class */ (function () {
                         messages = (response.data.messages || []);
                         current = this.messages.get(chatId) || [];
                         _i = 0, messages_1 = messages;
-                        _a.label = 3;
-                    case 3:
-                        if (!(_i < messages_1.length)) return [3 /*break*/, 6];
+                        _a.label = 4;
+                    case 4:
+                        if (!(_i < messages_1.length)) return [3 /*break*/, 7];
                         rawMessage = messages_1[_i];
                         return [4 /*yield*/, this.storage.decodeMessage(rawMessage)];
-                    case 4:
+                    case 5:
                         decrypted = _a.sent();
                         if (!decrypted) {
-                            return [3 /*break*/, 5];
+                            return [3 /*break*/, 6];
                         }
                         message = {
                             chatId: chatId,
@@ -254,13 +259,14 @@ var Inbox = /** @class */ (function () {
                             sender: rawMessage.sender
                         };
                         current.push(message);
-                        _a.label = 5;
-                    case 5:
-                        _i++;
-                        return [3 /*break*/, 3];
+                        _a.label = 6;
                     case 6:
+                        _i++;
+                        return [3 /*break*/, 4];
+                    case 7:
                         this.messages.set(chatId, current);
-                        this.loadChats();
+                        if (!init)
+                            this.loadChats();
                         return [2 /*return*/];
                 }
             });
@@ -281,7 +287,7 @@ var Inbox = /** @class */ (function () {
     };
     Inbox.prototype.getReceivers = function (chatId) {
         return __awaiter(this, void 0, void 0, function () {
-            var response, store, machineId, machines, receivers;
+            var response, machineId, machines, receivers;
             var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -291,7 +297,6 @@ var Inbox = /** @class */ (function () {
                         if (!response.status || !response.data) {
                             return [2 /*return*/, []];
                         }
-                        store = this.storage.getStore();
                         machineId = Machine.getMachineId();
                         machines = response.data.machines;
                         receivers = machines.filter(function (mch) { return mch.userId !== _this.userId || mch.machineId !== machineId; });

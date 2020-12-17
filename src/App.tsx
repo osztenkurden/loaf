@@ -1,21 +1,17 @@
-import Main from "Modules/Main";
 import React from "react";
+import Main from "./Modules/Main";
 import * as I from "./../modules/interface";
 import api from "./API";
 import * as Loaf from "./API/Loaf";
 import Login from "./Modules/Login";
 import Register from "./Modules/Register";
 import Splash from "./Modules/Splash";
-/*declare let window: any;
-if(typeof window.require !== "function"){
-    window.require = () => ({remote: {}});
-}*/
+
 import fakeRequire from "./API/DevHandler";
 declare let window: any;
 if(process.env.REACT_APP_DEV === "true"){
     window.require = fakeRequire;
 }
-const { remote } = window.require('electron');
 
 interface IState {
     user: I.IUser | null;
@@ -24,7 +20,7 @@ interface IState {
     register: boolean;
 }
 
-export class App extends React.Component<any, IState> {
+export default class App extends React.Component<any, IState> {
     constructor(props: any) {
         super(props);
         this.state = {
@@ -73,32 +69,5 @@ export class App extends React.Component<any, IState> {
 
     private togglePage = () => {
         this.setState((state) => ({...state, register: !state.register}));
-    }
-}
-
-export default class WindowApp extends React.Component {
-    minimize = () => {
-        remote.getCurrentWindow().minimize();
-    }
-    maximize = () => {
-        if(remote.getCurrentWindow().isMaximized()){
-            remote.getCurrentWindow().restore();
-        } else {
-            remote.getCurrentWindow().maximize();
-        }
-    }
-    close = () => {
-        remote.getCurrentWindow().close();
-    }
-    render(){
-        return <>
-            <div className="window-bar">
-                <div className="window-drag-bar"></div>
-                <div onClick={this.minimize} className="app-control">_</div>
-                <div onClick={this.maximize} className="app-control">O</div>
-                <div onClick={this.close} className="app-control close">X</div>
-            </div>
-            <App />
-        </>
     }
 }

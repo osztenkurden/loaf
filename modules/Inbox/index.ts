@@ -1,10 +1,7 @@
-import crypto from "crypto";
-import base32 from "thirty-two";
 import { api } from "../API";
 import * as I from "../interface";
 import * as Machine from "../Machine";
 import Storage from "../Storage";
-import * as Loaf from "./../EventHandler/handler";
 
 // import * as Machine from "../Machine";
 
@@ -25,7 +22,7 @@ export default class Inbox {
     }
 
     public addFriend = async (userId: number) => {
-        const response = await api.inbox.addFriend(userId);
+        await api.inbox.addFriend(userId);
 
         return this;
     }
@@ -73,7 +70,7 @@ export default class Inbox {
             date: (new Date()).toISOString(),
         }
         const result = await api.messages.send(chatId, entries, Machine.getMachineId());
-        
+
         if (result.success) {
             const current = this.messages.get(chatId);
             current.push(message);
@@ -118,18 +115,19 @@ export default class Inbox {
 
     public async loadAllMessages() {
         for(const chat of this.chats){
-            await this.loadMessages(chat.id);
+            await this.loadMessages(chat.id, true);
         }
+        this.loadChats();
     }
 
-    public async loadMessages(chatId: number) {
-        await this.loadChats();
+    public async loadMessages(chatId: number, init = false) {
+        if(!init) await this.loadChats();
         const response = await api.messages.get(chatId, Machine.getMachineId());
         if (!response.success || !response.data) {
             return null;
         }
         const messages = (response.data.messages || []) as I.IMessageRaw[];
-        
+
         const current = this.messages.get(chatId) || [];
         for (const rawMessage of messages) {
             const decrypted = await this.storage.decodeMessage(rawMessage);
@@ -149,7 +147,7 @@ export default class Inbox {
         }
         this.messages.set(chatId, current);
 
-        this.loadChats();
+        if(!init) this.loadChats();
     }
 
     private async prepareMessage(msg: I.IMessagePayload, bundle?: I.IPreKeyBundle) {
@@ -164,7 +162,7 @@ export default class Inbox {
         if (!response.status || !response.data) {
             return [];
         }
-        const store = this.storage.getStore();
+        // const store = this.storage.getStore();
         const machineId = Machine.getMachineId();
         const machines = response.data.machines as I.IMachine[];
         const receivers = machines.filter((mch) => mch.userId !== this.userId || mch.machineId !== machineId);

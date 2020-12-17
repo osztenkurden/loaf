@@ -1,4 +1,4 @@
-import { List, ListItem, Avatar, ListItemText, Divider } from "@material-ui/core";
+import { List } from "@material-ui/core";
 import React, { Component } from "react";
 import * as I from "./../../../modules/interface";
 import ChatsListEntry from "./ChatsListEntry";

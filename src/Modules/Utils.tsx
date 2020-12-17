@@ -1,6 +1,6 @@
 import React from 'react';
 import * as I from '../../modules/interface';
-import { Audiotrack } from "@material-ui/icons";
+import { Audiotrack, InsertDriveFile } from "@material-ui/icons";
 
 export function hashCode(str: string) { // java String#hashCode
     let hash = 0;
@@ -20,19 +20,42 @@ export function textToRGB(i: string) {
     return "#" + "00000".substring(0, 6 - c.length) + c;
 }
 
+export const fileIcon = (fileType: string) => {
+    if(fileType === "audio") {
+        return <Audiotrack />;
+    }
+    return <InsertDriveFile />;
+}
+
+export const filePreview = (file: I.IMessageContentFileMeta) => {
+    const fileData = file.data;
+    const fileType = fileData.substr(fileData.indexOf(':') + 1, fileData.indexOf('/') - fileData.indexOf(':') - 1);
+    return (
+        <div className="file-preview">
+            <div className="file-icon">
+                {fileIcon(fileType)}
+            </div>
+            <div className="file-data">
+                <div className="file-name">
+                    {file.name}
+                </div>
+                <div className="file-size">
+                    {bytesToString(file.size)}
+                </div>
+            </div>
+        </div>
+    )
+}
+
 export function renderGallery(message: I.IMessageContentPackage[]) {
     const isFile = (file: I.IMessageContentPackage): file is I.IMessageContentFile => file.type === "file";
-    return <div>
+    return <div className="many-msg-types">
         {message.filter(isFile).map(payload => {
             const fileData = payload.content.data;
             if (fileData.startsWith("data:image")) {
                 return <img src={fileData} alt={'Upload'} />
             }
-            const fileType = fileData.substr(fileData.indexOf(':')+1, fileData.indexOf('/')-fileData.indexOf(':')-1);
-            if(fileType === "audio") {
-                return <Audiotrack />
-            }
-            return <img src={`data:image/jpeg;base64,${questionMark}`} alt={'Upload'} data-fileType={fileType} />
+            return filePreview(payload.content);
         })}
         {message.filter(payload => payload.type === "text").map(payload => <p>{payload.content}</p>)}
 

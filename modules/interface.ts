@@ -37,13 +37,15 @@ export interface IMessageContentText {
     content: string;
 }
 
+export interface IMessageContentFileMeta {
+    data: string,
+    size: number,
+    name: string
+}
+
 export interface IMessageContentFile {
     type: "file";
-    content: {
-        data: string,
-        size: number,
-        name: string
-    };
+    content: IMessageContentFileMeta;
 }
 
 export interface IMessageContentMixed {
