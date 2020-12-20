@@ -63,12 +63,13 @@ var startApp = function () { return __awaiter(void 0, void 0, void 0, function (
             minWidth: 400,
             show: false,
             title: "Loaf",
-            //transparent:true,
+            // transparent:true,
             frame: false,
             webPreferences: {
                 backgroundThrottling: false,
                 // preload: __dirname + "/preload.js",
-                nodeIntegration: true
+                nodeIntegration: true,
+                enableRemoteModule: true
             },
             width: 1280
         });

@@ -22,12 +22,13 @@ const startApp = async () => {
         minWidth: 400,
         show: false,
         title: "Loaf",
-        //transparent:true,
+        // transparent:true,
         frame: false,
         webPreferences: {
             backgroundThrottling: false,
             // preload: __dirname + "/preload.js",
             nodeIntegration: true,
+            enableRemoteModule: true
         },
         width: 1280,
     });
