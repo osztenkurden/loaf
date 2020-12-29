@@ -1,4 +1,5 @@
 import { api } from "../API";
+import { saveFileToDrive, saveMessages } from "../Database";
 import * as I from "../interface";
 import * as Machine from "../Machine";
 import Storage from "../Storage";
@@ -129,11 +130,16 @@ export default class Inbox {
         const messages = (response.data.messages || []) as I.IMessageRaw[];
 
         const current = this.messages.get(chatId) || [];
+        const incoming: I.IMessage[] = [];
         for (const rawMessage of messages) {
             const decrypted = await this.storage.decodeMessage(rawMessage);
             if (!decrypted) {
                 continue;
             }
+
+            /**
+             * TODO: Check saving files in messages here and fix dates of messages
+             */
 
             const message: I.IMessage = {
                 chatId,
@@ -141,13 +147,31 @@ export default class Inbox {
                 date: (new Date()).toISOString(),
                 my: rawMessage.senderId === this.userId,
                 senderId: rawMessage.senderId,
-                sender: rawMessage.sender,
+                sender: this.getSenderData(chatId, rawMessage.senderId),
             };
+            await saveFileToDrive(message);
             current.push(message);
+            incoming.push(message);
         }
+
+        /**
+         * TODO: Check saving to DB here
+         */
+        saveMessages(this.userId, incoming);
         this.messages.set(chatId, current);
 
         if(!init) this.loadChats();
+    }
+
+    public getSenderData(chatId: number,senderId: number) {
+        const chat = this.chats.find(chat => chat.id === chatId);
+        if(!chat) return null;
+        const senderData = chat.users.find(user => user.id === senderId);
+        if(!senderData || !senderData.id) return null;
+        return {
+            id: senderData.id,
+            username: senderData.username
+        }
     }
 
     private async prepareMessage(msg: I.IMessagePayload, bundle?: I.IPreKeyBundle) {

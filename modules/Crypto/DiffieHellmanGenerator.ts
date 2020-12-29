@@ -1,10 +1,10 @@
 import crypto from "crypto";
-
+import * as I from "../interface";
 const diffiehellman = crypto.createDiffieHellman(2048);
 diffiehellman.generateKeys("hex");
 
-const keyData = {
-    gen: diffiehellman.getGenerator("hex"),
+const keyData: I.IKeyPackage = {
+    generator: diffiehellman.getGenerator("hex"),
     prime: diffiehellman.getPrime("hex"),
     private: diffiehellman.getPrivateKey("hex"),
     public: diffiehellman.getPublicKey("hex"),

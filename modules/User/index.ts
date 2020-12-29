@@ -58,7 +58,7 @@ export class User {
 
     public async register(username: string, password: string, firstName: string) {
         try {
-            const keys: any = await generateKeys();
+            const keys = await generateKeys();
             const storage = (await this.initStorage()).getStorage();
             const payload: I.IRegisterPayload = {
                  firstName,
@@ -80,12 +80,12 @@ export class User {
 
             storage.setUserId(user.id).saveStoreToFile();
 
-            if(keys.token){
+            if("token" in keys){
                 console.log(`${username} registered`)
                 return base32.encode(keys.token).toString().replace(/=/g, "");;
             }
 
-            const diffieHellman = crypto.createDiffieHellman(keys.prime, "hex", keys.gen, "hex");
+            const diffieHellman = crypto.createDiffieHellman(keys.prime, "hex", keys.generator, "hex");
             diffieHellman.setPrivateKey(keys.private, "hex");
             diffieHellman.setPublicKey(keys.public, "hex");
 
@@ -133,8 +133,8 @@ export class User {
         return this;
     }
 
-    private getKeys(keys: any) {
-        if(keys.token){
+    private getKeys(keys: I.IKeyPackage | I.IDebugKeys) {
+        if("token" in keys){
             const key: I.IDebugKeys = {
                 token: keys.token
             }
@@ -142,7 +142,7 @@ export class User {
             return key;
         }
         const key: I.IKeys = {
-            generator: keys.gen,
+            generator: keys.generator,
             prime: keys.prime,
             public: keys.public
         }

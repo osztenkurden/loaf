@@ -3,16 +3,18 @@ import { textToRGB, renderGallery, questionMark } from './../Utils';
 import { Avatar } from "@material-ui/core";
 import * as I from "./../../../modules/interface";
 
-export default class FriendMessage extends Component<{message: I.IMessage, sender: { username: string, id: number, avatar: Buffer | null}}>{
+export default class FriendMessage extends Component<{message: I.IMessage, sender: { username: string, id: number}}>{
     renderAvatar = () => {
         const { sender } = this.props;
-        const avatar = sender.avatar ? Buffer.from(sender.avatar).toString('base64') : null;
-        if(avatar){
-            return <Avatar src={`data:image/jpeg;base64,${avatar}`} className="avatar"/>
-        }
-        return <Avatar className="avatar" style={{ backgroundColor: textToRGB(sender.username) }}>
+        
+        
+        //TODO: Avatar as URL and fallback
+        
+        return <Avatar src={``} className="avatar"/>
+        
+        /*return <Avatar className="avatar" style={{ backgroundColor: textToRGB(sender.username) }}>
             {sender.username?.charAt(0).toUpperCase() || `#${sender.id}`}
-        </Avatar>
+        </Avatar>*/
     }
     renderContent = () => {
         const { message } = this.props;

@@ -40,7 +40,7 @@ export interface IMessageContentText {
 export interface IMessageContentFileMeta {
     data: string,
     size: number,
-    name: string
+    name: string,
 }
 
 export interface IMessageContentFile {
@@ -66,11 +66,6 @@ export interface IMessageRaw {
     read: boolean;
     senderMachine: number;
     entry: boolean;
-    sender?: {
-        id: number;
-        username: string;
-        avatar: Buffer | null;
-    }
 }
 
 export interface IMessage {
@@ -83,7 +78,6 @@ export interface IMessage {
     sender?: {
         id: number;
         username: string;
-        avatar: Buffer | null;
     }
 }
 
@@ -155,6 +149,13 @@ export interface IRegisterResponse {
 export interface IKeys {
     generator: string;
     prime: string;
+    public: string;
+}
+
+export interface IKeyPackage {
+    generator: string;
+    prime: string;
+    private: string;
     public: string;
 }
 
