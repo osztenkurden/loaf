@@ -99,7 +99,6 @@ Dev.on("getChats", () => {
         sender: {
             id: 1,
             username: 'Test User #1',
-            avatar: null
         }
     }]
     const chats = [{

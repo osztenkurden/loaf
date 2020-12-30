@@ -36,8 +36,10 @@ export default class Drawer extends Component<IProps> {
         return(<div className='sidenav'>
           <div className='userView'>
             <div className='background'></div>
+            <div className="userCredentials">
               <span className='firstName'>Hubert</span>
               <span className='username'>@osztenkurden</span>
+            </div>
           </div>
           <Divider />
           <List>

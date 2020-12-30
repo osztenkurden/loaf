@@ -46,6 +46,11 @@ export default class Main extends Component<{}, IState> {
                 }
             });
         });
+        document.addEventListener("keyup", ev => {
+            if(ev.key === "Escape" && this.state.currentChat && !this.state.newContactModal && !this.state.newConversationModal){
+                this.loadChat(null);
+            }
+        });
         api.chats.get();
     }
     public setContactModal = (state: boolean) => () => {
@@ -112,7 +117,7 @@ export default class Main extends Component<{}, IState> {
             </div>
         );
     }
-    private loadChat = (chat: I.IChat) => {
+    private loadChat = (chat: I.IChat | null) => {
         this.setState({ currentChat: chat });
     }
 }
