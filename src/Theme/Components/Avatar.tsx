@@ -8,6 +8,8 @@ interface IProps  {
     chat: I.IChat;
 }
 
+// TODO: Add usability for both chats and singular users
+
 export default class LoafAvatar extends Component<IProps> {
     public render() {
         const { chat } = this.props;

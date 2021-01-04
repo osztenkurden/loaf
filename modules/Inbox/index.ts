@@ -137,9 +137,7 @@ export default class Inbox {
                 continue;
             }
 
-            /**
-             * TODO: Check saving files in messages here and fix dates of messages
-             */
+            // TODO: Check saving files in messages here and fix dates of messages
 
             const message: I.IMessage = {
                 chatId,
@@ -154,9 +152,8 @@ export default class Inbox {
             incoming.push(message);
         }
 
-        /**
-         * TODO: Check saving to DB here
-         */
+        // TODO: Check saving to DB here
+        
         saveMessages(this.userId, incoming);
         this.messages.set(chatId, current);
 

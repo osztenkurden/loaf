@@ -50,8 +50,8 @@ const convertToRaw = (userId: number, message: I.IMessage): IDBMessageRaw => {
 
 export const saveFileToDrive = async (message: I.IMessage) => {
     const saveFileMessage = async (fileMessage: I.IMessageContentFile) => {
-        // TODO: Add proper directory
-        let filePath = await unusedFilename(`XD/${fileMessage.content.name}`);
+
+        let filePath = await unusedFilename(path.join(directories.files, fileMessage.content.name));
         fs.writeFileSync(filePath, fileMessage.content.data, 'base64');
         return filePath;
     }
@@ -74,9 +74,7 @@ export const saveMessages = (userId: number, messages: I.IMessage[]) => {
 
     const db = getMessagesDB();
 
-    /**
-     * TODO: Inserting the messages to database
-     */
+    // TODO: Inserting the messages to database
 }
 
 export const getLastMessages = (userId: number, chatsId: number[], lastLoadedTimeStamp?: string): Promise<I.IMessage[]> => new Promise((res, rej) => {

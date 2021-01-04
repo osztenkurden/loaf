@@ -162,7 +162,6 @@ export default class Chat extends Component<IProps, IState> {
 
     private handleKeyDown = (e: any) => {
         if (e.key === "Enter" && this.state.form.textMessage && this.props.chat) {
-            // TODO: SEND MESSAGE
             const content = this.state.form.textMessage;
             api.message.send(this.props.chat.id, { type: "text", content });
             this.setState({ form: { textMessage: "", files: [] } });

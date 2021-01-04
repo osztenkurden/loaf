@@ -50,7 +50,6 @@ export function initSockets() {
 export const start = (win: Electron.WebContents) => {
     User.assign(win);
 
-    // TODO: remove unnecessary event responses
 
     Loaf.on("getMachineId", () => {
         const machineId = Machine.getMachineId();
@@ -67,7 +66,7 @@ export const start = (win: Electron.WebContents) => {
         return { event: "cookie", data: getCookie() };
     });
 
-    Loaf.onAsync("loadImage", async (chatId) => {
+    Loaf.onAsync("loadImage", async (chatId: number) => {
         const res = await api.chats.loadImage(chatId);
         if(!res.data || !res.data.image){
             return { event: "imageLoaded", data: {id:chatId, image: null}};
