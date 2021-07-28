@@ -13,18 +13,18 @@ export default class Storage {
     private cypher: Cypher | null;
 
     constructor() {
-        /*let storeContent = "";
-        if (id) {
-            this.userId = id;
-            storeContent = this.loadStore();
-        }
-        const store = new Breadbox();
-        store.init(storeContent);
+            /*let storeContent = "";
+            if (id) {
+                this.userId = id;
+                storeContent = this.loadStore();
+            }
+            const store = new Breadbox();
+            store.init(storeContent);
 
-        this.store = store;
-        this.saveStoreToFile();
 
-        this.cypher = new Cypher(this.store);*/
+            this.cypher = new Cypher(this.store);*/
+        this.store = null;
+        this.cypher = null;
 
     }
 
@@ -77,19 +77,19 @@ export default class Storage {
      */
 
     public getRegistrationId() {
-        return this.store.getLocalRegistrationId();
+        return this.store?.getLocalRegistrationId();
     }
 
     public getIdentityKeyPair() {
-        return this.store.getIdentityKeyPair();
+        return this.store?.getIdentityKeyPair();
     }
 
     public getPreKeys() {
-        return this.store.getPreKeys();
+        return this.store?.getPreKeys();
     }
 
     public getSignedPreKey() {
-        return this.store.getSignedPreKey();
+        return this.store?.getSignedPreKey();
     }
 
     /**
@@ -103,7 +103,7 @@ export default class Storage {
         } else if (!fs.existsSync(storePath) && this.userId) {
             this.createStoreFile();
         }
-        fs.writeFileSync(storePath, this.store.getStore(), "utf8");
+        fs.writeFileSync(storePath, this.store?.getStore(), "utf8");
         return this;
     }
 
@@ -139,7 +139,7 @@ export default class Storage {
     public async createSession(machine: I.IMachine) {
         const { store, cypher } = this;
         const { userId, machineId } = machine;
-        const session = await store.loadSession(`${userId}.${machineId}`);
+        const session = await store?.loadSession(`${userId}.${machineId}`);
         if (session) {
             return true;
         }
@@ -152,10 +152,10 @@ export default class Storage {
         const message = await this.encodeMessage(msg, userId, machineId, bundle);
 
         return {
-            content: message.body,
+            content: message?.body,
             machineId,
             recipientId: userId,
-            type: message.type,
+            type: message?.type,
         };
     }
 

@@ -19,7 +19,20 @@ export function textToRGB(i: string) {
 
     return "#" + "00000".substring(0, 6 - c.length) + c;
 }
+export const scrollToBottom  = (top = 0) => {
+    const messageContainer = document.getElementById("message_container");
+    if(!messageContainer) return 0;
+    if(top){
+        messageContainer.scroll({ top });
+        return;
+    }
+    const bottom = messageContainer.scrollHeight - messageContainer.scrollTop - messageContainer.clientHeight;
 
+    if(bottom <= 100){
+        messageContainer.scroll({ top: messageContainer.scrollHeight });
+    }
+    return;
+}
 export const fileIcon = (fileType: string) => {
     if(fileType === "audio") {
         return <Audiotrack />;

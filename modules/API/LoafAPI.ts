@@ -1,5 +1,5 @@
 import fetchHandler from "fetch-cookie";
-import nodeFetch from "node-fetch";
+import nodeFetch, { RequestInit } from "node-fetch";
 import toughCookie from "tough-cookie";
 import * as I from "../interface";
 import {directories} from "./../Machine";

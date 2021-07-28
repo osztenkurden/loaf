@@ -69,6 +69,7 @@ export interface IMessageRaw {
 }
 
 export interface IMessage {
+    uuid: string;
     id?: number;
     senderId: number;
     content: IMessageContent;
@@ -92,6 +93,24 @@ export interface IChat {
     users: IUser[];
     unread: boolean;
     messages: IMessage[];
+}
+
+export interface IPage {
+    page: number;
+    messages: IMessage[];
+    maxPage: number;
+}
+export interface IChatPaged {
+    id: number;
+    name: string;
+    last: IMessage | null;
+    image: boolean;
+    creatorId: number;
+    private: boolean;
+    status: number;
+    users: IUser[];
+    unread: boolean;
+    pages: IPage[];
 }
 
 export interface IUser {

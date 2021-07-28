@@ -1,4 +1,7 @@
-const crypto = require("./crypto/index").crypto;
+//const crypto = require("./crypto/index").crypto;
+const cryptos = require("@peculiar/webcrypto");
+const Crypto = cryptos.Crypto;
+const crypt = new Crypto();
 
 if(typeof window === 'undefined'){
   var window = {};
@@ -10,7 +13,7 @@ if(typeof libsignal === 'undefined'){
   var libsignal = window.libsignal;
 }
 if(!window.crypto){
-  window.crypto = crypto;
+  window.crypto = crypt;
 }
 // The Module object: Our interface to the outside world. We import
 // and export values on it, and do the work to get that through
@@ -25387,11 +25390,12 @@ Curve25519Worker.prototype = {
     /* AMD */ if (typeof define === 'function' && define["amd"])
         define([], factory);
     /* CommonJS */ else if (typeof require === 'function' && typeof module === "object" && module && module["exports"]) {
+      //console.log(global)
       (global["dcodeIO"] = global["dcodeIO"] || {})["Long"] = factory();
       module["exports"] = factory();
     }
     /* Global */ else {
-      console.log("SDFSD")
+      console.log("SDFSD");
         (global["dcodeIO"] = global["dcodeIO"] || {})["Long"] = factory();
     }
 

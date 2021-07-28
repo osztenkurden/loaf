@@ -11,15 +11,55 @@ import ChatList from "./../Chat/ChatsList";
 import NewContact from "./../NewContact";
 import NewConversation from "./../NewConversation";
 import storage, {ChatImageStorage} from "./../../API/ChatImages";
+import { scrollToBottom } from "Modules/Utils";
 
 interface IState {
     drawer: boolean;
-    chats: I.IChat[];
-    currentChat: I.IChat | null;
+    chats: I.IChatPaged[];
+    currentChat: I.IChatPaged | null;
     newContactModal: boolean;
     newConversationModal: boolean;
     storage: ChatImageStorage;
-    hash: string
+    hash: string,
+}
+
+const addPageToChat = (chat: I.IChatPaged, pages: I.IPage[]) => {
+    for(const page of pages){
+        const existingEntry = chat.pages.find(pageEntry => pageEntry.page === page.page);
+        if(!existingEntry){
+            chat.pages.push(page);
+            continue;
+        }
+        existingEntry.messages = page.messages;
+    }
+}
+
+const didLastPageChange = (chat: I.IChatPaged, newPages: I.IPage[]) => {
+    const maxNewPage = Math.max(...newPages.map(page => page.page));
+    const maxOldPage = Math.max(...chat.pages.map(page => page.page));
+
+    if(maxOldPage > maxNewPage){
+        return false;
+    }
+
+    const newMaxPageEntry = newPages.find(page => page.page === maxNewPage) as I.IPage;
+    const lastPageEntry = chat.pages.find(page => page.page === maxNewPage);
+
+    if(!lastPageEntry){
+        return true;
+    }
+
+    if(newMaxPageEntry.messages.length !== lastPageEntry.messages.length) return true;
+
+    const currentUUIDs = lastPageEntry.messages.map(message => message.uuid);
+    const newUUIDs = newMaxPageEntry.messages.map(message => message.uuid);
+
+    for(const currentUUID of currentUUIDs){
+        if(!newUUIDs.includes(currentUUID)){
+            return true;
+        }
+    }
+    return false;
 }
 
 export default class Main extends Component<{}, IState> {
@@ -32,18 +72,59 @@ export default class Main extends Component<{}, IState> {
             newContactModal: false,
             newConversationModal: false,
             storage: storage.set(() => this.setState({hash: (new Date()).toISOString()})),
-            hash: ''
+            hash: '',
         };
     }
     public async componentDidMount() {
-        Loaf.on("chats", (chats: I.IChat[]) => {
-            this.setState({ chats }, () => {
-                if(!this.state.currentChat) return;
-                for(const chat of chats){
-                    if(chat.id === this.state.currentChat.id){
-                        this.setState({currentChat: chat})
-                    }
+        Loaf.on("chats", (newChats: I.IChatPaged[]) => {
+            const { currentChat } = this.state;
+
+            let newInCurrent = false;
+
+
+            if(currentChat){
+                const newCurrentChat = newChats.find(chat => chat.id === currentChat.id);
+                if(newCurrentChat){
+                    newInCurrent = didLastPageChange(currentChat, newCurrentChat.pages);
+                    addPageToChat(currentChat, newCurrentChat.pages);
                 }
+                const indexOfCurrentChat = newChats.findIndex(chat => chat.id === currentChat.id);
+                if(indexOfCurrentChat >= 0){
+                    newChats[indexOfCurrentChat] = currentChat;
+                }
+            }
+
+            this.setState({
+                chats: newChats,
+                currentChat
+            }, () => {
+                if(!newInCurrent) return;
+                scrollToBottom();
+            });
+        });
+
+        Loaf.on("chatPage", (chatPage: { chatId: number, pageEntry: I.IPage }) => {
+            const { chats, currentChat } = this.state;
+            const targetChat = chats.find(chat => chat.id === chatPage.chatId);
+
+            let newInCurrent = false;
+
+            if(!targetChat) return;
+
+            if(!currentChat || currentChat.id !== targetChat.id){
+                targetChat.pages = [chatPage.pageEntry];
+            } else {
+                newInCurrent = didLastPageChange(currentChat, [chatPage.pageEntry]);
+                addPageToChat(currentChat, [chatPage.pageEntry]);
+                currentChat.pages.sort((a,b) => a.page-b.page);
+            }
+
+            this.setState({
+                chats,
+                currentChat
+            }, () => {
+                if(!newInCurrent) return;
+                scrollToBottom();
             });
         });
         api.chats.get();
@@ -112,7 +193,11 @@ export default class Main extends Component<{}, IState> {
             </div>
         );
     }
-    private loadChat = (chat: I.IChat) => {
-        this.setState({ currentChat: chat });
+    private loadChat = (chat: I.IChatPaged) => {
+        this.setState({ currentChat: chat }, () => {
+            const container = document.getElementById("message_container");
+            if(!container) return;
+            container.scroll({ top: container.scrollHeight });
+        });
     }
 }

@@ -572,7 +572,32 @@ li > hr.separator {
     flex: 1;
     display: flex;
     overflow:auto;
+    height: 100%;
     flex-direction: column;
+}
+.load-messages-button {
+    height: 60px;
+    min-height: 60px;
+    background-color: #242b2f;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    letter-spacing: 1.5px;
+    font-weight: 500;
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+    cursor: pointer;
+}
+.date-tag {
+    color: white;
+    font-size: 12px;
+    letter-spacing: 1px;
+    background-color: rgba(0,0,0,0.2);
+    align-self: center;
+    padding: 10px 20px;
+    border-radius: 100px;
+    margin: 5pt 0;
 }
 .drag-show {
     position: absolute;

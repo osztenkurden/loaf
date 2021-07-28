@@ -3,7 +3,7 @@ import React, { Component } from "react";
 import * as I from "./../../../modules/interface";
 
 interface IProps {
-    chat: I.IChat;
+    chat: I.IChatPaged;
     accept: (chatId: number) => void;
 }
 

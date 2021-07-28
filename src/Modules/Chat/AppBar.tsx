@@ -6,7 +6,7 @@ import { ListItemText } from '@material-ui/core';
 import storage from "./../../API/ChatImages";
 
 interface IProps {
-    chat: I.IChat;
+    chat: I.IChatPaged;
 }
 
 export default class LoafAppBar extends React.Component<IProps> {

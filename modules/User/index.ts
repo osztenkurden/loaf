@@ -14,13 +14,14 @@ export class User {
     private user: I.IUser | null;
     private storage: Storage | null;
     private inbox: Inbox | null;
-    private window: Electron.WebContents;
+    private window: Electron.WebContents | null;
 
     constructor() {
         this.id = null;
         this.user = null;
         this.storage = null;
         this.window = null;
+        this.inbox = null;
     }
 
     public assign(window: Electron.WebContents) {
@@ -59,18 +60,32 @@ export class User {
     public async register(username: string, password: string, firstName: string) {
         try {
             const keys = await generateKeys();
+            if(!keys){
+                return false;
+            }
             const storage = (await this.initStorage()).getStorage();
-            const payload: I.IRegisterPayload = {
+            if(!storage){
+                return false;
+            }
+            const signedPreKey = storage.getSignedPreKey();
+            const preKeys = storage.getPreKeys();
+            const identityKeyPair = await storage.getIdentityKeyPair();
+
+            if(!signedPreKey || !preKeys || !identityKeyPair){
+                return false;
+            }
+
+            const payload  = {
                  firstName,
-                 identityKey: parseKeyObject(await storage.getIdentityKeyPair()).pubKey,
+                 identityKey: parseKeyObject(identityKeyPair).pubKey,
                  keys: this.getKeys(keys),
                  machineId: Machine.getMachineId(),
                  password,
-                 preKeys: storage.getPreKeys(),
+                 preKeys,
                  registrationId: await storage.getRegistrationId(),
-                 signedPreKey: storage.getSignedPreKey(),
+                 signedPreKey,
                  username,
-            };
+            } as I.IRegisterPayload;
             const result = await api.user.register(payload);
             if (!result) {
                 return false;
@@ -81,11 +96,10 @@ export class User {
             storage.setUserId(user.id).saveStoreToFile();
 
             if("token" in keys){
-                console.log(`${username} registered`)
                 return base32.encode(keys.token).toString().replace(/=/g, "");;
             }
-
             const diffieHellman = crypto.createDiffieHellman(keys.prime, "hex", keys.generator, "hex");
+
             diffieHellman.setPrivateKey(keys.private, "hex");
             diffieHellman.setPublicKey(keys.public, "hex");
 
@@ -94,7 +108,8 @@ export class User {
             const token = base32.encode(secret).toString().replace(/=/g, "");
             return token;
          } catch (e) {
-             return false;
+            console.log(e);
+            return false;
          }
     }
 
@@ -127,7 +142,7 @@ export class User {
     }
 
     private initInbox() {
-        if (!this.inbox && this.user.id) {
+        if (!this.inbox && this.user?.id && this.window && this.storage) {
             this.inbox = new Inbox(this.window, this.user.id, this.storage);
         }
         return this;

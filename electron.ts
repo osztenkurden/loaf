@@ -7,8 +7,10 @@ import * as Machine from "./modules/Machine";
 interface IExtApp extends App {
     isQuitting?: boolean;
 }
-
+process.env.NODE_ENV = 'production'
 const isDev = process.env.DEV === "true";
+
+let tray: Tray | null = null;
 
 const startApp = async () => {
     app.setAppUserModelId("com.bakerysoft.loaf");
@@ -33,7 +35,7 @@ const startApp = async () => {
         width: 1280,
     });
 
-    const tray = new Tray(path.join(__dirname, "assets/icon.png"));
+    tray = new Tray(path.join(__dirname, "assets/icon.png"));
     const context = Menu.buildFromTemplate([
         {
             click: () => {
@@ -76,6 +78,13 @@ const startApp = async () => {
         ipcMain.on(event.name, event.response);
     });*/
 };
+
+process.on("uncaughtException", (e) => {
+    console.log(e);
+});
+process.on("unhandledRejection", (e) => {
+    console.log(e);
+});
 
 app.on("window-all-closed", app.quit);
 

@@ -7,9 +7,9 @@ import storage from './../../API/ChatImages';
 
 
 interface IProps {
-    chats: I.IChat[];
-    currentChat: I.IChat | null;
-    loadChat: (chat: I.IChat) => void;
+    chats: I.IChatPaged[];
+    currentChat: I.IChatPaged | null;
+    loadChat: (chat: I.IChatPaged) => void;
 }
 
 

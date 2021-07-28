@@ -5,7 +5,7 @@ import { textToRGB } from './../../Modules/Utils';
 import storage from "./../../API/ChatImages";
 
 interface IProps  {
-    chat: I.IChat;
+    chat: I.IChatPaged;
 }
 
 export default class LoafAvatar extends Component<IProps> {

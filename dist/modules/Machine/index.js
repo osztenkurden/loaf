@@ -1,32 +1,47 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
     return result;
 };
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
-var electron_1 = require("electron");
-var fs = __importStar(require("fs"));
-var os_1 = __importDefault(require("os"));
-var path = __importStar(require("path"));
-var LoafBreadbox_1 = require("./../Breadbox/LoafBreadbox");
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.getMachine = exports.getMachineName = exports.getMachineId = exports.checkDirectories = exports.claimMachine = exports.directories = void 0;
+const electron_1 = require("electron");
+const fs = __importStar(require("fs"));
+const os_1 = __importDefault(require("os"));
+const path = __importStar(require("path"));
+const LoafBreadbox_1 = require("./../Breadbox/LoafBreadbox");
 exports.directories = {
     db: path.join(electron_1.app.getPath("userData"), "database"),
     user: electron_1.app.getPath("userData"),
-    messages: path.join(electron_1.app.getPath("userData"), "database", "messages")
+    files: path.join(electron_1.app.getPath('home'), 'Loaf Messenger'),
+    messages: path.join(electron_1.app.getPath("userData"), "database", "messages"),
 };
-exports.claimMachine = function () {
-    var machineId = LoafBreadbox_1.generateId()[0];
-    var content = { machineId: machineId };
+const claimMachine = () => {
+    const machineId = LoafBreadbox_1.generateId()[0];
+    const content = { machineId };
     fs.writeFileSync(path.join(exports.directories.user, "machine.loaf"), JSON.stringify(content));
 };
-exports.checkDirectories = function () {
-    Object.values(exports.directories).forEach(function (dir) {
+exports.claimMachine = claimMachine;
+const checkDirectories = () => {
+    Object.values(exports.directories).forEach((dir) => {
         if (!fs.existsSync(dir)) {
             fs.mkdirSync(dir);
         }
@@ -35,17 +50,19 @@ exports.checkDirectories = function () {
         exports.claimMachine();
     }
 };
-exports.getMachineId = function () {
-    var file = fs.readFileSync(path.join(exports.directories.user, "machine.loaf"), "UTF-8");
+exports.checkDirectories = checkDirectories;
+const getMachineId = () => {
+    const file = fs.readFileSync(path.join(exports.directories.user, "machine.loaf"), "UTF-8");
     try {
-        var content = JSON.parse(file);
+        const content = JSON.parse(file);
         return content.machineId;
     }
     catch (_a) {
         return 0;
     }
 };
-exports.getMachineName = function () {
+exports.getMachineId = getMachineId;
+const getMachineName = () => {
     function OS(platform) {
         if (platform === "freebsd") {
             return "FreeBSD";
@@ -55,8 +72,10 @@ exports.getMachineName = function () {
         }
         return platform[0].toUpperCase() + platform.substr(1);
     }
-    return OS(os_1["default"].platform()) + " " + os_1["default"].release() + " - " + os_1["default"].hostname();
+    return `${OS(os_1.default.platform())} ${os_1.default.release()} - ${os_1.default.hostname()}`;
 };
-exports.getMachine = function () {
+exports.getMachineName = getMachineName;
+const getMachine = () => {
     return { name: exports.getMachineName(), id: exports.getMachineId() };
 };
+exports.getMachine = getMachine;

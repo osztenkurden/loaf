@@ -6,8 +6,37 @@ import fs from 'fs';
 import unusedFilename from 'unused-filename';
 import { directories } from '../Machine';
 
+import Sequelize, { Model } from 'sequelize';
+
+class Message extends Model {
+    static Define(seq: Sequelize.Sequelize) {
+        this.init({
+            uuid: { type: Sequelize.UUID, primaryKey: true, allowNull: false, defaultValue: Sequelize.UUIDV4 },
+            id: { type: Sequelize.BIGINT },
+            senderId: { type: Sequelize.BIGINT },
+            content: { type: Sequelize.TEXT({ length: "long"}),  },
+            chatId: { type: Sequelize.BIGINT },
+            my: { type: Sequelize.BOOLEAN },
+            date: { type: Sequelize.DATE },
+            userId: { type: Sequelize.TEXT({ length: "long"}) },
+        }, {
+            timestamps:false,
+            sequelize: seq
+        });
+    }
+}
+
+export const sequelize = new Sequelize.Sequelize({
+    dialect: 'sqlite',
+    storage: path.join(directories.messages, 'messages.db')
+});
+
+Message.Define(sequelize);
+
+sequelize.sync({ force: false });
 interface IDBMessageRaw {
-    id: number;
+    uuid: string,
+    id?: number;
     senderId: number;
     content: string;
     chatId: number;
@@ -15,53 +44,59 @@ interface IDBMessageRaw {
     date: string;
     userId: number
 }
+interface IDBMessagePreRaw {
+    // uuid: string,
+    id?: number;
+    senderId: number;
+    content: string;
+    chatId: number;
+    my: number;
+    date: Date;
+    userId: number
+}
 
-
-const getMessagesDB = () => {
-    const db = new (sqlite3.verbose()).Database(path.join(directories.messages, 'messages.db'));
-    return db;
-};
-
-const convertRawMessage = (raw: IDBMessageRaw): I.IMessage => {
+const convertRawMessage = (chats: I.IChatPaged[] = []) => (raw: IDBMessageRaw): I.IMessage | null => {
     const inbox = User.getInbox();
+    if(!inbox) return null;
     return {
+        uuid: raw.uuid,
         id: raw.id,
         senderId: raw.senderId,
         content: JSON.parse(raw.content),
         chatId: raw.chatId,
         my: !!raw.my,
         date: raw.date,
-        sender: inbox.getSenderData(raw.chatId, raw.senderId)
+        sender: inbox.getSenderData(raw.chatId, raw.senderId, chats)
 
     }
 };
 
-const convertToRaw = (userId: number, message: I.IMessage): IDBMessageRaw => {
+const convertToRaw = (userId: number, message: I.IMessage): IDBMessagePreRaw => {
     return {
         id: message.id,
         senderId: message.senderId,
         content: JSON.stringify(message.content),
         chatId: message.chatId,
         my: Number(message.my),
-        date: message.date,
+        date: new Date(message.date),
         userId
     }
 }
 
 export const saveFileToDrive = async (message: I.IMessage) => {
     const saveFileMessage = async (fileMessage: I.IMessageContentFile) => {
-        // TODO: Add proper directory
-        let filePath = await unusedFilename(`XD/${fileMessage.content.name}`);
+
+        const filePath = await unusedFilename(path.join(directories.files, fileMessage.content.name));
         fs.writeFileSync(filePath, fileMessage.content.data, 'base64');
         return filePath;
     }
-    if(message.content.type === "text") return message;
-    if(message.content.type === "file") {
+    if (message.content.type === "text") return message;
+    if (message.content.type === "file") {
         message.content.content.data = await saveFileMessage(message.content);
         return message;
     }
     await Promise.all(message.content.content.map(async messageContent => {
-        if(messageContent.type === "file"){
+        if (messageContent.type === "file") {
             messageContent.content.data = await saveFileMessage(messageContent);
         }
         return messageContent;
@@ -69,21 +104,43 @@ export const saveFileToDrive = async (message: I.IMessage) => {
     return message;
 }
 
-export const saveMessages = (userId: number, messages: I.IMessage[]) => {
+export const saveMessages = async (userId: number, messages: I.IMessage[]) => {
     const rawMessages = messages.map(msg => convertToRaw(userId, msg));
 
-    const db = getMessagesDB();
-
-    /**
-     * TODO: Inserting the messages to database
-     */
+    try {
+        return await Message.bulkCreate(rawMessages)
+    } catch(e) {
+        console.log(e);
+        return null;
+    }
 }
 
-export const getLastMessages = (userId: number, chatsId: number[], lastLoadedTimeStamp?: string): Promise<I.IMessage[]> => new Promise((res, rej) => {
-    const db = getMessagesDB();
+const MESSAGES_PER_PAGE = 15;
 
-    db.all("SELECT * FROM messages WHERE chatId IN ? AND userId = ? AND datetime(date) < datetime(?) LIMIT 20", [chatsId, userId, lastLoadedTimeStamp || 'now'], (err, rows: IDBMessageRaw[]) => {
-        const messages = rows.map(convertRawMessage);
-        return res(messages);
+export const getMessages = async (userId: number, chatId: number, pageFromEnd = 0, chats: I.IChatPaged[] = [], useLiteralPage = false) => {
+    const messageCount = await Message.count({
+        where: {
+            userId,
+            chatId
+        }
     });
-});
+    // Page count starts from 0
+    const maxPage = Math.ceil(messageCount/MESSAGES_PER_PAGE)-1;
+
+    const page = !useLiteralPage ? (maxPage - pageFromEnd) : pageFromEnd;
+    const messages = await Message.findAll({
+        where: {
+            userId,
+            chatId
+        },
+        limit: MESSAGES_PER_PAGE+1,
+        offset: page*MESSAGES_PER_PAGE,
+        raw: true,
+        order: [['date', 'ASC']]
+    }) as unknown as IDBMessageRaw[];
+    const filteredMessages = messages.slice(0,MESSAGES_PER_PAGE).map(convertRawMessage(chats)).filter((message): message is I.IMessage => !!message);
+
+    // const hasMore = messages.length > MESSAGES_PER_PAGE;
+    return { messages: filteredMessages, page, maxPage } as I.IPage;
+}
+

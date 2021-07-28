@@ -10,7 +10,7 @@ import { Remove as RemoveIcon, Add as AddIcon } from '@material-ui/icons';
 interface IProps {
     onClose: () => void;
     closeDrawer: () => void;
-    chats: I.IChat[];
+    chats: I.IChatPaged[];
 }
 
 interface IState {

@@ -5,7 +5,7 @@ import React, { Component } from "react";
 import * as I from "./../../../modules/interface";
 import LoafAvatar from "./../../Theme/Components/Avatar";
 
-function getSubText(chat: I.IChat, last: I.IMessage | null) {
+function getSubText(chat: I.IChatPaged, last: I.IMessage | null) {
     switch (chat.status) {
         case 5:
             return "Waiting for response...";
@@ -20,19 +20,36 @@ function getSubText(chat: I.IChat, last: I.IMessage | null) {
 }
 
 interface IProps {
-    chat: I.IChat;
+    chat: I.IChatPaged;
     chatImage: string | null;
-    loadChat: (chat: I.IChat) => void;
+    loadChat: (chat: I.IChatPaged) => void;
     isCurrent: boolean;
 }
 
 export default class ChatsListEntry extends Component<IProps> {
-    getLast = () => {
+    getMessagesFromLastPage = () => {
         const { chat } = this.props;
-        if(!chat) return null;
-        if(chat.last) return chat.last;
-        if(!chat.messages.length) return null;
-        return chat.messages[chat.messages.length-1];
+        if(!chat) return [];
+        if(chat.last) return [chat.last];
+        const maxPage = Math.max(...chat.pages.map(page => page.page));
+        const lastPage = chat.pages.find(page => page.page === maxPage);
+        if(!lastPage) return [];
+        return lastPage.messages;
+    }
+    getLast = () => {
+        const messages = this.getMessagesFromLastPage();
+        let last: I.IMessage | null = null;
+
+        for(const message of messages){
+            if(!last){
+                last = message;
+                continue;
+            }
+            if(new Date(message.date) > new Date(last.date)){
+                last = message;
+            }
+        }
+        return last;
     }
 
     getLastTag = () => {

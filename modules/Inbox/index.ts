@@ -1,16 +1,17 @@
 import { api } from "../API";
-import { saveFileToDrive, saveMessages } from "../Database";
+import { getMessages, saveFileToDrive, saveMessages } from "../Database";
 import * as I from "../interface";
 import * as Machine from "../Machine";
 import Storage from "../Storage";
+import { uuid } from 'uuidv4';
 
 // import * as Machine from "../Machine";
 
 export default class Inbox {
-    private chats: I.IChat[];
+    private chats: I.IChatPaged[];
     private content: Electron.WebContents;
     private userId: number;
-    private storage: Storage | null;
+    private storage: Storage;
     private messages: Map<number, I.IMessage[]>;
 
     constructor(content: Electron.WebContents, userId: number, storage: Storage) {
@@ -31,15 +32,15 @@ export default class Inbox {
     public loadChats = async (init?: boolean) => {
         const response = await api.inbox.getChats();
         if (response.success && response.data) {
-            const chats = response.data.chats as I.IChat[];
-
+            const chats = response.data.chats as I.IChatPaged[];
             for (const chat of chats) {
-                let messages = this.messages.get(chat.id);
-                if (!messages) {
-                    this.messages.set(chat.id, []);
-                    messages = [];
-                }
-                chat.messages = messages;
+                const newestPage = await getMessages(this.userId, chat.id, 0, chats);
+                // const inboxedMessages = this.messages.get(chat.id);
+                // const savedMessages = init ? (await getMessages(this.userId, chat.id, 0, chats)).messages : [];
+
+                this.messages.set(chat.id, newestPage.messages);
+
+                chat.pages = [newestPage];
             }
             this.chats = chats;
         }
@@ -49,6 +50,16 @@ export default class Inbox {
         }
         // Loaf.send("chats", this.chats);
         return this;
+    }
+
+    public loadMessagesFromPage = async (chatId: number, page: number) => {
+        const chat = this.chats.find(entry => entry.id === chatId);
+
+        if(!chat) return;
+
+        const pageEntry = await getMessages(this.userId, chatId, page, [], true);
+
+        this.content.send("chatPage", { chatId, pageEntry });
     }
 
     public async sendToChat(chatId: number, msg: I.IMessageContent) {
@@ -61,9 +72,10 @@ export default class Inbox {
                 recipientId: receiver.userId,
             };
             const entry = await this.prepareMessage(payload);
-            entries.push(entry);
+            if(entry) entries.push(entry);
         }
         const message: I.IMessage = {
+            uuid: uuid(),
             senderId: this.userId,
             content: msg,
             chatId,
@@ -73,10 +85,12 @@ export default class Inbox {
         const result = await api.messages.send(chatId, entries, Machine.getMachineId());
 
         if (result.success) {
-            const current = this.messages.get(chatId);
+            const current = this.messages.get(chatId) || [];
+
             current.push(message);
             this.messages.set(chatId, current);
             this.content.send("chats", this.chats);
+            await saveMessages(this.userId, [message]);
         } else {
             console.log(result);
         }
@@ -128,7 +142,6 @@ export default class Inbox {
             return null;
         }
         const messages = (response.data.messages || []) as I.IMessageRaw[];
-
         const current = this.messages.get(chatId) || [];
         const incoming: I.IMessage[] = [];
         for (const rawMessage of messages) {
@@ -137,14 +150,13 @@ export default class Inbox {
                 continue;
             }
 
-            /**
-             * TODO: Check saving files in messages here and fix dates of messages
-             */
+            const date = (rawMessage as any).createdAt;
 
             const message: I.IMessage = {
+                uuid: uuid(),
                 chatId,
                 content: decrypted,
-                date: (new Date()).toISOString(),
+                date,
                 my: rawMessage.senderId === this.userId,
                 senderId: rawMessage.senderId,
                 sender: this.getSenderData(chatId, rawMessage.senderId),
@@ -154,20 +166,19 @@ export default class Inbox {
             incoming.push(message);
         }
 
-        /**
-         * TODO: Check saving to DB here
-         */
-        saveMessages(this.userId, incoming);
+        await saveMessages(this.userId, incoming);
         this.messages.set(chatId, current);
 
         if(!init) this.loadChats();
     }
 
-    public getSenderData(chatId: number,senderId: number) {
-        const chat = this.chats.find(chat => chat.id === chatId);
-        if(!chat) return null;
+    public getSenderData(chatId: number,senderId: number, chats: I.IChatPaged[] = []) {
+        const chat = this.chats.find(chatEntry => chatEntry.id === chatId) || chats.find(chatEntry => chatEntry.id === chatId);
+        if(!chat) return undefined;
+
         const senderData = chat.users.find(user => user.id === senderId);
-        if(!senderData || !senderData.id) return null;
+        if(!senderData || !senderData.id)  return undefined;
+
         return {
             id: senderData.id,
             username: senderData.username

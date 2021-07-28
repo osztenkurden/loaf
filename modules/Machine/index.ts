@@ -7,7 +7,7 @@ import { generateId } from "./../Breadbox/LoafBreadbox";
 export const directories = {
     db: path.join(app.getPath("userData"), "database"),
     user: app.getPath("userData"),
-    files: path.join(app.getPath("userData"), "database", "files"),
+    files: path.join(app.getPath('home'), 'Loaf Messenger'),
     messages: path.join(app.getPath("userData"), "database", "messages"),
 
 };
@@ -41,7 +41,7 @@ export const getMachineId = (): number => {
 };
 
 export const getMachineName = () => {
-    function OS(platform) {
+    function OS(platform: string) {
         if (platform === "freebsd") {
             return "FreeBSD";
         }

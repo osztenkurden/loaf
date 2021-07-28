@@ -4,7 +4,7 @@ import * as I from "../interface";
 
 
 
-export const generateKeys = async (): Promise<I.IKeyPackage | I.IDebugKeys> => {
+export const generateKeys = async (): Promise<I.IKeyPackage | I.IDebugKeys | null> => {
     return new Promise((res, rej) => {
         if(process.env.DEVUSER1){
             const keys = {

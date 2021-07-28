@@ -48,7 +48,7 @@ export default class Cypher {
         ciphered.recipientId = recipientId;
         ciphered.machineId = machineId;
         ciphered.entry = ciphered.type == 3;
-        
+
         return ciphered;
     }
 

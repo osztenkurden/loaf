@@ -58,6 +58,7 @@ Dev.on("getUser", () => {
 
 Dev.on("getChats", () => {
     const messages: IMessage[] = [{
+        uuid: 'sdf43w5=e345e4-65464',
         id: 1,
         senderId: 1,
         content: {
@@ -98,8 +99,7 @@ Dev.on("getChats", () => {
         date: new Date().toISOString(),
         sender: {
             id: 1,
-            username: 'Test User #1',
-            avatar: null
+            username: 'Test User #1'
         }
     }]
     const chats = [{

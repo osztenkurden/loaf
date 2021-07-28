@@ -1,4 +1,23 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -8,86 +27,45 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
-exports.__esModule = true;
-var API_1 = require("../API");
-var Machine = __importStar(require("../Machine"));
+Object.defineProperty(exports, "__esModule", { value: true });
+const API_1 = require("../API");
+const Database_1 = require("../Database");
+const Machine = __importStar(require("../Machine"));
+const uuidv4_1 = require("uuidv4");
 // import * as Machine from "../Machine";
-var Inbox = /** @class */ (function () {
-    function Inbox(content, userId, storage) {
-        var _this = this;
-        this.addFriend = function (userId) { return __awaiter(_this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, API_1.api.inbox.addFriend(userId)];
-                    case 1:
-                        _a.sent();
-                        return [2 /*return*/, this];
+class Inbox {
+    constructor(content, userId, storage) {
+        this.addFriend = (userId) => __awaiter(this, void 0, void 0, function* () {
+            yield API_1.api.inbox.addFriend(userId);
+            return this;
+        });
+        this.loadChats = (init) => __awaiter(this, void 0, void 0, function* () {
+            const response = yield API_1.api.inbox.getChats();
+            if (response.success && response.data) {
+                const chats = response.data.chats;
+                for (const chat of chats) {
+                    const newestPage = yield Database_1.getMessages(this.userId, chat.id, 0, chats);
+                    // const inboxedMessages = this.messages.get(chat.id);
+                    // const savedMessages = init ? (await getMessages(this.userId, chat.id, 0, chats)).messages : [];
+                    this.messages.set(chat.id, newestPage.messages);
+                    chat.pages = [newestPage];
                 }
-            });
-        }); };
-        this.loadChats = function (init) { return __awaiter(_this, void 0, void 0, function () {
-            var response, chats, _i, chats_1, chat, messages;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, API_1.api.inbox.getChats()];
-                    case 1:
-                        response = _a.sent();
-                        if (response.success && response.data) {
-                            chats = response.data.chats;
-                            for (_i = 0, chats_1 = chats; _i < chats_1.length; _i++) {
-                                chat = chats_1[_i];
-                                messages = this.messages.get(chat.id);
-                                if (!messages) {
-                                    this.messages.set(chat.id, []);
-                                    messages = [];
-                                }
-                                chat.messages = messages;
-                            }
-                            this.chats = chats;
-                        }
-                        this.content.send("chats", this.chats);
-                        if (init) {
-                            this.loadAllMessages();
-                        }
-                        // Loaf.send("chats", this.chats);
-                        return [2 /*return*/, this];
-                }
-            });
-        }); };
+                this.chats = chats;
+            }
+            this.content.send("chats", this.chats);
+            if (init) {
+                this.loadAllMessages();
+            }
+            // Loaf.send("chats", this.chats);
+            return this;
+        });
+        this.loadMessagesFromPage = (chatId, page) => __awaiter(this, void 0, void 0, function* () {
+            const chat = this.chats.find(entry => entry.id === chatId);
+            if (!chat)
+                return;
+            const pageEntry = yield Database_1.getMessages(this.userId, chatId, page, [], true);
+            this.content.send("chatPage", { chatId, pageEntry });
+        });
         this.chats = [];
         this.content = content;
         this.userId = userId;
@@ -95,216 +73,144 @@ var Inbox = /** @class */ (function () {
         this.messages = new Map();
         this.loadChats(true);
     }
-    Inbox.prototype.sendToChat = function (chatId, msg) {
-        return __awaiter(this, void 0, void 0, function () {
-            var receivers, entries, _i, receivers_1, receiver, payload, entry, message, result, current;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.getReceivers(chatId)];
-                    case 1:
-                        receivers = _a.sent();
-                        entries = [];
-                        _i = 0, receivers_1 = receivers;
-                        _a.label = 2;
-                    case 2:
-                        if (!(_i < receivers_1.length)) return [3 /*break*/, 5];
-                        receiver = receivers_1[_i];
-                        payload = {
-                            content: msg,
-                            machineId: receiver.machineId,
-                            recipientId: receiver.userId
-                        };
-                        return [4 /*yield*/, this.prepareMessage(payload)];
-                    case 3:
-                        entry = _a.sent();
-                        entries.push(entry);
-                        _a.label = 4;
-                    case 4:
-                        _i++;
-                        return [3 /*break*/, 2];
-                    case 5:
-                        message = {
-                            senderId: this.userId,
-                            content: msg,
-                            chatId: chatId,
-                            my: true,
-                            date: (new Date()).toISOString()
-                        };
-                        return [4 /*yield*/, API_1.api.messages.send(chatId, entries, Machine.getMachineId())];
-                    case 6:
-                        result = _a.sent();
-                        if (result.success) {
-                            current = this.messages.get(chatId);
-                            current.push(message);
-                            this.messages.set(chatId, current);
-                            this.content.send("chats", this.chats);
-                        }
-                        else {
-                            console.log(result);
-                        }
-                        return [2 /*return*/, result];
-                }
-            });
+    sendToChat(chatId, msg) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const receivers = yield this.getReceivers(chatId);
+            const entries = [];
+            for (const receiver of receivers) {
+                const payload = {
+                    content: msg,
+                    machineId: receiver.machineId,
+                    recipientId: receiver.userId,
+                };
+                const entry = yield this.prepareMessage(payload);
+                if (entry)
+                    entries.push(entry);
+            }
+            const message = {
+                uuid: uuidv4_1.uuid(),
+                senderId: this.userId,
+                content: msg,
+                chatId,
+                my: true,
+                date: (new Date()).toISOString(),
+            };
+            const result = yield API_1.api.messages.send(chatId, entries, Machine.getMachineId());
+            if (result.success) {
+                const current = this.messages.get(chatId) || [];
+                current.push(message);
+                this.messages.set(chatId, current);
+                this.content.send("chats", this.chats);
+                yield Database_1.saveMessages(this.userId, [message]);
+            }
+            else {
+                console.log(result);
+            }
+            return result;
         });
-    };
-    Inbox.prototype.acceptChat = function (chatId) {
-        return __awaiter(this, void 0, void 0, function () {
-            var receivers, messages, machineId, _i, receivers_2, machine, message, payload, result;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.getReceivers(chatId)];
-                    case 1:
-                        receivers = _a.sent();
-                        if (!receivers.length) {
-                            return [2 /*return*/, false];
-                        }
-                        messages = [];
-                        machineId = Machine.getMachineId();
-                        _i = 0, receivers_2 = receivers;
-                        _a.label = 2;
-                    case 2:
-                        if (!(_i < receivers_2.length)) return [3 /*break*/, 5];
-                        machine = receivers_2[_i];
-                        return [4 /*yield*/, this.storage.createSession(machine)];
-                    case 3:
-                        message = _a.sent();
-                        if (typeof message !== "boolean") {
-                            messages.push(message);
-                        }
-                        _a.label = 4;
-                    case 4:
-                        _i++;
-                        return [3 /*break*/, 2];
-                    case 5:
-                        payload = {
-                            chatId: chatId,
-                            entries: messages,
-                            senderId: this.userId,
-                            senderMachine: machineId
-                        };
-                        return [4 /*yield*/, API_1.api.inbox.accept(payload)];
-                    case 6:
-                        result = _a.sent();
-                        if (result.success) {
-                            this.loadChats();
-                            return [2 /*return*/, true];
-                        }
-                        return [2 /*return*/, false];
+    }
+    acceptChat(chatId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const receivers = yield this.getReceivers(chatId);
+            if (!receivers.length) {
+                return false;
+            }
+            const messages = [];
+            const machineId = Machine.getMachineId();
+            for (const machine of receivers) {
+                const message = yield this.storage.createSession(machine);
+                if (typeof message !== "boolean") {
+                    messages.push(message);
                 }
-            });
+            }
+            const payload = {
+                chatId,
+                entries: messages,
+                senderId: this.userId,
+                senderMachine: machineId,
+            };
+            const result = yield API_1.api.inbox.accept(payload);
+            if (result.success) {
+                this.loadChats();
+                return true;
+            }
+            return false;
         });
-    };
-    Inbox.prototype.loadAllMessages = function () {
-        return __awaiter(this, void 0, void 0, function () {
-            var _i, _a, chat;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
-                    case 0:
-                        _i = 0, _a = this.chats;
-                        _b.label = 1;
-                    case 1:
-                        if (!(_i < _a.length)) return [3 /*break*/, 4];
-                        chat = _a[_i];
-                        return [4 /*yield*/, this.loadMessages(chat.id, true)];
-                    case 2:
-                        _b.sent();
-                        _b.label = 3;
-                    case 3:
-                        _i++;
-                        return [3 /*break*/, 1];
-                    case 4:
-                        this.loadChats();
-                        return [2 /*return*/];
+    }
+    loadAllMessages() {
+        return __awaiter(this, void 0, void 0, function* () {
+            for (const chat of this.chats) {
+                yield this.loadMessages(chat.id, true);
+            }
+            this.loadChats();
+        });
+    }
+    loadMessages(chatId, init = false) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!init)
+                yield this.loadChats();
+            const response = yield API_1.api.messages.get(chatId, Machine.getMachineId());
+            if (!response.success || !response.data) {
+                return null;
+            }
+            const messages = (response.data.messages || []);
+            const current = this.messages.get(chatId) || [];
+            const incoming = [];
+            for (const rawMessage of messages) {
+                const decrypted = yield this.storage.decodeMessage(rawMessage);
+                if (!decrypted) {
+                    continue;
                 }
-            });
+                const date = rawMessage.createdAt;
+                const message = {
+                    uuid: uuidv4_1.uuid(),
+                    chatId,
+                    content: decrypted,
+                    date,
+                    my: rawMessage.senderId === this.userId,
+                    senderId: rawMessage.senderId,
+                    sender: this.getSenderData(chatId, rawMessage.senderId),
+                };
+                yield Database_1.saveFileToDrive(message);
+                current.push(message);
+                incoming.push(message);
+            }
+            yield Database_1.saveMessages(this.userId, incoming);
+            this.messages.set(chatId, current);
+            if (!init)
+                this.loadChats();
         });
-    };
-    Inbox.prototype.loadMessages = function (chatId, init) {
-        if (init === void 0) { init = false; }
-        return __awaiter(this, void 0, void 0, function () {
-            var response, messages, current, _i, messages_1, rawMessage, decrypted, message;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        if (!!init) return [3 /*break*/, 2];
-                        return [4 /*yield*/, this.loadChats()];
-                    case 1:
-                        _a.sent();
-                        _a.label = 2;
-                    case 2: return [4 /*yield*/, API_1.api.messages.get(chatId, Machine.getMachineId())];
-                    case 3:
-                        response = _a.sent();
-                        if (!response.success || !response.data) {
-                            return [2 /*return*/, null];
-                        }
-                        messages = (response.data.messages || []);
-                        current = this.messages.get(chatId) || [];
-                        _i = 0, messages_1 = messages;
-                        _a.label = 4;
-                    case 4:
-                        if (!(_i < messages_1.length)) return [3 /*break*/, 7];
-                        rawMessage = messages_1[_i];
-                        return [4 /*yield*/, this.storage.decodeMessage(rawMessage)];
-                    case 5:
-                        decrypted = _a.sent();
-                        if (!decrypted) {
-                            return [3 /*break*/, 6];
-                        }
-                        message = {
-                            chatId: chatId,
-                            content: decrypted,
-                            date: (new Date()).toISOString(),
-                            my: rawMessage.senderId === this.userId,
-                            senderId: rawMessage.senderId,
-                            sender: rawMessage.sender
-                        };
-                        current.push(message);
-                        _a.label = 6;
-                    case 6:
-                        _i++;
-                        return [3 /*break*/, 4];
-                    case 7:
-                        this.messages.set(chatId, current);
-                        if (!init)
-                            this.loadChats();
-                        return [2 /*return*/];
-                }
-            });
+    }
+    getSenderData(chatId, senderId, chats = []) {
+        const chat = this.chats.find(chatEntry => chatEntry.id === chatId) || chats.find(chatEntry => chatEntry.id === chatId);
+        if (!chat)
+            return undefined;
+        const senderData = chat.users.find(user => user.id === senderId);
+        if (!senderData || !senderData.id)
+            return undefined;
+        return {
+            id: senderData.id,
+            username: senderData.username
+        };
+    }
+    prepareMessage(msg, bundle) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const encrypted = yield this.storage.encodeMessage(msg.content, msg.recipientId, msg.machineId, bundle);
+            return encrypted;
         });
-    };
-    Inbox.prototype.prepareMessage = function (msg, bundle) {
-        return __awaiter(this, void 0, void 0, function () {
-            var encrypted;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.storage.encodeMessage(msg.content, msg.recipientId, msg.machineId, bundle)];
-                    case 1:
-                        encrypted = _a.sent();
-                        return [2 /*return*/, encrypted];
-                }
-            });
+    }
+    getReceivers(chatId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const response = yield API_1.api.inbox.getReceivers(chatId);
+            if (!response.status || !response.data) {
+                return [];
+            }
+            // const store = this.storage.getStore();
+            const machineId = Machine.getMachineId();
+            const machines = response.data.machines;
+            const receivers = machines.filter((mch) => mch.userId !== this.userId || mch.machineId !== machineId);
+            return receivers;
         });
-    };
-    Inbox.prototype.getReceivers = function (chatId) {
-        return __awaiter(this, void 0, void 0, function () {
-            var response, machineId, machines, receivers;
-            var _this = this;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, API_1.api.inbox.getReceivers(chatId)];
-                    case 1:
-                        response = _a.sent();
-                        if (!response.status || !response.data) {
-                            return [2 /*return*/, []];
-                        }
-                        machineId = Machine.getMachineId();
-                        machines = response.data.machines;
-                        receivers = machines.filter(function (mch) { return mch.userId !== _this.userId || mch.machineId !== machineId; });
-                        return [2 /*return*/, receivers];
-                }
-            });
-        });
-    };
-    return Inbox;
-}());
-exports["default"] = Inbox;
+    }
+}
+exports.default = Inbox;

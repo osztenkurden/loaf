@@ -77,6 +77,7 @@ export const start = (win: Electron.WebContents) => {
 
     Loaf.onAsync("addUser", async (userId: number | string) => {
         const inbox = User.getInbox();
+        if(!inbox) return { event: "userAdded", data: false };
         if(typeof userId === "number"){
             await inbox.addFriend(userId);
         } else {
@@ -97,7 +98,7 @@ export const start = (win: Electron.WebContents) => {
 
     Loaf.onAsync("createGroup", async (name: string, users: number[]) => {
         const user = User.getUser();
-        if(!user.id) return null;
+        if(!user?.id) return null;
         if(!users.includes(user.id)){
             users.push(user.id);
         }
@@ -112,6 +113,9 @@ export const start = (win: Electron.WebContents) => {
 
     Loaf.onAsync("acceptChat", async (chatId: number) => {
         const inbox = User.getInbox();
+        if(!inbox){
+            return { event: "acceptInvitation", data: false };
+        }
         const result = await inbox.acceptChat(chatId);
         if (result) {
             await inbox.loadChats();
@@ -121,14 +125,27 @@ export const start = (win: Electron.WebContents) => {
 
     Loaf.onAsync("getChats", async () => {
         const inbox = User.getInbox();
+        if(!inbox){
+            return { event: "chatsLoaded", data: false };
+        }
         await inbox.loadChats();
 
         return { event: "chatsLoaded", data: true };
     });
 
+    Loaf.onAsync("loadPageOfMessages", async (chatId: number, page: number) => {
+        const inbox = User.getInbox();
+        if(!inbox){
+            return { event: "loadedPage", data: false };
+        }
+        await inbox.loadMessagesFromPage(chatId, page);
+
+        return { event: "loadedPage", data: true };
+    });
+
     Loaf.onAsync("sendMessage", async (chatId: number, message: I.IMessageContent) => {
         const inbox = User.getInbox();
-        await inbox.sendToChat(chatId, message);
+        await inbox?.sendToChat(chatId, message);
         return null;
     });
 

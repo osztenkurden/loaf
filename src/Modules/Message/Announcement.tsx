@@ -3,7 +3,7 @@ import * as I from "./../../../modules/interface";
 import api from "./../../API";
 import Request from "./Request";
 
-export default class Announcement extends Component<{ request: boolean, chat: I.IChat }> {
+export default class Announcement extends Component<{ request: boolean, chat: I.IChatPaged }> {
     public render() {
         const { chat, request } = this.props;
         if (request) {
