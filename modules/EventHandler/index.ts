@@ -6,6 +6,16 @@ import * as Machine from "./../Machine";
 import User from "./../User";
 import * as Loaf from "./handler";
 
+interface CallStatus {
+    caller: string | null;
+    status: 'incoming' | 'ongoing' | null;
+}
+
+const call: CallStatus = {
+    caller: null,
+    status: null,
+}
+
 export function initSockets() {
     const socketOpts: SocketIOClient.ConnectOpts = {
         transportOptions: {
@@ -15,8 +25,16 @@ export function initSockets() {
                 },
             },
         },
+        reconnectionDelay: 2000,
+        reconnectionDelayMax: 2000,
     };
     const socket = socketio("http://localhost:5000", socketOpts);
+
+    const rejectCall = () => {
+        socket.emit('reject-call');
+        call.caller = null;
+        call.status = null;
+    }
 
     socket.on("disconnect", () => {
         console.log("DISCONNECTION");
@@ -36,6 +54,63 @@ export function initSockets() {
         if (inbox) {
             inbox.loadChats();
         }
+    });
+    
+    /**
+     * Events from server: call-rejected, call-offer, call-failed
+     */
+
+    socket.on('call-offer', (data: I.CallDescription) => {
+        if(!User.window || (call.caller && call.caller !== data.target)) return;
+        User.window.send('call-offer', data);
+
+        call.caller = data.target;
+        call.status =  data.type === 'accept' ? 'ongoing' : 'incoming';
+    });
+
+    socket.on('call-rejected', () => {
+        if(!User.window || !call.caller) return;
+        User.window.send('call-rejected');
+
+        call.caller = null;
+        call.status = null;
+    });
+
+    socket.on('call-failed', () => {
+        if(!User.window) return;
+        User.window.send('call-failed');
+
+        call.caller = null;
+        call.status = null;
+    });
+
+    Loaf.onAsync("call-to-user", async (data: I.CallDescription) => {
+        socket.emit('call-to-user', data);
+        console.log('sending to user', data.target);
+        //below uninportant
+        return { event: "called-to-user", data: null };
+    });
+
+    Loaf.onAsync("exchange-offer", async (data: I.CallDescription) => {
+        socket.emit('exchange-offer', data);
+
+        //below uninportant
+        return { event: "exchanged-offer", data: null };
+    });
+
+    Loaf.onAsync("accept-call", async (data: I.CallDescription) => {
+        socket.emit('accept-call', data);
+
+        //below uninportant
+        return { event: "accepted-call", data: null };
+    });
+
+    Loaf.onAsync("reject-call", async () => {
+        socket.emit('reject-call');
+        rejectCall();
+
+        //below uninportant
+        return { event: "call-rejection", data: null };
     });
 
     socket.on("message", async (data: any) => {
@@ -73,7 +148,7 @@ export const start = (win: Electron.WebContents) => {
             return { event: "imageLoaded", data: {id:chatId, image: null}};
         }
         return { event: "imageLoaded", data: {id:chatId, image: res.data.image}};
-    })
+    });
 
     Loaf.onAsync("addUser", async (userId: number | string) => {
         const inbox = User.getInbox();
@@ -176,7 +251,7 @@ export const start = (win: Electron.WebContents) => {
         if(process.env.DEVUSER1){
             User.register('user1', 'password', 'Hubert');
         }
-    
+
         if(process.env.DEVUSER2){
             User.register('user2', 'password', 'Hubert');
         }

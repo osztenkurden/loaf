@@ -4,6 +4,7 @@ import * as I from "./../../../modules/interface";
 import ChatsListEntry from "./ChatsListEntry";
 // import moment from "moment";
 import storage from './../../API/ChatImages';
+import Video from "Modules/Video";
 
 
 interface IProps {
@@ -16,6 +17,10 @@ interface IProps {
 export default class ChatsList extends Component<IProps> {
     public render() {
         const { chats } = this.props;
+        const allUsers = chats.map(chat => chat.users).flat();
+
+        const uniqueUsersId = [...new Set(allUsers.map(user => user.id).filter((id): id is number => id !== undefined))];
+        const uniqueUsers = uniqueUsersId.map(id => allUsers.find(user => user.id === id)).filter((user): user is I.IUser => !!user);
         return <div className="chat-list">
             <List>
                 {chats.map((chat) => <ChatsListEntry
@@ -26,6 +31,7 @@ export default class ChatsList extends Component<IProps> {
                     isCurrent={this.props.currentChat?.id === chat.id}
                 />)}
             </List>
+            <Video users={uniqueUsers} />
         </div>;
     }
 }

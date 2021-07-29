@@ -38,6 +38,10 @@ const API_1 = require("./../API");
 const Machine = __importStar(require("./../Machine"));
 const User_1 = __importDefault(require("./../User"));
 const Loaf = __importStar(require("./handler"));
+const call = {
+    caller: null,
+    status: null,
+};
 function initSockets() {
     const socketOpts = {
         transportOptions: {
@@ -47,8 +51,15 @@ function initSockets() {
                 },
             },
         },
+        reconnectionDelay: 2000,
+        reconnectionDelayMax: 2000,
     };
     const socket = socket_io_client_1.default("http://localhost:5000", socketOpts);
+    const rejectCall = () => {
+        socket.emit('reject-call');
+        call.caller = null;
+        call.status = null;
+    };
     socket.on("disconnect", () => {
         console.log("DISCONNECTION");
     });
@@ -64,6 +75,52 @@ function initSockets() {
             inbox.loadChats();
         }
     });
+    /**
+     * Events from server: call-rejected, call-offer, call-failed
+     */
+    socket.on('call-offer', (data) => {
+        if (!User_1.default.window || (call.caller && call.caller !== data.target))
+            return;
+        User_1.default.window.send('call-offer', data);
+        call.caller = data.target;
+        call.status = data.type === 'accept' ? 'ongoing' : 'incoming';
+    });
+    socket.on('call-rejected', () => {
+        if (!User_1.default.window || !call.caller)
+            return;
+        User_1.default.window.send('call-rejected');
+        call.caller = null;
+        call.status = null;
+    });
+    socket.on('call-failed', () => {
+        if (!User_1.default.window)
+            return;
+        User_1.default.window.send('call-failed');
+        call.caller = null;
+        call.status = null;
+    });
+    Loaf.onAsync("call-to-user", (data) => __awaiter(this, void 0, void 0, function* () {
+        socket.emit('call-to-user', data);
+        console.log('sending to user', data.target);
+        //below uninportant
+        return { event: "called-to-user", data: null };
+    }));
+    Loaf.onAsync("exchange-offer", (data) => __awaiter(this, void 0, void 0, function* () {
+        socket.emit('exchange-offer', data);
+        //below uninportant
+        return { event: "exchanged-offer", data: null };
+    }));
+    Loaf.onAsync("accept-call", (data) => __awaiter(this, void 0, void 0, function* () {
+        socket.emit('accept-call', data);
+        //below uninportant
+        return { event: "accepted-call", data: null };
+    }));
+    Loaf.onAsync("reject-call", () => __awaiter(this, void 0, void 0, function* () {
+        socket.emit('reject-call');
+        rejectCall();
+        //below uninportant
+        return { event: "call-rejection", data: null };
+    }));
     socket.on("message", (data) => __awaiter(this, void 0, void 0, function* () {
         const inbox = User_1.default.getInbox();
         if (inbox && data.chatId) {

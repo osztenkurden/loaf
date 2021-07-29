@@ -42,6 +42,10 @@ export default class App extends React.Component<any, IState> {
                 this.setState({authentication: true});
             }
         });
+        (async () => {
+            //const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            //console.log(stream);
+        })()
         this.getUser();
     }
     public render() {

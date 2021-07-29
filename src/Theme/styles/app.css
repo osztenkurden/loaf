@@ -22,6 +22,9 @@ body {
     --primaryColor800: #161c1f;
     --secondaryColor:#0e4380;
 }
+.video-call-preview {
+    width: 300px;
+}
 .loaf-app-logging h2 {
     color: #fff
 }

@@ -19,6 +19,11 @@ export interface IPreKeyBundle {
     };
 }
 
+export interface CallDescription {
+    offerOrAnswer: any // RTCSessionDescriptionInit,
+    target: string;
+    type?: 'invite' | 'accept' |'answer';
+}
 export interface IMessagePayload {
     content: IMessageContent;
     recipientId: number;

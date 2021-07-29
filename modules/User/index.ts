@@ -14,7 +14,7 @@ export class User {
     private user: I.IUser | null;
     private storage: Storage | null;
     private inbox: Inbox | null;
-    private window: Electron.WebContents | null;
+    public window: Electron.WebContents | null;
 
     constructor() {
         this.id = null;
