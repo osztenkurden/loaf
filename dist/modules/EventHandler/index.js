@@ -116,7 +116,6 @@ function initSockets() {
         return { event: "accepted-call", data: null };
     }));
     Loaf.onAsync("reject-call", () => __awaiter(this, void 0, void 0, function* () {
-        socket.emit('reject-call');
         rejectCall();
         //below uninportant
         return { event: "call-rejection", data: null };

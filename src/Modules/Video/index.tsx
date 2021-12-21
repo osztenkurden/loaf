@@ -1,14 +1,12 @@
-import React, { Component, useEffect, useState } from "react";
-import Announcement from "../Message/Announcement";
-import Message from "../Message/Message";
+import React, { useEffect, useState } from "react";
+
 import * as Loaf from "./../../API/Loaf";
 import * as I from "./../../../modules/interface";
 import api from "./../../API";
-import { InView } from 'react-intersection-observer';
-import { scrollToBottom } from "Modules/Utils";
 import useStateRef from "API/useRefState";
 
-const peerConnection = new RTCPeerConnection();
+let peerConnection: RTCPeerConnection | null = null;
+let mediaStream: MediaStream |  null = null;
 
 interface IProps {
     users: I.IUser[];
@@ -20,7 +18,7 @@ const Video = ({ users }: IProps) => {
     const [_userCalling, setUserCalling, userCallingRef] = useStateRef('');
     const [_isAnswered, setIsAnswered, isAnsweredRef] = useStateRef(false)
     const call = async (user: I.IUser) => {
-        if (isCalling || !user.id) {
+        if (!peerConnection || isCalling || !user.id) {
             return;
         }
 
@@ -38,42 +36,80 @@ const Video = ({ users }: IProps) => {
         api.call.make({ offerOrAnswer, target: targetId, type: 'invite' });
     }
 
+    const closeConnection = () => {
+        const remoteVideo = document.getElementById('remote-video');
+        if(!remoteVideo) return;
+
+        (remoteVideo as any).srcObject = null;
+        if(!peerConnection) {
+            initiateVideoTransmission();
+            return;
+        }
+
+        peerConnection.close();
+
+        if(peerConnection.iceConnectionState === 'closed') {
+            initiateVideoTransmission();
+            return;
+        };
+    }
+
     const reject = () => {
         if(!userCallingRef.current) return;
-        console.log("end of call")
         setCalling(false);
         setUserCalling('');
         setIsAnswered(false);
+
+        closeConnection();
+
         api.call.reject();
     }
 
-    useEffect(() => {
+    const initYourCamera = async () => {
+        if(!peerConnection) return;
+        const pc = peerConnection;
+
+        try {
+            if(!mediaStream){
+                mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, /*audio: true*/ });
+            }
+            const localVideo = document.getElementById("local-video");
+            if(localVideo){
+                (localVideo as any).srcObject = mediaStream;
+            }
+
+            mediaStream.getTracks().forEach(track => pc.addTrack(track, mediaStream as MediaStream));
+        } catch(e) {
+            console.log(e);
+        }
+    }
+
+    const initiateVideoTransmission = () => {
+        peerConnection = new RTCPeerConnection();
+
         peerConnection.ontrack = ({ streams: [stream] }) => {
             const remoteVideo = document.getElementById('remote-video');
             if(!remoteVideo) return;
 
             (remoteVideo as any).srcObject = stream;
         }
+        peerConnection.oniceconnectionstatechange = (ev) => {
+            if(!peerConnection) return;
 
-        const initYourCamera = async () => {
-            try {
-                const devices = await navigator.mediaDevices.enumerateDevices();
-                console.log(devices);
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                const localVideo = document.getElementById("local-video");
-                if(localVideo){
-                    (localVideo as any).srcObject = stream;
-                }
-
-                stream.getTracks().forEach(track => peerConnection.addTrack(track, stream));
-            } catch(e) {
-                console.log(e);
+            const state = peerConnection.iceConnectionState;
+            if(state === 'closed'){
+                // closeConnection();
             }
         }
 
         initYourCamera();
+    }
+
+    useEffect(() => {
+        initiateVideoTransmission();
 
         Loaf.on('call-rejected', () => {
+            console.log('call closed')
             reject();
         });
         Loaf.on('call-failed', () => {
@@ -82,6 +118,7 @@ const Video = ({ users }: IProps) => {
         Loaf.on("call-offer", async (data: I.CallDescription) => {
             console.log('someone is calling')
             console.log(data);
+            if(!peerConnection) return;
 
             if (data.type === 'invite') {
                 let isAccepted = false;
@@ -118,7 +155,7 @@ const Video = ({ users }: IProps) => {
                 }
 
             } else if (data.type === 'answer' || data.type === 'accept') {
-                console.log('step 2/3');
+                console.log('step 2/3', data.type);
                 await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offerOrAnswer));
 
                 if (!isAnsweredRef.current) {
@@ -144,7 +181,7 @@ const Video = ({ users }: IProps) => {
             ))
         }
         <video className="video-call-preview" autoPlay id="remote-video"></video>
-        <video className="video-call-preview"autoPlay muted id="local-video"></video>
+        <video className="video-call-preview" autoPlay muted id="local-video"></video>
     </React.Fragment>
 }
 

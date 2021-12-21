@@ -106,7 +106,6 @@ export function initSockets() {
     });
 
     Loaf.onAsync("reject-call", async () => {
-        socket.emit('reject-call');
         rejectCall();
 
         //below uninportant
