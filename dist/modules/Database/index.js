@@ -57,7 +57,8 @@ class Message extends sequelize_1.Model {
 }
 exports.sequelize = new sequelize_1.default.Sequelize({
     dialect: 'sqlite',
-    storage: path_1.default.join(Machine_1.directories.messages, 'messages.db')
+    storage: path_1.default.join(Machine_1.directories.messages, 'messages.db'),
+    logging: false
 });
 Message.Define(exports.sequelize);
 exports.sequelize.sync({ force: false });

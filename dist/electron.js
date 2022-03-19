@@ -82,14 +82,14 @@ const startApp = () => __awaiter(void 0, void 0, void 0, function* () {
     win.once("ready-to-show", win.show);
     win.setMenuBarVisibility(false);
     win.loadURL(isDev ? "http://localhost:3000" : `file://${__dirname}/build/index.html`);
-    win.on("close", (event) => {
-        const application = electron_1.app;
+    /*win.on("close", (event) => {
+        /*const application: IExtApp = app;
         if (!application.isQuitting) {
-            event.preventDefault();
-            win.hide();
+            //event.preventDefault();
+            //win.hide();
         }
         return false;
-    });
+    });*/
     EventInit.start(win.webContents);
     /*events.forEach((event) => {
         ipcMain.on(event.name, event.response);

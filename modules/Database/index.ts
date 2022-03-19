@@ -28,7 +28,8 @@ class Message extends Model {
 
 export const sequelize = new Sequelize.Sequelize({
     dialect: 'sqlite',
-    storage: path.join(directories.messages, 'messages.db')
+    storage: path.join(directories.messages, 'messages.db'),
+    logging: false
 });
 
 Message.Define(sequelize);

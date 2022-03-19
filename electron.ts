@@ -65,14 +65,14 @@ const startApp = async () => {
 
     win.loadURL(isDev ? "http://localhost:3000" : `file://${__dirname}/build/index.html`);
 
-    win.on("close", (event) => {
-        const application: IExtApp = app;
+    /*win.on("close", (event) => {
+        /*const application: IExtApp = app;
         if (!application.isQuitting) {
-            event.preventDefault();
-            win.hide();
+            //event.preventDefault();
+            //win.hide();
         }
         return false;
-    });
+    });*/
 
     EventInit.start(win.webContents);
 

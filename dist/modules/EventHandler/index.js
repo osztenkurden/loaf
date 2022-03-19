@@ -51,10 +51,15 @@ function initSockets() {
                 },
             },
         },
+        rejectUnauthorized: false,
         reconnectionDelay: 2000,
         reconnectionDelayMax: 2000,
     };
+    console.log("CONNECTION IS TRYING TO BE MADE");
     const socket = socket_io_client_1.default("https://loaf.bakerysoft.pl", socketOpts);
+    socket.on('error', (err) => {
+        console.log(err);
+    });
     const rejectCall = () => {
         socket.emit('reject-call');
         call.caller = null;
