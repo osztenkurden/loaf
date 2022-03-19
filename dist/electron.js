@@ -102,4 +102,10 @@ process.on("unhandledRejection", (e) => {
     console.log(e);
 });
 electron_1.app.on("window-all-closed", electron_1.app.quit);
-electron_1.app.on("ready", startApp);
+const lock = electron_1.app.requestSingleInstanceLock();
+if (!lock) {
+    electron_1.app.quit();
+}
+else {
+    electron_1.app.on('ready', startApp);
+}

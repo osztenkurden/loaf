@@ -90,4 +90,10 @@ process.on("unhandledRejection", (e) => {
 
 app.on("window-all-closed", app.quit);
 
-app.on("ready", startApp);
+const lock = app.requestSingleInstanceLock();
+if (!lock) {
+	app.quit();
+} else {
+	app.on('ready', startApp);
+}
+
