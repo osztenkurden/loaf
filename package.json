@@ -87,6 +87,7 @@
     "dist": "electron-builder",
     "postinstall": "electron-builder install-app-deps",
     "pack": "electron-builder --dir",
+    "onlyCompile": "npm run transpile && npm run pack",
     "compile": "npm run build && npm run pack"
   },
   "eslintConfig": {
