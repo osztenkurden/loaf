@@ -28,7 +28,7 @@ export function initSockets() {
         reconnectionDelay: 2000,
         reconnectionDelayMax: 2000,
     };
-    const socket = socketio("http://localhost:5000", socketOpts);
+    const socket = socketio("https://loaf.bakerysoft.pl", socketOpts);
 
     const rejectCall = () => {
         socket.emit('reject-call');
@@ -241,9 +241,20 @@ export const start = (win: Electron.WebContents) => {
         return { event: "userStatus", data: status };
     });
 
+    Loaf.onAsync("logout", async () => {
+        await User.logOut();
+
+        return null;
+    });
+
     Loaf.onAsync("loadUser", async () => {
         await User.loadUser();
         return { event: "user", data: User.getUser() };
+    });
+    Loaf.onAsync("errortest", async () => {
+        await api.user.error();
+
+        return null;
     });
     const devMode = async () => {
 

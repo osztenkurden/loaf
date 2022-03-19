@@ -40,5 +40,7 @@ export const api = {
             }
             return response.data as I.IRegisterResponse;
         },
+        logout: () => Loaf("auth/logout"),
+        error: () => Loaf("errortest")
     },
 };

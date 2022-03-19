@@ -1,7 +1,9 @@
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 import { app, App, BrowserWindow, Menu, Tray } from "electron";
 import path from "path";
 import * as EventInit from "./modules/EventHandler";
 import * as Machine from "./modules/Machine";
+
 // import * as Storage from "./storage/storage";
 
 interface IExtApp extends App {

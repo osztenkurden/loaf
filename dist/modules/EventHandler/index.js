@@ -54,7 +54,7 @@ function initSockets() {
         reconnectionDelay: 2000,
         reconnectionDelayMax: 2000,
     };
-    const socket = socket_io_client_1.default("http://localhost:5000", socketOpts);
+    const socket = socket_io_client_1.default("https://loaf.bakerysoft.pl", socketOpts);
     const rejectCall = () => {
         socket.emit('reject-call');
         call.caller = null;
@@ -228,9 +228,17 @@ const start = (win) => {
         const status = yield User_1.default.logIn(username, password);
         return { event: "userStatus", data: status };
     }));
+    Loaf.onAsync("logout", () => __awaiter(void 0, void 0, void 0, function* () {
+        yield User_1.default.logOut();
+        return null;
+    }));
     Loaf.onAsync("loadUser", () => __awaiter(void 0, void 0, void 0, function* () {
         yield User_1.default.loadUser();
         return { event: "user", data: User_1.default.getUser() };
+    }));
+    Loaf.onAsync("errortest", () => __awaiter(void 0, void 0, void 0, function* () {
+        yield API_1.api.user.error();
+        return null;
     }));
     const devMode = () => __awaiter(void 0, void 0, void 0, function* () {
         if (process.env.DEVUSER1) {

@@ -19,8 +19,8 @@ export default class Login extends Component<IProps, IState> {
         super(props);
         this.state = {
             authCode: 0,
-            password: "password",
-            username: "user1",
+            password: "",
+            username: "",
         };
     }
 

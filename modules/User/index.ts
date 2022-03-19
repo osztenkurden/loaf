@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import { app } from "electron";
 import base32 from "thirty-two";
 import Inbox from "../Inbox";
 import * as I from "../interface";
@@ -47,6 +48,12 @@ export class User {
         this.storage = storage;
         */
         return this;
+    }
+
+    public async logOut(){
+        await api.user.logout();
+
+        app.quit();
     }
 
     public async logIn(username: string, password: string) {

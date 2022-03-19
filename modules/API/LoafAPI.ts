@@ -1,23 +1,37 @@
 import fetchHandler from "fetch-cookie";
 import nodeFetch, { RequestInit } from "node-fetch";
-import toughCookie from "tough-cookie";
+import { CookieJar } from "tough-cookie";
 import * as I from "../interface";
 import {directories} from "./../Machine";
+import { FileCookieStore } from 'tough-cookie-file-store';
 import fs from "fs";
 import path from 'path';
+import User from "../User";
+import { app } from "electron";
 
-const cookieJar = new toughCookie.CookieJar();
+const cookiePath = path.join(app.getPath('userData'), 'cookie.json');
+const cookieJar = new CookieJar(new FileCookieStore(cookiePath));
 const fetch = fetchHandler(nodeFetch, cookieJar);
 
 const config = {
-    apiURL: "http://localhost:5000",
+    apiURL: "https://loaf.bakerysoft.pl",
 };
 
 export const getCookie = () => {
     const cookieString = cookieJar.getCookieStringSync(config.apiURL);
     return cookieString;
 }
+const characters ='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
+function generateString(length: number) {
+    let result = ' ';
+    const charactersLength = characters.length;
+    for ( let i = 0; i < length; i++ ) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+
+    return result;
+}
 export default async function apiV2(url: string, method = "GET", body?: object): Promise<I.IServerResponse> {
     const options: RequestInit = {
         headers: { "Accept": "application/json", "Content-Type": "application/json" },
@@ -38,7 +52,7 @@ export default async function apiV2(url: string, method = "GET", body?: object):
             BODY: ${options.body}
         `;
         console.log('Error has been saved')
-        fs.writeFileSync(path.join(directories.db, "error.txt"), errorContent);
+        fs.writeFileSync(path.join(directories.db, `error-${new Date().getTime()}-${generateString(10)}.txt`), errorContent);
         return { status: 500, success: false};
     }
     try {
@@ -47,6 +61,9 @@ export default async function apiV2(url: string, method = "GET", body?: object):
             status: res.status,
             success: res.status < 300,
         };
+        if(!response.success && response.data && response.data.errorMessage && User.window){
+            User.window.send('error-message', response.data.errorMessage);
+        }
         return response;
     } catch {
         // Checks if status was successfull (HTTP200-HTTP299)

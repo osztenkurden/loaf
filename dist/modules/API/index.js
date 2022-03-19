@@ -52,5 +52,7 @@ exports.api = {
             }
             return response.data;
         }),
+        logout: () => LoafAPI_1.default("auth/logout"),
+        error: () => LoafAPI_1.default("errortest")
     },
 };

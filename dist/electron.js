@@ -31,6 +31,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 const electron_1 = require("electron");
 const path_1 = __importDefault(require("path"));
 const EventInit = __importStar(require("./modules/EventHandler"));

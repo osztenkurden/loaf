@@ -33,6 +33,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.User = void 0;
 const crypto_1 = __importDefault(require("crypto"));
+const electron_1 = require("electron");
 const thirty_two_1 = __importDefault(require("thirty-two"));
 const Inbox_1 = __importDefault(require("../Inbox"));
 const Storage_1 = __importDefault(require("../Storage"));
@@ -70,6 +71,12 @@ class User {
             this.storage = storage;
             */
             return this;
+        });
+    }
+    logOut() {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield API_1.api.user.logout();
+            electron_1.app.quit();
         });
     }
     logIn(username, password) {

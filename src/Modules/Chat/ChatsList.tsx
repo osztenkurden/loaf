@@ -4,7 +4,6 @@ import * as I from "./../../../modules/interface";
 import ChatsListEntry from "./ChatsListEntry";
 // import moment from "moment";
 import storage from './../../API/ChatImages';
-import Video from "Modules/Video";
 
 
 interface IProps {
@@ -31,7 +30,6 @@ export default class ChatsList extends Component<IProps> {
                     isCurrent={this.props.currentChat?.id === chat.id}
                 />)}
             </List>
-            <Video users={uniqueUsers} />
         </div>;
     }
 }

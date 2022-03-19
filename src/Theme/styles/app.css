@@ -814,3 +814,16 @@ li > hr.separator {
 .dropArea input[type="file"]{
     display:none;
 }
+
+.error-message {
+    position: fixed;
+    bottom: 10px;
+    right: -100%;
+    background-color: rgba(0,0,0,0.75);
+    padding: 15px;
+    color: white;
+}
+
+.error-message.show {
+    right: 10px;
+}

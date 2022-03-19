@@ -15,20 +15,33 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.LoafStatus = exports.getCookie = void 0;
 const fetch_cookie_1 = __importDefault(require("fetch-cookie"));
 const node_fetch_1 = __importDefault(require("node-fetch"));
-const tough_cookie_1 = __importDefault(require("tough-cookie"));
+const tough_cookie_1 = require("tough-cookie");
 const Machine_1 = require("./../Machine");
+const tough_cookie_file_store_1 = require("tough-cookie-file-store");
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
-const cookieJar = new tough_cookie_1.default.CookieJar();
+const User_1 = __importDefault(require("../User"));
+const electron_1 = require("electron");
+const cookiePath = path_1.default.join(electron_1.app.getPath('userData'), 'cookie.json');
+const cookieJar = new tough_cookie_1.CookieJar(new tough_cookie_file_store_1.FileCookieStore(cookiePath));
 const fetch = fetch_cookie_1.default(node_fetch_1.default, cookieJar);
 const config = {
-    apiURL: "http://localhost:5000",
+    apiURL: "https://loaf.bakerysoft.pl",
 };
 const getCookie = () => {
     const cookieString = cookieJar.getCookieStringSync(config.apiURL);
     return cookieString;
 };
 exports.getCookie = getCookie;
+const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+function generateString(length) {
+    let result = ' ';
+    const charactersLength = characters.length;
+    for (let i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
+}
 function apiV2(url, method = "GET", body) {
     return __awaiter(this, void 0, void 0, function* () {
         const options = {
@@ -50,7 +63,7 @@ function apiV2(url, method = "GET", body) {
             BODY: ${options.body}
         `;
             console.log('Error has been saved');
-            fs_1.default.writeFileSync(path_1.default.join(Machine_1.directories.db, "error.txt"), errorContent);
+            fs_1.default.writeFileSync(path_1.default.join(Machine_1.directories.db, `error-${new Date().getTime()}-${generateString(10)}.txt`), errorContent);
             return { status: 500, success: false };
         }
         try {
@@ -59,6 +72,9 @@ function apiV2(url, method = "GET", body) {
                 status: res.status,
                 success: res.status < 300,
             };
+            if (!response.success && response.data && response.data.errorMessage && User_1.default.window) {
+                User_1.default.window.send('error-message', response.data.errorMessage);
+            }
             return response;
         }
         catch (_a) {
