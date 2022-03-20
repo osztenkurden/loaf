@@ -439,6 +439,23 @@ body {
     height: 40px;
     background: #ffd66bc7;
     border-radius: 50%;
+    position: relative;
+    cursor: pointer;
+}
+.file-preview .file-icon .default-icon {
+    opacity: 1;
+    transition: opacity 0.35s;
+}
+.file-preview .file-icon:hover .default-icon {
+    opacity: 0;
+}
+.file-preview .file-icon .hover-icon {
+    opacity: 0;
+    transition: opacity 0.35s;
+    position: absolute;
+}
+.file-preview .file-icon:hover .hover-icon {
+    opacity: 1;
 }
 .file-preview .file-data {
     padding: 0 20px;

@@ -17,7 +17,7 @@ export default class DragUploadModal extends Component<IProps> {
                 <div className="upload-entries-preview">
                     {images.map(this.renderEntry)}
                 </div>
-                <div className="image-send btn-behaviour" onClick={() => null}>SEND</div>
+                <div className="image-send btn-behaviour" onClick={sendFiles}>SEND</div>
             </div>
         );
     }
