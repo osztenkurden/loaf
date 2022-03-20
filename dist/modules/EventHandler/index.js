@@ -51,12 +51,17 @@ function initSockets() {
                 },
             },
         },
-        rejectUnauthorized: false,
         reconnectionDelay: 2000,
         reconnectionDelayMax: 2000,
     };
     console.log("CONNECTION IS TRYING TO BE MADE");
     const socket = socket_io_client_1.default("https://loaf.bakerysoft.pl", socketOpts);
+    socket.on("connection", () => {
+        console.log("CONNECTED TO SERVER");
+    });
+    socket.on("connect", () => {
+        console.log("CONNECTED TO SERVER");
+    });
     socket.on('error', (err) => {
         console.log(err);
     });
@@ -67,9 +72,6 @@ function initSockets() {
     };
     socket.on("disconnect", () => {
         console.log("DISCONNECTION");
-    });
-    socket.on("connect", () => {
-        console.log("CONNECTED TO SERVER");
     });
     socket.on("disconnection", () => {
         console.log("DISCONNECTION #2");

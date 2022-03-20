@@ -7,12 +7,6 @@ import Login from "./Modules/Login";
 import Register from "./Modules/Register";
 import Splash from "./Modules/Splash";
 
-import fakeRequire from "./API/DevHandler";
-declare let window: any;
-if(process.env.REACT_APP_DEV === "true"){
-    window.require = fakeRequire;
-}
-
 interface IState {
     user: I.IUser | null;
     loading: boolean;

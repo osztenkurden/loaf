@@ -88,6 +88,7 @@ export const saveFileToDrive = async (message: I.IMessage) => {
     const saveFileMessage = async (fileMessage: I.IMessageContentFile) => {
 
         const filePath = await unusedFilename(path.join(directories.files, fileMessage.content.name));
+        console.log('saving file to', filePath);
         fs.writeFileSync(filePath, fileMessage.content.data, 'base64');
         return filePath;
     }

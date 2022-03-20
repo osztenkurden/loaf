@@ -1,8 +1,8 @@
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 import { app, App, BrowserWindow, Menu, Tray } from "electron";
 import path from "path";
 import * as EventInit from "./modules/EventHandler";
 import * as Machine from "./modules/Machine";
+import User from "./modules/User";
 
 // import * as Storage from "./storage/storage";
 
@@ -30,12 +30,15 @@ const startApp = async () => {
         frame: false,
         webPreferences: {
             backgroundThrottling: false,
-            // preload: __dirname + "/preload.js",
+            preload: path.join(__dirname, 'preload.js'),
             nodeIntegration: true,
-            enableRemoteModule: true
         },
         width: 1280,
     });
+    win.on('focus', () => {
+        //win.flashFrame(false);
+    })
+        
 
     app.on("second-instance", () => {
         win.show();
@@ -44,6 +47,12 @@ const startApp = async () => {
 
     tray = new Tray(path.join(__dirname, "assets/icon.png"));
     const context = Menu.buildFromTemplate([
+        {
+            click: () => {
+                win.show();
+            },
+            label: "Show",
+        },
         {
             click: () => {
                 const application: IExtApp = app;
@@ -56,6 +65,7 @@ const startApp = async () => {
     tray.setContextMenu(context);
     tray.setToolTip("Loaf");
     tray.on("click", () => {
+        win.flashFrame(true);
         win.show();
     });
 
@@ -64,7 +74,13 @@ const startApp = async () => {
         win.close();
     });
 
-    win.once("ready-to-show", win.show);
+    win.on('hide', () => {
+        User.window?.send("clearPages");
+    })
+
+    win.once("ready-to-show", () => {
+        win.show();
+    });
 
     win.setMenuBarVisibility(false);
 
@@ -76,6 +92,7 @@ const startApp = async () => {
             event.preventDefault();
             win.hide();
         }
+        win.flashFrame(true);
         return false;
     });
 

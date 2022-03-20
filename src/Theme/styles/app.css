@@ -558,6 +558,8 @@ li > hr.separator {
     margin: 10pt;
     margin-top: 5pt;
     margin-bottom: 5pt;
+    box-shadow: 0 0 5px 2px #0000004a;
+    word-break: break-all;
 }
 .message.friend {
     display: flex;

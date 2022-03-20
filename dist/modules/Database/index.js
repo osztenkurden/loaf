@@ -91,6 +91,7 @@ const convertToRaw = (userId, message) => {
 const saveFileToDrive = (message) => __awaiter(void 0, void 0, void 0, function* () {
     const saveFileMessage = (fileMessage) => __awaiter(void 0, void 0, void 0, function* () {
         const filePath = yield unused_filename_1.default(path_1.default.join(Machine_1.directories.files, fileMessage.content.name));
+        console.log('saving file to', filePath);
         fs_1.default.writeFileSync(filePath, fileMessage.content.data, 'base64');
         return filePath;
     });

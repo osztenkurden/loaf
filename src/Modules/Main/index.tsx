@@ -11,7 +11,7 @@ import ChatList from "./../Chat/ChatsList";
 import NewContact from "./../NewContact";
 import NewConversation from "./../NewConversation";
 import storage, {ChatImageStorage} from "./../../API/ChatImages";
-import { scrollToBottom } from "Modules/Utils";
+import { scrollToBottom, sortChats } from "Modules/Utils";
 
 interface IState {
     drawer: boolean;
@@ -95,13 +95,28 @@ export default class Main extends Component<{}, IState> {
             }
 
             this.setState({
-                chats: newChats,
+                chats: sortChats(newChats),
                 currentChat
             }, () => {
                 if(!newInCurrent) return;
                 scrollToBottom();
             });
         });
+
+        Loaf.on("clearPages", () => {
+            this.loadChat(null);
+            const { chats } = this.state;
+
+            chats.map(chat => {
+                if(chat.pages.length === 0) return chat;
+                const maxPage = Math.max(...chat.pages.map(page => page.page));
+                const lastPage = chat.pages.find(page => page.page === maxPage);
+                if(!lastPage) return chat;
+                chat.pages = [lastPage];
+                return chat;
+            })
+            this.setState({ chats: sortChats(chats) });
+        })
 
         Loaf.on("chatPage", (chatPage: { chatId: number, pageEntry: I.IPage }) => {
             const { chats, currentChat } = this.state;
@@ -120,7 +135,7 @@ export default class Main extends Component<{}, IState> {
             }
 
             this.setState({
-                chats,
+                chats: sortChats(chats),
                 currentChat
             }, () => {
                 if(!newInCurrent) return;
@@ -193,11 +208,13 @@ export default class Main extends Component<{}, IState> {
             </div>
         );
     }
-    private loadChat = (chat: I.IChatPaged) => {
+    private loadChat = (chat: I.IChatPaged | null) => {
         this.setState({ currentChat: chat }, () => {
-            const container = document.getElementById("message_container");
-            if(!container) return;
-            container.scroll({ top: container.scrollHeight });
+            setTimeout(() => {
+                const container = document.getElementById("message_container");
+                if(!container) return;
+                container.scroll({ top: container.scrollHeight });
+            }, 10);
         });
     }
 }

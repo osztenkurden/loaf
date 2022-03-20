@@ -16,10 +16,14 @@ interface IProps {
 export default class ChatsList extends Component<IProps> {
     public render() {
         const { chats } = this.props;
-        const allUsers = chats.map(chat => chat.users).flat();
+        /*const sortedChats = [...chats].sort((a, b) => {
+            if(!a.last || !b.last) return 0;
+            if(a.last.)
+        })*/
+        /*const allUsers = chats.map(chat => chat.users).flat();
 
         const uniqueUsersId = [...new Set(allUsers.map(user => user.id).filter((id): id is number => id !== undefined))];
-        const uniqueUsers = uniqueUsersId.map(id => allUsers.find(user => user.id === id)).filter((user): user is I.IUser => !!user);
+        const uniqueUsers = uniqueUsersId.map(id => allUsers.find(user => user.id === id)).filter((user): user is I.IUser => !!user);*/
         return <div className="chat-list">
             <List>
                 {chats.map((chat) => <ChatsListEntry

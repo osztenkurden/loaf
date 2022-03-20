@@ -31,11 +31,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 const electron_1 = require("electron");
 const path_1 = __importDefault(require("path"));
 const EventInit = __importStar(require("./modules/EventHandler"));
 const Machine = __importStar(require("./modules/Machine"));
+const User_1 = __importDefault(require("./modules/User"));
 process.env.NODE_ENV = 'production';
 const isDev = process.env.DEV === "true";
 let tray = null;
@@ -53,11 +53,13 @@ const startApp = () => __awaiter(void 0, void 0, void 0, function* () {
         frame: false,
         webPreferences: {
             backgroundThrottling: false,
-            // preload: __dirname + "/preload.js",
+            preload: path_1.default.join(__dirname, 'preload.js'),
             nodeIntegration: true,
-            enableRemoteModule: true
         },
         width: 1280,
+    });
+    win.on('focus', () => {
+        //win.flashFrame(false);
     });
     electron_1.app.on("second-instance", () => {
         win.show();
@@ -65,6 +67,12 @@ const startApp = () => __awaiter(void 0, void 0, void 0, function* () {
     });
     tray = new electron_1.Tray(path_1.default.join(__dirname, "assets/icon.png"));
     const context = electron_1.Menu.buildFromTemplate([
+        {
+            click: () => {
+                win.show();
+            },
+            label: "Show",
+        },
         {
             click: () => {
                 const application = electron_1.app;
@@ -77,13 +85,20 @@ const startApp = () => __awaiter(void 0, void 0, void 0, function* () {
     tray.setContextMenu(context);
     tray.setToolTip("Loaf");
     tray.on("click", () => {
+        win.flashFrame(true);
         win.show();
     });
     electron_1.app.on("before-quit", () => {
         win.removeAllListeners("close");
         win.close();
     });
-    win.once("ready-to-show", win.show);
+    win.on('hide', () => {
+        var _a;
+        (_a = User_1.default.window) === null || _a === void 0 ? void 0 : _a.send("clearPages");
+    });
+    win.once("ready-to-show", () => {
+        win.show();
+    });
     win.setMenuBarVisibility(false);
     win.loadURL(isDev ? "http://localhost:3000" : `file://${__dirname}/build/index.html`);
     win.on("close", (event) => {
@@ -92,6 +107,7 @@ const startApp = () => __awaiter(void 0, void 0, void 0, function* () {
             event.preventDefault();
             win.hide();
         }
+        win.flashFrame(true);
         return false;
     });
     EventInit.start(win.webContents);

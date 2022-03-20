@@ -48,6 +48,44 @@ export const fileIcon = (fileType: string) => {
     return <InsertDriveFile />;
 }
 
+
+export const getMessagesFromLastPage = (chat: I.IChatPaged | null) => {
+    if(!chat) return [];
+    if(chat.last) return [chat.last];
+    const maxPage = Math.max(...chat.pages.map(page => page.page));
+    const lastPage = chat.pages.find(page => page.page === maxPage);
+    if(!lastPage) return [];
+    return lastPage.messages;
+}
+export const getLast = (chat: I.IChatPaged | null) => {
+    const messages = getMessagesFromLastPage(chat);
+    let last: I.IMessage | null = null;
+
+    for(const message of messages){
+        if(!last){
+            last = message;
+            continue;
+        }
+        if(new Date(message.date) > new Date(last.date)){
+            last = message;
+        }
+    }
+    return last;
+}
+
+export const sortChats = (chats: I.IChatPaged[]) => {
+    const sortedChats = [...chats].sort((a, b) => {
+        const [aLast, bLast] = [getLast(a), getLast(b)];
+
+        if(!aLast || !bLast) return 0;
+        const [aDate, bDate] = [new Date(aLast.date), new Date(bLast.date)];
+
+        if(aDate > bDate) return -1;
+        return 1;
+    });
+    return sortedChats;
+}
+
 export const filePreview = (file: I.IMessageContentFileMeta) => {
     const fileData = file.data;
     const fileType = fileData.substr(fileData.indexOf(':') + 1, fileData.indexOf('/') - fileData.indexOf(':') - 1);

@@ -1,9 +1,19 @@
 import { Divider, ListItem, ListItemText } from "@material-ui/core";
+import { getLast } from "Modules/Utils";
 import moment from "moment";
 import React, { Component } from "react";
 // import * as API from "./api";
 import * as I from "./../../../modules/interface";
 import LoafAvatar from "./../../Theme/Components/Avatar";
+
+const getLastTag = (chat: I.IChatPaged, last: I.IMessage | null) => {
+    if(!last) return null;
+    if(!last.my && chat.private) return '';
+    if(last.my){
+        return <span className="you">You:</span>;
+    }
+    return <span className="you">{last.sender?.username || last.senderId}:</span>
+}
 
 function getSubText(chat: I.IChatPaged, last: I.IMessage | null) {
     switch (chat.status) {
@@ -27,45 +37,9 @@ interface IProps {
 }
 
 export default class ChatsListEntry extends Component<IProps> {
-    getMessagesFromLastPage = () => {
-        const { chat } = this.props;
-        if(!chat) return [];
-        if(chat.last) return [chat.last];
-        const maxPage = Math.max(...chat.pages.map(page => page.page));
-        const lastPage = chat.pages.find(page => page.page === maxPage);
-        if(!lastPage) return [];
-        return lastPage.messages;
-    }
-    getLast = () => {
-        const messages = this.getMessagesFromLastPage();
-        let last: I.IMessage | null = null;
-
-        for(const message of messages){
-            if(!last){
-                last = message;
-                continue;
-            }
-            if(new Date(message.date) > new Date(last.date)){
-                last = message;
-            }
-        }
-        return last;
-    }
-
-    getLastTag = () => {
-        const { chat } = this.props;
-        const last = this.getLast();
-        if(!last) return null;
-        if(!last.my && chat.private) return '';
-        if(last.my){
-            return <span className="you">You:</span>;
-        }
-        return <span className="you">{last.sender?.username || last.senderId}:</span>
-    }
-
     public render() {
         const { chat, isCurrent } = this.props;
-        const last = this.getLast();
+        const last = getLast(chat);
         return (
             <div className={`chat-list-entry ${isCurrent ? 'current' : ''}`}>
                 <ListItem button
@@ -86,7 +60,7 @@ export default class ChatsListEntry extends Component<IProps> {
                         secondary={
                             <div className="chat-last-message">
                                 <div className="text">
-                                    {this.getLastTag()} {getSubText(chat, last)}
+                                    {getLastTag(chat, last)} {getSubText(chat, last)}
                                 </div>
                                 <div className={"last-text-status " /*+ (chat.lastYours ? chat.status : '')*/}></div>
                             </div>
