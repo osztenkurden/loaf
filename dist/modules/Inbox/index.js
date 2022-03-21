@@ -27,11 +27,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const API_1 = require("../API");
 const Database_1 = require("../Database");
 const Machine = __importStar(require("../Machine"));
 const uuid_1 = require("uuid");
+const electron_1 = require("electron");
+const fs_1 = require("fs");
+const path_1 = __importDefault(require("path"));
 // import * as Machine from "../Machine";
 class Inbox {
     constructor(content, userId, storage) {
@@ -178,7 +184,29 @@ class Inbox {
             yield Database_1.saveMessages(this.userId, incoming);
             this.messages.set(chatId, current);
             if (!init)
-                this.loadChats();
+                yield this.loadChats();
+            const window = electron_1.BrowserWindow.fromWebContents(this.content);
+            if (!window || window.isFocused())
+                return;
+            if (window.isVisible()) {
+                window.flashFrame(true);
+                return;
+            }
+            for (const message of incoming) {
+                if (!message.sender)
+                    continue;
+                const chat = this.chats.find(chat => chat.id === message.chatId);
+                if (!chat)
+                    continue;
+                const iconPath = path_1.default.join(Machine.directories.images, `${chat.id}.png`);
+                const icon = fs_1.existsSync(iconPath) ? iconPath : undefined;
+                const notification = new electron_1.Notification({ title: chat.name, body: `${message.sender.username} sent new message`, icon });
+                notification.on('click', () => {
+                    window.show();
+                    window.focus();
+                });
+                notification.show();
+            }
         });
     }
     getSenderData(chatId, senderId, chats = []) {

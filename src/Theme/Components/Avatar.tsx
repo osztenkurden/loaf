@@ -15,7 +15,7 @@ const LoafAvatar = ({ chat, editable }: IProps) => {
         {chat.name.charAt(0)?.toUpperCase() || "#"}
     </Avatar>;
     if (chat.image) {
-        avatar = <Avatar src={storage.get(chat.id) as string} className="avatar" />
+        avatar = <Avatar src={'file://' + storage.get(chat.id) as string} className="avatar" />
     }
     return <div className={`avatar-container ${editable ? 'editable':''}`}>
         {avatar}

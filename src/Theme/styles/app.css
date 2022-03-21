@@ -319,6 +319,7 @@ body {
 }
 .chat-list-entry .avatar-container, .chat-list-entry .avatar, .chat-list-entry .avatar img {
     height:50px;
+    min-width:50px !important;
     width:50px !important;
 }
 

@@ -37,7 +37,7 @@ const startApp = async () => {
         width: 1280,
     });
     win.on('focus', () => {
-        //win.flashFrame(false);
+        win.flashFrame(false);
     })
         
 
@@ -66,7 +66,6 @@ const startApp = async () => {
     tray.setContextMenu(context);
     tray.setToolTip("Loaf");
     tray.on("click", () => {
-        win.flashFrame(true);
         win.show();
     });
 
@@ -93,7 +92,6 @@ const startApp = async () => {
             event.preventDefault();
             win.hide();
         }
-        win.flashFrame(true);
         return false;
     });
 

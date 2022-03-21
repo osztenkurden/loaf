@@ -4,7 +4,9 @@ import * as I from "../interface";
 import * as Machine from "../Machine";
 import Storage from "../Storage";
 import { v4 as uuid } from 'uuid';
-
+import { BrowserWindow, Notification } from "electron";
+import { existsSync } from "fs";
+import path from 'path';
 // import * as Machine from "../Machine";
 
 export default class Inbox {
@@ -169,7 +171,36 @@ export default class Inbox {
         await saveMessages(this.userId, incoming);
         this.messages.set(chatId, current);
 
-        if(!init) this.loadChats();
+        if(!init) await this.loadChats();
+
+        const window = BrowserWindow.fromWebContents(this.content);
+
+        if(!window || window.isFocused()) return;
+
+        if(window.isVisible()){
+            window.flashFrame(true);
+            return;
+        }
+
+        for(const message of incoming){
+            if(!message.sender) continue;
+            const chat = this.chats.find(chat => chat.id === message.chatId);
+
+            if(!chat) continue;
+
+            const iconPath = path.join(Machine.directories.images, `${chat.id}.png`);
+
+            const icon = existsSync(iconPath) ? iconPath : undefined;
+
+            const notification = new Notification({ title: chat.name, body: `${message.sender.username} sent new message`, icon});
+
+            notification.on('click', () => {
+                window.show();
+                window.focus();
+            });
+
+            notification.show();
+        }
     }
 
     public getSenderData(chatId: number,senderId: number, chats: I.IChatPaged[] = []) {

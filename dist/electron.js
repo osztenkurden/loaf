@@ -60,7 +60,7 @@ const startApp = () => __awaiter(void 0, void 0, void 0, function* () {
         width: 1280,
     });
     win.on('focus', () => {
-        //win.flashFrame(false);
+        win.flashFrame(false);
     });
     electron_1.app.on("second-instance", () => {
         win.show();
@@ -86,7 +86,6 @@ const startApp = () => __awaiter(void 0, void 0, void 0, function* () {
     tray.setContextMenu(context);
     tray.setToolTip("Loaf");
     tray.on("click", () => {
-        win.flashFrame(true);
         win.show();
     });
     electron_1.app.on("before-quit", () => {
@@ -108,7 +107,6 @@ const startApp = () => __awaiter(void 0, void 0, void 0, function* () {
             event.preventDefault();
             win.hide();
         }
-        win.flashFrame(true);
         return false;
     });
     EventInit.start(win);

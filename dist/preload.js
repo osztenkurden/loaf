@@ -10,5 +10,5 @@ electron_1.contextBridge.exposeInMainWorld('ipcApi', {
     },
     on: (channel, func) => {
         electron_1.ipcRenderer.on(channel, (event, ...args) => func(...args));
-    }
+    },
 });
