@@ -200,6 +200,10 @@ export default class Inbox {
         // const store = this.storage.getStore();
         const machineId = Machine.getMachineId();
         const machines = response.data.machines as I.IMachine[];
+        if(!machines){
+            console.log(response);
+            return [];
+        }
         const receivers = machines.filter((mch) => mch.userId !== this.userId || mch.machineId !== machineId);
 
         return receivers;

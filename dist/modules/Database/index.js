@@ -44,11 +44,11 @@ class Message extends sequelize_1.Model {
             uuid: { type: sequelize_1.default.UUID, primaryKey: true, allowNull: false, defaultValue: sequelize_1.default.UUIDV4 },
             id: { type: sequelize_1.default.BIGINT },
             senderId: { type: sequelize_1.default.BIGINT },
-            content: { type: sequelize_1.default.TEXT({ length: "long" }), },
+            content: { type: sequelize_1.default.TEXT, },
             chatId: { type: sequelize_1.default.BIGINT },
             my: { type: sequelize_1.default.BOOLEAN },
             date: { type: sequelize_1.default.DATE },
-            userId: { type: sequelize_1.default.TEXT({ length: "long" }) },
+            userId: { type: sequelize_1.default.TEXT },
         }, {
             timestamps: false,
             sequelize: seq
@@ -91,8 +91,11 @@ const convertToRaw = (userId, message) => {
 const saveFileToDrive = (message) => __awaiter(void 0, void 0, void 0, function* () {
     const saveFileMessage = (fileMessage) => __awaiter(void 0, void 0, void 0, function* () {
         const filePath = yield unused_filename_1.default(path_1.default.join(Machine_1.directories.files, fileMessage.content.name));
-        console.log('saving file to', filePath);
-        fs_1.default.writeFileSync(filePath, fileMessage.content.data, 'base64');
+        let data = fileMessage.content.data;
+        if (data.includes(",")) {
+            data = data.split(",")[1];
+        }
+        fs_1.default.writeFileSync(filePath, data, 'base64');
         return filePath;
     });
     if (message.content.type === "text")

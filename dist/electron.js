@@ -55,6 +55,7 @@ const startApp = () => __awaiter(void 0, void 0, void 0, function* () {
             backgroundThrottling: false,
             preload: path_1.default.join(__dirname, 'preload.js'),
             nodeIntegration: true,
+            webSecurity: false
         },
         width: 1280,
     });

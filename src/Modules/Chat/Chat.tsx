@@ -10,6 +10,7 @@ import AppBar from './AppBar';
 import DragUploadModal from './DragUploadModal';
 import { InView } from 'react-intersection-observer';
 import { scrollToBottom } from "Modules/Utils";
+import { Attachment } from "@material-ui/icons";
 export interface FilePayloadData {
     data: string,
     size: number,
@@ -60,11 +61,13 @@ export default class Chat extends Component<IProps, IState> {
     }
 
     allow = (e: React.DragEvent<HTMLDivElement>) => {
+
         e.preventDefault();
         e.stopPropagation();
     }
 
     whileOver = (evt: React.DragEvent<HTMLDivElement>) => {
+        console.log('a')
         let highlight = false;
         if (evt.type === "dragenter" || evt.type === "dragover") {
             highlight = true;
@@ -83,6 +86,7 @@ export default class Chat extends Component<IProps, IState> {
     }
 
     componentDidMount = () => {
+        console.log()
         Loaf.on("chatPage", () => {
             setTimeout(() => {
                 scrollToBottom(62);
@@ -91,7 +95,7 @@ export default class Chat extends Component<IProps, IState> {
         });
     }
 
-    public handleFiles = (files: FileList) => {
+    public handleFiles = (files: FileList | null) => {
         if (!files || !files.length) return;
         const filesToSend: FilePayloadData[] = [];
 
@@ -182,7 +186,7 @@ export default class Chat extends Component<IProps, IState> {
                                                     <div  ref={ref} className="load-messages-button" onClick={() => this.loadMoreMessages(page.page - 1)}>LOAD MORE MESSAGES {inView} {entry ? (Math.floor(entry.intersectionRatio * 100)) + "%" : 'nic'}...</div>
                                                 )}
                                                 </InView>*/}
-                                                <InView threshold={0} trackVisibility={true} delay={100} as="div" className="load-messages-button" onClick={() => this.loadMoreMessages(page.page - 1)} onChange={this.loadMoreByScroll(page.page-1)}>
+                                                <InView threshold={0} trackVisibility={true} delay={100} as="div" className="load-messages-button" onClick={() => this.loadMoreMessages(page.page - 1)} onChange={this.loadMoreByScroll(page.page - 1)}>
                                                     LOAD MORE MESSAGES
                                                 </InView>
                                             </>
@@ -230,6 +234,10 @@ export default class Chat extends Component<IProps, IState> {
                             style: { color: 'white' }
                         }}
                     />
+                    <div className="add_attachment_button">
+                        <label htmlFor="attachment"><Attachment fontSize={'large'} htmlColor="white" /></label>
+                        <input id="attachment" type="file" style={{display: 'none'}} onChange={e => this.handleFiles(e.target.files)} />
+                    </div>
                 </div> : null}
             </div>
         );

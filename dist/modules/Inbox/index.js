@@ -208,6 +208,10 @@ class Inbox {
             // const store = this.storage.getStore();
             const machineId = Machine.getMachineId();
             const machines = response.data.machines;
+            if (!machines) {
+                console.log(response.data);
+                return [];
+            }
             const receivers = machines.filter((mch) => mch.userId !== this.userId || mch.machineId !== machineId);
             return receivers;
         });

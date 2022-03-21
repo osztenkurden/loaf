@@ -32,6 +32,7 @@ const startApp = async () => {
             backgroundThrottling: false,
             preload: path.join(__dirname, 'preload.js'),
             nodeIntegration: true,
+            webSecurity: false
         },
         width: 1280,
     });

@@ -22,7 +22,7 @@ export default class FriendMessage extends Component<{message: I.IMessage, sende
             case "text":
                 return <p>{message.content.content}</p>
             case "file":
-                return <div><img src={message.content.content.data.startsWith('data:image') ? message.content.content.data : `data:image/jpeg;base64,${questionMark}`} alt={'Upload'}/></div>
+                return renderGallery([message.content]);
             case "mixed":
                 return renderGallery(message.content.content);
         }

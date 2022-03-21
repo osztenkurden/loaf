@@ -14,11 +14,11 @@ class Message extends Model {
             uuid: { type: Sequelize.UUID, primaryKey: true, allowNull: false, defaultValue: Sequelize.UUIDV4 },
             id: { type: Sequelize.BIGINT },
             senderId: { type: Sequelize.BIGINT },
-            content: { type: Sequelize.TEXT({ length: "long"}),  },
+            content: { type: Sequelize.TEXT,  },
             chatId: { type: Sequelize.BIGINT },
             my: { type: Sequelize.BOOLEAN },
             date: { type: Sequelize.DATE },
-            userId: { type: Sequelize.TEXT({ length: "long"}) },
+            userId: { type: Sequelize.TEXT },
         }, {
             timestamps:false,
             sequelize: seq
@@ -88,8 +88,13 @@ export const saveFileToDrive = async (message: I.IMessage) => {
     const saveFileMessage = async (fileMessage: I.IMessageContentFile) => {
 
         const filePath = await unusedFilename(path.join(directories.files, fileMessage.content.name));
-        console.log('saving file to', filePath);
-        fs.writeFileSync(filePath, fileMessage.content.data, 'base64');
+        
+        let data = fileMessage.content.data;
+        if(data.includes(",")){
+            data = data.split(",")[1];
+        } 
+
+        fs.writeFileSync(filePath, data, 'base64');
         return filePath;
     }
     if (message.content.type === "text") return message;

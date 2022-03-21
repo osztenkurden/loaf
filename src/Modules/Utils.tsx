@@ -1,6 +1,7 @@
 import React from 'react';
 import * as I from '../../modules/interface';
 import { Audiotrack, InsertDriveFile, CloudDownload } from "@material-ui/icons";
+import imageExtensions from './imageExtensions';
 
 export function hashCode(str: string) { // java String#hashCode
     let hash = 0;
@@ -116,7 +117,8 @@ export function renderGallery(message: I.IMessageContentPackage[]) {
     return <div className="many-msg-types">
         {message.filter(isFile).map(payload => {
             const fileData = payload.content.data;
-            if (fileData.startsWith("data:image")) {
+            const fileName = payload.content.name;
+            if (fileData.startsWith("data:image") || imageExtensions.find(extension => fileName.endsWith(`.${extension}`))) {
                 return <img src={fileData} alt={'Upload'} />
             }
             return filePreview(payload.content);

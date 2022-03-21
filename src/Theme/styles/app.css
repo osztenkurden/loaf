@@ -776,6 +776,8 @@ li > hr.separator {
     height:56px;
     border-top: 2px solid transparent;
     border-image: linear-gradient(to right, #ffd66b, #ff8b84) 3;
+    display: flex;
+    align-items: center;
 }
 .chat_container .chat-name-text {
     font-size: 1.5rem;
@@ -845,4 +847,10 @@ li > hr.separator {
 
 .error-message.show {
     right: 10px;
+}
+
+.add_attachment_button {
+    position: absolute;
+    right: 20px;
+    cursor:pointer;
 }
