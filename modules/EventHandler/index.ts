@@ -1,4 +1,4 @@
-import socketio from "socket.io-client";
+import socketio, { ManagerOptions, SocketOptions } from "socket.io-client";
 import { getCookie } from "./../API/LoafAPI";
 import { api } from "./../API";
 import * as I from "./../interface";
@@ -17,21 +17,27 @@ const call: CallStatus = {
 }
 
 export function initSockets() {
-    const socketOpts: SocketIOClient.ConnectOpts = {
+    const socketOpts: Partial<ManagerOptions & SocketOptions> = {
         transportOptions: {
             polling: {
                 extraHeaders: {
                     Cookie: getCookie(),
+                    'api-version': '1.0'
                 },
             },
+
         },
-        reconnectionDelay: 2000,
-        reconnectionDelayMax: 2000,
+        //rejectUnauthorized: false,
+        reconnectionDelay: 1000,
+        reconnectionDelayMax: 1500,
+        withCredentials: true,
+        reconnection: true,
+        //transports: ['websocket'],
     };
     console.log("CONNECTION IS TRYING TO BE MADE")
     const socket = socketio("https://loaf.bakerysoft.pl", socketOpts);
-    socket.on("connection", () => {
-        console.log("CONNECTED TO SERVER");
+    socket.on("connect_error", (err: any) => {
+        console.log(`connect_error due to ${err}`);
     });
 
     socket.on("connect", () => {
@@ -51,10 +57,6 @@ export function initSockets() {
         console.log("DISCONNECTION");
     });
 
-    socket.on("disconnection", () => {
-        console.log("DISCONNECTION #2");
-    })
-
     socket.on("chat", () => {
         const inbox = User.getInbox();
 
@@ -62,21 +64,21 @@ export function initSockets() {
             inbox.loadChats();
         }
     });
-    
+
     /**
      * Events from server: call-rejected, call-offer, call-failed
      */
 
     socket.on('call-offer', (data: I.CallDescription) => {
-        if(!User.window || (call.caller && call.caller !== data.target)) return;
+        if (!User.window || (call.caller && call.caller !== data.target)) return;
         User.window.send('call-offer', data);
 
         call.caller = data.target;
-        call.status =  data.type === 'accept' ? 'ongoing' : 'incoming';
+        call.status = data.type === 'accept' ? 'ongoing' : 'incoming';
     });
 
     socket.on('call-rejected', () => {
-        if(!User.window || !call.caller) return;
+        if (!User.window || !call.caller) return;
         User.window.send('call-rejected');
 
         call.caller = null;
@@ -84,7 +86,7 @@ export function initSockets() {
     });
 
     socket.on('call-failed', () => {
-        if(!User.window) return;
+        if (!User.window) return;
         User.window.send('call-failed');
 
         call.caller = null;
@@ -150,25 +152,25 @@ export const start = (win: Electron.WebContents) => {
 
     Loaf.onAsync("loadImage", async (chatId) => {
         const res = await api.chats.loadImage(chatId);
-        if(!res.data || !res.data.image){
-            return { event: "imageLoaded", data: {id:chatId, image: null}};
+        if (!res.data || !res.data.image) {
+            return { event: "imageLoaded", data: { id: chatId, image: null } };
         }
-        return { event: "imageLoaded", data: {id:chatId, image: res.data.image}};
+        return { event: "imageLoaded", data: { id: chatId, image: res.data.image } };
     });
 
     Loaf.onAsync("addUser", async (userId: number | string) => {
         const inbox = User.getInbox();
-        if(!inbox) return { event: "userAdded", data: false };
-        if(typeof userId === "number"){
+        if (!inbox) return { event: "userAdded", data: false };
+        if (typeof userId === "number") {
             await inbox.addFriend(userId);
         } else {
             const response = await api.user.getByName(userId);
             const data = response.data;
-            if(!data){
+            if (!data) {
                 return { event: "userAdded", data: false };
             }
             const id = data.user?.id;
-            if(!Number.isInteger(id)){
+            if (!Number.isInteger(id)) {
                 return { event: "userAdded", data: false };
             }
             await inbox.addFriend(id);
@@ -179,8 +181,8 @@ export const start = (win: Electron.WebContents) => {
 
     Loaf.onAsync("createGroup", async (name: string, users: number[]) => {
         const user = User.getUser();
-        if(!user?.id) return null;
-        if(!users.includes(user.id)){
+        if (!user?.id) return null;
+        if (!users.includes(user.id)) {
             users.push(user.id);
         }
         const response = await api.inbox.createGroup(name, users);
@@ -194,7 +196,7 @@ export const start = (win: Electron.WebContents) => {
 
     Loaf.onAsync("acceptChat", async (chatId: number) => {
         const inbox = User.getInbox();
-        if(!inbox){
+        if (!inbox) {
             return { event: "acceptInvitation", data: false };
         }
         const result = await inbox.acceptChat(chatId);
@@ -206,7 +208,7 @@ export const start = (win: Electron.WebContents) => {
 
     Loaf.onAsync("getChats", async () => {
         const inbox = User.getInbox();
-        if(!inbox){
+        if (!inbox) {
             return { event: "chatsLoaded", data: false };
         }
         await inbox.loadChats();
@@ -216,7 +218,7 @@ export const start = (win: Electron.WebContents) => {
 
     Loaf.onAsync("loadPageOfMessages", async (chatId: number, page: number) => {
         const inbox = User.getInbox();
-        if(!inbox){
+        if (!inbox) {
             return { event: "loadedPage", data: false };
         }
         await inbox.loadMessagesFromPage(chatId, page);
@@ -265,14 +267,14 @@ export const start = (win: Electron.WebContents) => {
     });
     const devMode = async () => {
 
-        if(process.env.DEVUSER1){
+        if (process.env.DEVUSER1) {
             User.register('user1', 'password', 'Hubert');
         }
 
-        if(process.env.DEVUSER2){
+        if (process.env.DEVUSER2) {
             User.register('user2', 'password', 'Hubert');
         }
-        if(process.env.DEVUSER3){
+        if (process.env.DEVUSER3) {
             User.register('user3', 'password', 'Hubert');
         }
     }

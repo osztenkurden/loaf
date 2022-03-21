@@ -34,12 +34,12 @@ function generateString(length: number) {
 }
 export default async function apiV2(url: string, method = "GET", body?: object): Promise<I.IServerResponse> {
     const options: RequestInit = {
-        headers: { "Accept": "application/json", "Content-Type": "application/json" },
+        headers: { "Accept": "application/json", "Content-Type": "application/json", 'api-version': '1.0' },
         method,
     };
 
-    if (body) {
-        options.body = JSON.stringify(body);
+    if (method !== 'GET' && method !== 'HEAD') {
+        options.body = JSON.stringify(body || {});
     }
     let res;
     try {

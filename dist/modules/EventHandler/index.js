@@ -48,16 +48,21 @@ function initSockets() {
             polling: {
                 extraHeaders: {
                     Cookie: LoafAPI_1.getCookie(),
+                    'api-version': '1.0'
                 },
             },
         },
-        reconnectionDelay: 2000,
-        reconnectionDelayMax: 2000,
+        //rejectUnauthorized: false,
+        reconnectionDelay: 1000,
+        reconnectionDelayMax: 1500,
+        withCredentials: true,
+        reconnection: true,
+        //transports: ['websocket'],
     };
     console.log("CONNECTION IS TRYING TO BE MADE");
     const socket = socket_io_client_1.default("https://loaf.bakerysoft.pl", socketOpts);
-    socket.on("connection", () => {
-        console.log("CONNECTED TO SERVER");
+    socket.on("connect_error", (err) => {
+        console.log(`connect_error due to ${err}`);
     });
     socket.on("connect", () => {
         console.log("CONNECTED TO SERVER");
@@ -72,9 +77,6 @@ function initSockets() {
     };
     socket.on("disconnect", () => {
         console.log("DISCONNECTION");
-    });
-    socket.on("disconnection", () => {
-        console.log("DISCONNECTION #2");
     });
     socket.on("chat", () => {
         const inbox = User_1.default.getInbox();
