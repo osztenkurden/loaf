@@ -21,6 +21,7 @@ interface IState {
     newConversationModal: boolean;
     storage: ChatImageStorage;
     hash: string,
+    temporaryMessages: I.IAnyMessage[]
 }
 
 const addPageToChat = (chat: I.IChatPaged, pages: I.IPage[]) => {
@@ -73,10 +74,11 @@ export default class Main extends Component<{}, IState> {
             newConversationModal: false,
             storage: storage.set(() => this.setState({hash: (new Date()).toISOString()})),
             hash: '',
+            temporaryMessages: []
         };
     }
     public async componentDidMount() {
-        Loaf.on("chats", (newChats: I.IChatPaged[]) => {
+        Loaf.on("chats", (newChats: I.IChatPaged[], localUUID?: string) => {
             const { currentChat } = this.state;
 
             let newInCurrent = false;
@@ -93,12 +95,12 @@ export default class Main extends Component<{}, IState> {
                     newChats[indexOfCurrentChat] = currentChat;
                 }
             }
-
             this.setState({
                 chats: sortChats(newChats),
-                currentChat
+                currentChat,
+                temporaryMessages: this.state.temporaryMessages.filter(msg => !localUUID || msg.uuid !== localUUID)
             }, () => {
-                if(!newInCurrent) return;
+                if(!newInCurrent && !localUUID) return;
                 scrollToBottom();
             });
         });
@@ -153,7 +155,11 @@ export default class Main extends Component<{}, IState> {
     public toggleDrawer = () => {
         this.setState((state) => ({ ...state, drawer: !state.drawer }));
     }
+    addTemporaryMessage = (temporaryMessage: I.IAnyMessage) => {
+        this.setState({ temporaryMessages: [...this.state.temporaryMessages, temporaryMessage]}, scrollToBottom);
+    }
     public render() {
+        const { chats, temporaryMessages, hash, currentChat } = this.state;
         return (
             <div className="loaf-app">
                 <AppBar position="fixed" style={{top:'20px'}} >
@@ -194,16 +200,16 @@ export default class Main extends Component<{}, IState> {
                     <NewConversation
                         onClose={this.setConversationModal(false)}
                         closeDrawer={this.toggleDrawer}
-                        chats={this.state.chats}
+                        chats={chats}
                     />
                 </Modal>
                 <div className="playground">
                     <ChatList
-                        chats={this.state.chats}
-                        currentChat={this.state.currentChat}
+                        chats={chats}
+                        currentChat={currentChat}
                         loadChat={this.loadChat}
                     />
-                    <Chat chat={this.state.currentChat}  hash={this.state.hash} />
+                    <Chat chat={currentChat} temporaryMessages={temporaryMessages.filter(msg => currentChat && msg.chatId === currentChat.id)}  hash={hash} addTemporaryMessage={this.addTemporaryMessage} />
                 </div>
             </div>
         );
@@ -214,7 +220,7 @@ export default class Main extends Component<{}, IState> {
                 const container = document.getElementById("message_container");
                 if(!container) return;
                 container.scroll({ top: container.scrollHeight });
-            }, 10);
+            }, 17);
         });
     }
 }

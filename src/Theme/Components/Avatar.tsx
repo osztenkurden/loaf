@@ -1,21 +1,26 @@
 import { Avatar } from "@material-ui/core";
-import React, { Component } from "react";
+import React from "react";
 import * as I from "./../../../modules/interface";
 import { textToRGB } from './../../Modules/Utils';
 import storage from "./../../API/ChatImages";
+import { AddAPhoto } from "@material-ui/icons";
 
-interface IProps  {
+interface IProps {
     chat: I.IChatPaged;
+    editable?: boolean
 }
 
-export default class LoafAvatar extends Component<IProps> {
-    public render() {
-        const { chat } = this.props;
-        if(chat.image){
-            return <Avatar src={`data:image/jpeg;base64,${storage.get(chat.id)}`} className="avatar" />
-        }
-        return <Avatar className="avatar" style={{backgroundColor: textToRGB(chat.name)}}>
-            {chat.name.charAt(0)?.toUpperCase() || "#"}
-        </Avatar>
+const LoafAvatar = ({ chat, editable }: IProps) => {
+    let avatar = <Avatar className="avatar" style={{ backgroundColor: textToRGB(chat.name) }}>
+        {chat.name.charAt(0)?.toUpperCase() || "#"}
+    </Avatar>;
+    if (chat.image) {
+        avatar = <Avatar src={storage.get(chat.id) as string} className="avatar" />
     }
+    return <div className={`avatar-container ${editable ? 'editable':''}`}>
+        {avatar}
+        {editable ? <div className="editable-hover"><AddAPhoto /></div> : null}
+    </div>
 }
+
+export default LoafAvatar;

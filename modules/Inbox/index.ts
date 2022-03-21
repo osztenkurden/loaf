@@ -3,7 +3,7 @@ import { getMessages, saveFileToDrive, saveMessages } from "../Database";
 import * as I from "../interface";
 import * as Machine from "../Machine";
 import Storage from "../Storage";
-import { uuid } from 'uuidv4';
+import { v4 as uuid } from 'uuid';
 
 // import * as Machine from "../Machine";
 
@@ -62,7 +62,7 @@ export default class Inbox {
         this.content.send("chatPage", { chatId, pageEntry });
     }
 
-    public async sendToChat(chatId: number, msg: I.IMessageContent) {
+    public async sendToChat(chatId: number, msg: I.IMessageContent, localUUID: string) {
         const receivers = await this.getReceivers(chatId);
         const entries: I.ISignalEncrypted[] = [];
         for (const receiver of receivers) {
@@ -89,7 +89,7 @@ export default class Inbox {
 
             current.push(message);
             this.messages.set(chatId, current);
-            this.content.send("chats", this.chats);
+            this.content.send("chats", this.chats, localUUID);
             await saveMessages(this.userId, [message]);
         } else {
             console.log(result);

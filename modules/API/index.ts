@@ -10,7 +10,8 @@ export const api = {
         getReceivers: (chatId: number) => Loaf(`machines/${chatId}`),
     },
     chats: {
-        loadImage: (chatId:number) => Loaf(`chats/image/base64?chatId=${chatId}`)
+        loadImage: (chatId:number) => Loaf(`chats/image/base64?chatId=${chatId}`),
+        updateChatInfo: (chatId: number, name: string, image?: string) => Loaf('chats', 'PATCH', { chatId, name, image })
     },
     messages:  {
         get: (chatId: number, machineId: number) => Loaf(`messages/${chatId}?machineId=${machineId}`),

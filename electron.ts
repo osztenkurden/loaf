@@ -97,7 +97,7 @@ const startApp = async () => {
         return false;
     });
 
-    EventInit.start(win.webContents);
+    EventInit.start(win);
 
     /*events.forEach((event) => {
         ipcMain.on(event.name, event.response);

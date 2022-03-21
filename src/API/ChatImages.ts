@@ -13,8 +13,12 @@ class ChatImageStorage {
         this.images = new Map();
         this.onLoad = () => {}
         Loaf.on("imageLoaded", (data: {id: number, image: string|null}) => {
-            this.images.set(data.id, {loading:false, image:data.image});
+            const imageUrl = data.image ? data.image + `?cache=${new Date().getTime()}` : null
+            this.images.set(data.id, {loading:false, image:imageUrl});
             if(this.onLoad) this.onLoad();
+        });
+        Loaf.on("updatedChat", (data: { chatId: number, data: any }) => {
+            api.chats.loadImage(data.chatId, true);
         });
     }
     set(onLoad: () => void){

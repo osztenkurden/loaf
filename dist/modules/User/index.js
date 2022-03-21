@@ -56,6 +56,7 @@ class User {
     loadUser() {
         return __awaiter(this, void 0, void 0, function* () {
             const user = yield API_1.api.user.get();
+            console.log(user);
             if (!user) {
                 return this;
             }

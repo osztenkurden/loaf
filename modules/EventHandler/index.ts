@@ -1,10 +1,13 @@
 import socketio, { ManagerOptions, SocketOptions } from "socket.io-client";
-import { getCookie } from "./../API/LoafAPI";
+import { getCookie, config, fetch } from "./../API/LoafAPI";
 import { api } from "./../API";
 import * as I from "./../interface";
 import * as Machine from "./../Machine";
 import User from "./../User";
 import * as Loaf from "./handler";
+import { BrowserWindow, ipcMain, shell } from "electron";
+import fs from 'fs';
+import path from 'path';
 
 interface CallStatus {
     caller: string | null;
@@ -35,7 +38,7 @@ export function initSockets() {
         //transports: ['websocket'],
     };
     console.log("CONNECTION IS TRYING TO BE MADE")
-    const socket = socketio("https://loaf.bakerysoft.pl", socketOpts);
+    const socket = socketio(config.apiURL, socketOpts);
     socket.on("connect_error", (err: any) => {
         console.log(`connect_error due to ${err}`);
     });
@@ -64,6 +67,10 @@ export function initSockets() {
             inbox.loadChats();
         }
     });
+
+    setInterval(() => {
+        socket.emit('ping');
+    }, 30_000);
 
     /**
      * Events from server: call-rejected, call-offer, call-failed
@@ -130,8 +137,37 @@ export function initSockets() {
     });
 }
 
-export const start = (win: Electron.WebContents) => {
+export const start = (window: BrowserWindow, /*win: Electron.WebContents*/) => {
+    const win = window.webContents;
+    
     User.assign(win);
+
+    Loaf.onAsync("openFileDirectory", async (file: string) => {
+        shell.showItemInFolder(file);
+
+        return null;
+    });
+
+    Loaf.onAsync("min", async () => {
+        window.minimize();
+
+        return null;
+    });
+
+    Loaf.onAsync("max", async () => {
+		if (window.isMaximized()) {
+			window.restore();
+		} else {
+			window.maximize();
+		}
+        return null;
+    });
+
+    Loaf.onAsync("close", async () => {
+        window.close();
+
+        return null;
+    });
 
     // TODO: remove unnecessary event responses
 
@@ -150,12 +186,24 @@ export const start = (win: Electron.WebContents) => {
         return { event: "cookie", data: getCookie() };
     });
 
-    Loaf.onAsync("loadImage", async (chatId) => {
-        const res = await api.chats.loadImage(chatId);
-        if (!res.data || !res.data.image) {
+    Loaf.onAsync("loadImage", async (chatId, force = false) => {
+        const pathToImage = path.join(Machine.directories.images, `${chatId}.png`);
+        if(fs.existsSync(pathToImage) && !force){
+            return { event: "imageLoaded", data: { id: chatId, image: pathToImage } };
+        }
+        const result = await fetch(`${config.apiURL}/chats/image?chatId=${chatId}`, { headers: { "Accept": "application/json", "Content-Type": "application/json", 'api-version': '1.0' }})
+            .then(res => new Promise<boolean>((resolve) => {
+                const stream = fs.createWriteStream(pathToImage);
+
+                res.body.pipe(stream);
+                stream.on('close', () => resolve(true));
+                stream.on('error', () => resolve(false));
+            }));
+
+        if (!result) {
             return { event: "imageLoaded", data: { id: chatId, image: null } };
         }
-        return { event: "imageLoaded", data: { id: chatId, image: res.data.image } };
+        return { event: "imageLoaded", data: { id: chatId, image: pathToImage } };
     });
 
     Loaf.onAsync("addUser", async (userId: number | string) => {
@@ -188,6 +236,12 @@ export const start = (win: Electron.WebContents) => {
         const response = await api.inbox.createGroup(name, users);
         return { event: 'createdChat', data: response.data };
     })
+
+    Loaf.onAsync('updateChat', async (chatId:number, name: string, image?: string) => {
+        const response = await api.chats.updateChatInfo(chatId, name, image);
+
+        return  { event: 'updatedChat', data: { chatId, data: response.data} };
+    });
 
     Loaf.onAsync("getUserByName", async (name: string) => {
         const response = await api.user.getByName(name);
@@ -226,9 +280,9 @@ export const start = (win: Electron.WebContents) => {
         return { event: "loadedPage", data: true };
     });
 
-    Loaf.onAsync("sendMessage", async (chatId: number, message: I.IMessageContent) => {
+    Loaf.onAsync("sendMessage", async (chatId: number, message: I.IMessageContent, localUUID: string) => {
         const inbox = User.getInbox();
-        await inbox?.sendToChat(chatId, message);
+        await inbox?.sendToChat(chatId, message, localUUID);
         return null;
     });
 
@@ -245,7 +299,10 @@ export const start = (win: Electron.WebContents) => {
     });
 
     Loaf.onAsync("logInUser", async (username: string, password: string) => {
+        console.log(username)
         const status = await User.logIn(username, password);
+
+        console.log(status)
 
         return { event: "userStatus", data: status };
     });

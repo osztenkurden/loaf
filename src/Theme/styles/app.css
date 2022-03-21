@@ -317,10 +317,11 @@ body {
     overflow:visible !important;
     /*border-radius:0 !important;*/
 }
-.chat-list-entry .avatar {
+.chat-list-entry .avatar-container, .chat-list-entry .avatar, .chat-list-entry .avatar img {
     height:50px;
-    width:50px;
+    width:50px !important;
 }
+
 /*.MuiDrawer-paper-97{
     background-color:var(--primaryColor600) !important;
 }*/
@@ -337,6 +338,7 @@ body {
     letter-spacing: 0.7px;
     font-weight: 600;
     text-shadow: 0 0 10px #ffffff73;
+    color: white;
 }
 .sidenav .background {
     display: flex;
@@ -381,8 +383,9 @@ body {
     border-radius:50%;
     width:auto;
 }
-.bar .avatar img {
+.bar .avatar, .bar .avatar img {
     height:45px;
+    width: 45px;
 }
 /*.chat-button.new-message .avatar::before{
     content:"";
@@ -561,6 +564,11 @@ li > hr.separator {
     box-shadow: 0 0 5px 2px #0000004a;
     word-break: break-all;
 }
+
+.message.sending {
+    opacity: 0.5;
+}
+
 .message.friend {
     display: flex;
     flex-direction: row;
@@ -852,5 +860,32 @@ li > hr.separator {
 .add_attachment_button {
     position: absolute;
     right: 20px;
-    cursor:pointer;
+}
+.add_attachment_button label {
+    cursor: pointer;
+}
+.avatar-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    overflow: hidden;
+}
+.avatar-container.editable {
+    cursor: pointer;
+}
+.avatar-container .editable-hover {
+    opacity: 0;
+    transition: opacity 0.35s;
+    position: absolute;
+    background-color: rgba(0,0,0,0.5);
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.avatar-container:hover .editable-hover {
+    opacity: 1;
 }

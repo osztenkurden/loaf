@@ -17,10 +17,10 @@ export const onAsync  = (eventName: string, handler: (...args: any[]) => Promise
         if (!result) {
             return null;
         }
-        event.reply(result.event, result.data);
+        event.reply?.(result.event, result.data);
     });
 };
 
 export const register = (eventName: string, ...args: any[]) => {
-    return ipcMain.emit(eventName, args);
+    return ipcMain.emit(eventName, ...args);
 };

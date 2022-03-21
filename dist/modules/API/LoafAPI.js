@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.LoafStatus = exports.getCookie = void 0;
+exports.LoafStatus = exports.getCookie = exports.config = exports.fetch = void 0;
 const fetch_cookie_1 = __importDefault(require("fetch-cookie"));
 const node_fetch_1 = __importDefault(require("node-fetch"));
 const tough_cookie_1 = require("tough-cookie");
@@ -24,12 +24,12 @@ const User_1 = __importDefault(require("../User"));
 const electron_1 = require("electron");
 const cookiePath = path_1.default.join(electron_1.app.getPath('userData'), 'cookie.json');
 const cookieJar = new tough_cookie_1.CookieJar(new tough_cookie_file_store_1.FileCookieStore(cookiePath));
-const fetch = fetch_cookie_1.default(node_fetch_1.default, cookieJar);
-const config = {
-    apiURL: "https://loaf.bakerysoft.pl",
+exports.fetch = fetch_cookie_1.default(node_fetch_1.default, cookieJar);
+exports.config = {
+    apiURL: process.env.local === 'true' ? 'http://localhost:5000' : "https://loaf.bakerysoft.pl",
 };
 const getCookie = () => {
-    const cookieString = cookieJar.getCookieStringSync(config.apiURL);
+    const cookieString = cookieJar.getCookieStringSync(exports.config.apiURL);
     return cookieString;
 };
 exports.getCookie = getCookie;
@@ -53,7 +53,7 @@ function apiV2(url, method = "GET", body) {
         }
         let res;
         try {
-            res = yield fetch(`${config.apiURL}/${url}`, options);
+            res = yield exports.fetch(`${exports.config.apiURL}/${url}`, options);
         }
         catch (e) {
             const errorContent = `

@@ -23,15 +23,16 @@ const on = (eventName, handler) => {
 exports.on = on;
 const onAsync = (eventName, handler) => {
     electron_1.ipcMain.on(eventName, (event, ...args) => __awaiter(void 0, void 0, void 0, function* () {
+        var _a;
         const result = yield handler(...args);
         if (!result) {
             return null;
         }
-        event.reply(result.event, result.data);
+        (_a = event.reply) === null || _a === void 0 ? void 0 : _a.call(event, result.event, result.data);
     }));
 };
 exports.onAsync = onAsync;
 const register = (eventName, ...args) => {
-    return electron_1.ipcMain.emit(eventName, args);
+    return electron_1.ipcMain.emit(eventName, ...args);
 };
 exports.register = register;

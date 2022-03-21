@@ -23,7 +23,8 @@ exports.api = {
         getReceivers: (chatId) => LoafAPI_1.default(`machines/${chatId}`),
     },
     chats: {
-        loadImage: (chatId) => LoafAPI_1.default(`chats/image/base64?chatId=${chatId}`)
+        loadImage: (chatId) => LoafAPI_1.default(`chats/image/base64?chatId=${chatId}`),
+        updateChatInfo: (chatId, name, image) => LoafAPI_1.default('chats', 'PATCH', { chatId, name, image })
     },
     messages: {
         get: (chatId, machineId) => LoafAPI_1.default(`messages/${chatId}?machineId=${machineId}`),

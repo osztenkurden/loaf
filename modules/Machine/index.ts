@@ -5,11 +5,11 @@ import * as path from "path";
 import { generateId } from "./../Breadbox/LoafBreadbox";
 
 export const directories = {
-    db: path.join(app.getPath("userData"), "database"),
     user: app.getPath("userData"),
-    files: path.join(app.getPath('home'), 'Loaf Messenger'),
+    db: path.join(app.getPath("userData"), "database"),
+    files: path.join(app.getPath('downloads'), 'Loaf Messenger'),
     messages: path.join(app.getPath("userData"), "database", "messages"),
-
+    images: path.join(app.getPath('userData'), 'images')
 };
 
 export const claimMachine = () => {

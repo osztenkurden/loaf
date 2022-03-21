@@ -9,8 +9,9 @@ import api from "./../../API";
 import AppBar from './AppBar';
 import DragUploadModal from './DragUploadModal';
 import { InView } from 'react-intersection-observer';
-import { scrollToBottom } from "Modules/Utils";
+import { scrollToBottom, sortMessages } from "Modules/Utils";
 import { Attachment } from "@material-ui/icons";
+import { v4 as uuidv4 } from 'uuid';
 export interface FilePayloadData {
     data: string,
     size: number,
@@ -19,6 +20,8 @@ export interface FilePayloadData {
 interface IProps {
     chat: I.IChatPaged | null;
     hash: string;
+    addTemporaryMessage: (message: I.IAnyMessage) => void;
+    temporaryMessages: I.IAnyMessage[];
 }
 
 
@@ -67,7 +70,6 @@ export default class Chat extends Component<IProps, IState> {
     }
 
     whileOver = (evt: React.DragEvent<HTMLDivElement>) => {
-        console.log('a')
         let highlight = false;
         if (evt.type === "dragenter" || evt.type === "dragover") {
             highlight = true;
@@ -86,7 +88,6 @@ export default class Chat extends Component<IProps, IState> {
     }
 
     componentDidMount = () => {
-        console.log()
         Loaf.on("chatPage", () => {
             setTimeout(() => {
                 scrollToBottom(62);
@@ -153,10 +154,13 @@ export default class Chat extends Component<IProps, IState> {
     }
 
     public render() {
-        const { chat } = this.props;
+        const { chat, temporaryMessages } = this.props;
         if (!chat) {
             return <div className={`chat_container empty`}></div>;
         }
+        const minimumPage = Math.min(...chat.pages.map(page => page.page));
+
+        const messages: I.IAnyMessage[] = sortMessages([...chat.pages.map(page => page.messages).flat(), ...temporaryMessages]);
 
         return (
             <div className="chat_container">
@@ -176,34 +180,27 @@ export default class Chat extends Component<IProps, IState> {
                         /> : null}
                     {
                         chat.status === 2 ? (
-                            chat.pages.map(page => (
-                                <>
-                                    {
-                                        page.page > 0 && !chat.pages.find(pageEntry => pageEntry.page === page.page - 1) ? (
-                                            <>
-                                                {/*<InView threshold={0} trackVisibility={true} delay={100}>
-                                                {({ inView, ref, entry }) => (
-                                                    <div  ref={ref} className="load-messages-button" onClick={() => this.loadMoreMessages(page.page - 1)}>LOAD MORE MESSAGES {inView} {entry ? (Math.floor(entry.intersectionRatio * 100)) + "%" : 'nic'}...</div>
-                                                )}
-                                                </InView>*/}
-                                                <InView threshold={0} trackVisibility={true} delay={100} as="div" className="load-messages-button" onClick={() => this.loadMoreMessages(page.page - 1)} onChange={this.loadMoreByScroll(page.page - 1)}>
-                                                    LOAD MORE MESSAGES
-                                                </InView>
-                                            </>
-                                        ) : null
-                                    }
-                                    {page.messages.map((message) => (
+                            <>
+                                {
+                                    minimumPage > 0 ? (
+                                        <InView threshold={0} trackVisibility={true} delay={100} as="div" className="load-messages-button" onClick={() => this.loadMoreMessages(minimumPage - 1)} onChange={this.loadMoreByScroll(minimumPage - 1)}>
+                                            LOAD MORE MESSAGES
+                                        </InView>
+                                    ) : null
+                                }
+                                {
+                                    messages.map(message => (
                                         <React.Fragment key={getKeyFromMessage(message)}>
                                             {
                                                 isThisFirstDateOccurence(chat.pages, message) ? (
                                                     <div className="date-tag">{moment(message.date).format('dddd, MMMM Do YYYY')}</div>
                                                 ) : null
                                             }
-                                            <Message message={message} chatName={chat.name} />
+                                            <Message message={message} />
                                         </React.Fragment>
-                                    ))}
-                                </>
-                            ))
+                                    ))
+                                }
+                            </>
                         ) : null
                     }
                 </div>
@@ -236,7 +233,7 @@ export default class Chat extends Component<IProps, IState> {
                     />
                     <div className="add_attachment_button">
                         <label htmlFor="attachment"><Attachment fontSize={'large'} htmlColor="white" /></label>
-                        <input id="attachment" type="file" style={{display: 'none'}} onChange={e => this.handleFiles(e.target.files)} />
+                        <input id="attachment" type="file" style={{ display: 'none' }} onChange={e => this.handleFiles(e.target.files)} />
                     </div>
                 </div> : null}
             </div>
@@ -254,13 +251,29 @@ export default class Chat extends Component<IProps, IState> {
         if (e.key === "Enter" && this.state.form.textMessage && this.props.chat) {
             // TODO: SEND MESSAGE
             const content = this.state.form.textMessage;
-            api.message.send(this.props.chat.id, { type: "text", content });
-            this.setState({ form: { textMessage: "", files: [] } });
+            this.sendMessages(this.props.chat.id, { type: "text", content });
         }
     }
+    private addTemporaryMessage = (chatId: number, message: I.IMessageContent, localUUID: string) => {
+        const newTemporaryMessage: I.IAnyMessage = {
+            uuid: localUUID,
+            chatId,
+            id: (new Date()).getTime(),
+            senderId: -1,
+            content: message,
+            my: true,
+            date: (new Date()).toISOString(),
+            temporary: true
+        }
+
+        this.props.addTemporaryMessage(newTemporaryMessage);
+    }
     private sendMessages = async (chatId: number, message: I.IMessageContent) => {
-        await api.message.send(chatId, message);
-        this.setState({ form: { textMessage: "", files: [] } });
+        const uuid = uuidv4();
+        this.setState({ form: { textMessage: "", files: [] } }, () => {
+            this.addTemporaryMessage(chatId, message, uuid);
+        });
+        api.message.send(chatId, message, uuid);
     }
     private sendFiles = () => {
         const files = this.state.form.files;

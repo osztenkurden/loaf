@@ -38,6 +38,9 @@ const API_1 = require("./../API");
 const Machine = __importStar(require("./../Machine"));
 const User_1 = __importDefault(require("./../User"));
 const Loaf = __importStar(require("./handler"));
+const electron_1 = require("electron");
+const fs_1 = __importDefault(require("fs"));
+const path_1 = __importDefault(require("path"));
 const call = {
     caller: null,
     status: null,
@@ -60,7 +63,7 @@ function initSockets() {
         //transports: ['websocket'],
     };
     console.log("CONNECTION IS TRYING TO BE MADE");
-    const socket = socket_io_client_1.default("https://loaf.bakerysoft.pl", socketOpts);
+    const socket = socket_io_client_1.default(LoafAPI_1.config.apiURL, socketOpts);
     socket.on("connect_error", (err) => {
         console.log(`connect_error due to ${err}`);
     });
@@ -84,6 +87,9 @@ function initSockets() {
             inbox.loadChats();
         }
     });
+    setInterval(() => {
+        socket.emit('ping');
+    }, 30000);
     /**
      * Events from server: call-rejected, call-offer, call-failed
      */
@@ -137,8 +143,30 @@ function initSockets() {
     }));
 }
 exports.initSockets = initSockets;
-const start = (win) => {
+const start = (window) => {
+    const win = window.webContents;
     User_1.default.assign(win);
+    Loaf.onAsync("openFileDirectory", (file) => __awaiter(void 0, void 0, void 0, function* () {
+        electron_1.shell.showItemInFolder(file);
+        return null;
+    }));
+    Loaf.onAsync("min", () => __awaiter(void 0, void 0, void 0, function* () {
+        window.minimize();
+        return null;
+    }));
+    Loaf.onAsync("max", () => __awaiter(void 0, void 0, void 0, function* () {
+        if (window.isMaximized()) {
+            window.restore();
+        }
+        else {
+            window.maximize();
+        }
+        return null;
+    }));
+    Loaf.onAsync("close", () => __awaiter(void 0, void 0, void 0, function* () {
+        window.close();
+        return null;
+    }));
     // TODO: remove unnecessary event responses
     Loaf.on("getMachineId", () => {
         const machineId = Machine.getMachineId();
@@ -150,12 +178,22 @@ const start = (win) => {
     Loaf.on("getCookie", () => {
         return { event: "cookie", data: LoafAPI_1.getCookie() };
     });
-    Loaf.onAsync("loadImage", (chatId) => __awaiter(void 0, void 0, void 0, function* () {
-        const res = yield API_1.api.chats.loadImage(chatId);
-        if (!res.data || !res.data.image) {
+    Loaf.onAsync("loadImage", (chatId, force = false) => __awaiter(void 0, void 0, void 0, function* () {
+        const pathToImage = path_1.default.join(Machine.directories.images, `${chatId}.png`);
+        if (fs_1.default.existsSync(pathToImage) && !force) {
+            return { event: "imageLoaded", data: { id: chatId, image: pathToImage } };
+        }
+        const result = yield LoafAPI_1.fetch(`${LoafAPI_1.config.apiURL}/chats/image?chatId=${chatId}`, { headers: { "Accept": "application/json", "Content-Type": "application/json", 'api-version': '1.0' } })
+            .then(res => new Promise((resolve) => {
+            const stream = fs_1.default.createWriteStream(pathToImage);
+            res.body.pipe(stream);
+            stream.on('close', () => resolve(true));
+            stream.on('error', () => resolve(false));
+        }));
+        if (!result) {
             return { event: "imageLoaded", data: { id: chatId, image: null } };
         }
-        return { event: "imageLoaded", data: { id: chatId, image: res.data.image } };
+        return { event: "imageLoaded", data: { id: chatId, image: pathToImage } };
     }));
     Loaf.onAsync("addUser", (userId) => __awaiter(void 0, void 0, void 0, function* () {
         var _a;
@@ -189,6 +227,10 @@ const start = (win) => {
         const response = yield API_1.api.inbox.createGroup(name, users);
         return { event: 'createdChat', data: response.data };
     }));
+    Loaf.onAsync('updateChat', (chatId, name, image) => __awaiter(void 0, void 0, void 0, function* () {
+        const response = yield API_1.api.chats.updateChatInfo(chatId, name, image);
+        return { event: 'updatedChat', data: { chatId, data: response.data } };
+    }));
     Loaf.onAsync("getUserByName", (name) => __awaiter(void 0, void 0, void 0, function* () {
         const response = yield API_1.api.user.getByName(name);
         return { event: "userData", data: response.data };
@@ -220,9 +262,9 @@ const start = (win) => {
         yield inbox.loadMessagesFromPage(chatId, page);
         return { event: "loadedPage", data: true };
     }));
-    Loaf.onAsync("sendMessage", (chatId, message) => __awaiter(void 0, void 0, void 0, function* () {
+    Loaf.onAsync("sendMessage", (chatId, message, localUUID) => __awaiter(void 0, void 0, void 0, function* () {
         const inbox = User_1.default.getInbox();
-        yield (inbox === null || inbox === void 0 ? void 0 : inbox.sendToChat(chatId, message));
+        yield (inbox === null || inbox === void 0 ? void 0 : inbox.sendToChat(chatId, message, localUUID));
         return null;
     }));
     Loaf.onAsync("register", (username, password, name) => __awaiter(void 0, void 0, void 0, function* () {
@@ -234,7 +276,9 @@ const start = (win) => {
         return { event: "userStatus", data: status };
     }));
     Loaf.onAsync("logInUser", (username, password) => __awaiter(void 0, void 0, void 0, function* () {
+        console.log(username);
         const status = yield User_1.default.logIn(username, password);
+        console.log(status);
         return { event: "userStatus", data: status };
     }));
     Loaf.onAsync("logout", () => __awaiter(void 0, void 0, void 0, function* () {

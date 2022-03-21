@@ -31,7 +31,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const API_1 = require("../API");
 const Database_1 = require("../Database");
 const Machine = __importStar(require("../Machine"));
-const uuidv4_1 = require("uuidv4");
+const uuid_1 = require("uuid");
 // import * as Machine from "../Machine";
 class Inbox {
     constructor(content, userId, storage) {
@@ -73,7 +73,7 @@ class Inbox {
         this.messages = new Map();
         this.loadChats(true);
     }
-    sendToChat(chatId, msg) {
+    sendToChat(chatId, msg, localUUID) {
         return __awaiter(this, void 0, void 0, function* () {
             const receivers = yield this.getReceivers(chatId);
             const entries = [];
@@ -88,7 +88,7 @@ class Inbox {
                     entries.push(entry);
             }
             const message = {
-                uuid: uuidv4_1.uuid(),
+                uuid: uuid_1.v4(),
                 senderId: this.userId,
                 content: msg,
                 chatId,
@@ -100,7 +100,7 @@ class Inbox {
                 const current = this.messages.get(chatId) || [];
                 current.push(message);
                 this.messages.set(chatId, current);
-                this.content.send("chats", this.chats);
+                this.content.send("chats", this.chats, localUUID);
                 yield Database_1.saveMessages(this.userId, [message]);
             }
             else {
@@ -163,7 +163,7 @@ class Inbox {
                 }
                 const date = rawMessage.createdAt;
                 const message = {
-                    uuid: uuidv4_1.uuid(),
+                    uuid: uuid_1.v4(),
                     chatId,
                     content: decrypted,
                     date,
@@ -209,7 +209,7 @@ class Inbox {
             const machineId = Machine.getMachineId();
             const machines = response.data.machines;
             if (!machines) {
-                console.log(response.data);
+                console.log(response);
                 return [];
             }
             const receivers = machines.filter((mch) => mch.userId !== this.userId || mch.machineId !== machineId);

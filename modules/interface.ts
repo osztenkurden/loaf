@@ -87,6 +87,10 @@ export interface IMessage {
     }
 }
 
+export interface IAnyMessage extends IMessage {
+    temporary?: boolean;
+}
+
 export interface IChat {
     id: number;
     name: string;

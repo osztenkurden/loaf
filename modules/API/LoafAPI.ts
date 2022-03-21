@@ -11,11 +11,12 @@ import { app } from "electron";
 
 const cookiePath = path.join(app.getPath('userData'), 'cookie.json');
 const cookieJar = new CookieJar(new FileCookieStore(cookiePath));
-const fetch = fetchHandler(nodeFetch, cookieJar);
+export const fetch = fetchHandler(nodeFetch, cookieJar);
 
-const config = {
-    apiURL: "https://loaf.bakerysoft.pl",
+export const config = {
+    apiURL: process.env.local === 'true' ? 'http://localhost:5000' : "https://loaf.bakerysoft.pl",
 };
+
 
 export const getCookie = () => {
     const cookieString = cookieJar.getCookieStringSync(config.apiURL);

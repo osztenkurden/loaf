@@ -9,11 +9,12 @@ const api = {
         accept: (chatId: number) => Loaf.api("acceptChat", false, chatId),
         createGroup: (name: string, users: number[]) => Loaf.api("createGroup", false, name, users),
         get: () => Loaf.api("getChats", false),
-        loadImage: (chatId: number) => Loaf.api("loadImage", false, chatId),
+        loadImage: (chatId: number, force = false) => Loaf.api("loadImage", false, chatId, force),
         loadPageOfMessages: (chatId: number, page: number) => Loaf.api("loadPageOfMessages", false, chatId, page),
+        updateChatInfo: (chatId: number, name: string, image?: string) => Loaf.api('updateChat', false, chatId, name, image)
     },
     message: {
-        send: (chatId: number, message: I.IMessageContent) => Loaf.api("sendMessage", false, chatId, message),
+        send: (chatId: number, message: I.IMessageContent, localUUID: string) => Loaf.api("sendMessage", false, chatId, message, localUUID),
     },
     call: {
       make: (data: I.CallDescription) => Loaf.api('call-to-user', false, data),

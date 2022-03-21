@@ -29,10 +29,11 @@ const os_1 = __importDefault(require("os"));
 const path = __importStar(require("path"));
 const LoafBreadbox_1 = require("./../Breadbox/LoafBreadbox");
 exports.directories = {
-    db: path.join(electron_1.app.getPath("userData"), "database"),
     user: electron_1.app.getPath("userData"),
-    files: path.join(electron_1.app.getPath('home'), 'Loaf Messenger'),
+    db: path.join(electron_1.app.getPath("userData"), "database"),
+    files: path.join(electron_1.app.getPath('downloads'), 'Loaf Messenger'),
     messages: path.join(electron_1.app.getPath("userData"), "database", "messages"),
+    images: path.join(electron_1.app.getPath('userData'), 'images')
 };
 const claimMachine = () => {
     const machineId = LoafBreadbox_1.generateId()[0];

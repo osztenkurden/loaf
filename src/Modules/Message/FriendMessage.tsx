@@ -22,9 +22,9 @@ export default class FriendMessage extends Component<{message: I.IMessage, sende
             case "text":
                 return <p>{message.content.content}</p>
             case "file":
-                return renderGallery([message.content]);
+                return renderGallery([message.content], true);
             case "mixed":
-                return renderGallery(message.content.content);
+                return renderGallery(message.content.content, true);
         }
     }
     public render(){

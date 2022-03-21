@@ -111,7 +111,7 @@ const startApp = () => __awaiter(void 0, void 0, void 0, function* () {
         win.flashFrame(true);
         return false;
     });
-    EventInit.start(win.webContents);
+    EventInit.start(win);
     /*events.forEach((event) => {
         ipcMain.on(event.name, event.response);
     });*/

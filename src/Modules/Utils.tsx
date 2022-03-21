@@ -87,12 +87,30 @@ export const sortChats = (chats: I.IChatPaged[]) => {
     return sortedChats;
 }
 
-export const filePreview = (file: I.IMessageContentFileMeta) => {
+export const sortMessages = (messages: I.IMessage[]) => {
+    messages.sort((a, b) => {
+        if(a.date === b.date) return 0;
+
+        return new Date(a.date).getTime() - new Date(b.date).getTime();
+    });
+    return messages;
+}
+
+const handleFileClick = (fileData: string, fileName: string, open?: boolean) => {
+    if(!open){
+        downloadFile(fileData, fileName);
+        return;
+    }
+
+    window.ipcApi.send('openFileDirectory', fileData);
+}
+
+export const filePreview = (file: I.IMessageContentFileMeta, open?: boolean) => {
     const fileData = file.data;
     const fileType = fileData.substr(fileData.indexOf(':') + 1, fileData.indexOf('/') - fileData.indexOf(':') - 1);
     return (
         <div className="file-preview">
-            <div className="file-icon" onClick={() => downloadFile(fileData, file.name)} >
+            <div className="file-icon" onClick={() => handleFileClick(fileData, file.name, open)} >
                 <div className="hover-icon">
                     <CloudDownload />
                 </div>
@@ -112,7 +130,7 @@ export const filePreview = (file: I.IMessageContentFileMeta) => {
     )
 }
 
-export function renderGallery(message: I.IMessageContentPackage[]) {
+export function renderGallery(message: I.IMessageContentPackage[], open?: boolean) {
     const isFile = (file: I.IMessageContentPackage): file is I.IMessageContentFile => file.type === "file";
     return <div className="many-msg-types">
         {message.filter(isFile).map(payload => {
@@ -121,7 +139,7 @@ export function renderGallery(message: I.IMessageContentPackage[]) {
             if (fileData.startsWith("data:image") || imageExtensions.find(extension => fileName.endsWith(`.${extension}`))) {
                 return <img src={fileData} alt={'Upload'} />
             }
-            return filePreview(payload.content);
+            return filePreview(payload.content, open);
         })}
         {message.filter(payload => payload.type === "text").map(payload => <p>{payload.content}</p>)}
 
