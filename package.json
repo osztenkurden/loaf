@@ -41,7 +41,8 @@
     "appId": "com.bakerysoft.loaf",
     "productName": "Loaf",
     "linux": {
-      "target": "AppImage"
+      "target": "AppImage",
+      "icon": "256x256.png"
     },
     "win": {
       "target": "NSIS"
