@@ -39,6 +39,9 @@
   "build": {
     "appId": "com.bakerysoft.loaf",
     "productName": "Loaf",
+    "linux": {
+      "target":"deb"
+    },
     "win": {
       "target": "NSIS"
     },
@@ -79,8 +82,8 @@
     "dist": "electron-builder",
     "postinstall": "electron-builder install-app-deps",
     "pack": "electron-builder --dir",
-    "onlyCompile": "npm run transpile && npm run pack",
-    "compile": "npm run build && npm run pack"
+    "onlyCompile": "npm run transpile && npm run dist",
+    "compile": "npm run build && npm run dist"
   },
   "eslintConfig": {
     "extends": "react-app"
