@@ -51,7 +51,7 @@ function initSockets() {
             polling: {
                 extraHeaders: {
                     Cookie: LoafAPI_1.getCookie(),
-                    'api-version': '1.0'
+                    'api-version': LoafAPI_1.config.apiVersion
                 },
             },
         },
@@ -183,7 +183,7 @@ const start = (window) => {
         if (fs_1.default.existsSync(pathToImage) && !force) {
             return { event: "imageLoaded", data: { id: chatId, image: pathToImage } };
         }
-        const result = yield LoafAPI_1.fetch(`${LoafAPI_1.config.apiURL}/chats/image?chatId=${chatId}`, { headers: { "Accept": "application/json", "Content-Type": "application/json", 'api-version': '1.0' } })
+        const result = yield LoafAPI_1.fetch(`${LoafAPI_1.config.apiURL}/chats/image?chatId=${chatId}`, { headers: { "Accept": "application/json", "Content-Type": "application/json", 'api-version': LoafAPI_1.config.apiVersion } })
             .then(res => new Promise((resolve) => {
             const stream = fs_1.default.createWriteStream(pathToImage);
             res.body.pipe(stream);

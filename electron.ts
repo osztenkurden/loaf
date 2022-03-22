@@ -3,6 +3,7 @@ import path from "path";
 import * as EventInit from "./modules/EventHandler";
 import * as Machine from "./modules/Machine";
 import User from "./modules/User";
+import './updater';
 
 // import * as Storage from "./storage/storage";
 

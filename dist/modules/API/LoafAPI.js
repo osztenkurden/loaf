@@ -27,6 +27,7 @@ const cookieJar = new tough_cookie_1.CookieJar(new tough_cookie_file_store_1.Fil
 exports.fetch = fetch_cookie_1.default(node_fetch_1.default, cookieJar);
 exports.config = {
     apiURL: process.env.local === 'true' ? 'http://localhost:5000' : "https://loaf.bakerysoft.pl",
+    apiVersion: '1.1'
 };
 const getCookie = () => {
     const cookieString = cookieJar.getCookieStringSync(exports.config.apiURL);
@@ -45,7 +46,7 @@ function generateString(length) {
 function apiV2(url, method = "GET", body) {
     return __awaiter(this, void 0, void 0, function* () {
         const options = {
-            headers: { "Accept": "application/json", "Content-Type": "application/json", 'api-version': '1.0' },
+            headers: { "Accept": "application/json", "Content-Type": "application/json", 'api-version': exports.config.apiVersion },
             method,
         };
         if (method !== 'GET' && method !== 'HEAD') {

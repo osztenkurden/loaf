@@ -14,6 +14,7 @@
     "cors": "^2.8.5",
     "cross-env": "^6.0.3",
     "dotenv": "^8.2.0",
+    "electron-updater": "^4.6.5",
     "fetch-cookie": "^1.0.0",
     "ip": "^1.1.5",
     "moment": "^2.24.0",
@@ -40,7 +41,7 @@
     "appId": "com.bakerysoft.loaf",
     "productName": "Loaf",
     "linux": {
-      "target":"deb"
+      "target": "deb"
     },
     "win": {
       "target": "NSIS"
@@ -49,6 +50,13 @@
       "output": "app",
       "buildResources": "assets"
     },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "osztenkurden",
+        "repo": "loaf"
+      }
+    ],
     "files": [
       "dist/**/*",
       "package.json",
@@ -79,11 +87,11 @@
     "electronDev3": "npm run transpile && cross-env DEV=true DEVUSER3=true electron ./",
     "dev": "concurrently \"cross-env BROWSER=none npm start\" \"npm run electron\"",
     "eject": "react-scripts eject",
-    "dist": "electron-builder",
-    "postinstall": "electron-builder install-app-deps",
-    "pack": "electron-builder --dir",
+    "dist": "cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --publish never",
+    "publish": "cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --publish always",
     "onlyCompile": "npm run transpile && npm run dist",
-    "compile": "npm run build && npm run dist"
+    "compile": "npm run build && npm run dist",
+    "compileAndPublish": "npm run build && npm run publish"
   },
   "eslintConfig": {
     "extends": "react-app"

@@ -37,7 +37,7 @@ class Cypher {
     }
     decrypt(message, senderId, machineId, isFirst = false) {
         return __awaiter(this, void 0, void 0, function* () {
-            const original = Buffer.from(message, "hex").toString("ucs-2");
+            const original = Buffer.from(message, "base64").toString("ucs-2");
             const address = new libsignal.SignalProtocolAddress(senderId, machineId);
             const cipher = new libsignal.SessionCipher(this.store, address);
             let decrypted;
@@ -66,7 +66,7 @@ class Cypher {
             }
             const cipher = new libsignal.SessionCipher(this.store, address);
             const ciphered = yield cipher.encrypt(content);
-            ciphered.body = Buffer.from(ciphered.body, "ucs-2").toString("hex");
+            ciphered.body = Buffer.from(ciphered.body, "ucs-2").toString("base64");
             ciphered.content = ciphered.body;
             ciphered.recipientId = recipientId;
             ciphered.machineId = machineId;
