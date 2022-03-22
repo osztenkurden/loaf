@@ -25,7 +25,7 @@ export function initSockets() {
             polling: {
                 extraHeaders: {
                     Cookie: getCookie(),
-                    'api-version': '1.0'
+                    'api-version': config.apiVersion
                 },
             },
 
@@ -191,7 +191,7 @@ export const start = (window: BrowserWindow, /*win: Electron.WebContents*/) => {
         if(fs.existsSync(pathToImage) && !force){
             return { event: "imageLoaded", data: { id: chatId, image: pathToImage } };
         }
-        const result = await fetch(`${config.apiURL}/chats/image?chatId=${chatId}`, { headers: { "Accept": "application/json", "Content-Type": "application/json", 'api-version': '1.0' }})
+        const result = await fetch(`${config.apiURL}/chats/image?chatId=${chatId}`, { headers: { "Accept": "application/json", "Content-Type": "application/json", 'api-version': config.apiVersion }})
             .then(res => new Promise<boolean>((resolve) => {
                 const stream = fs.createWriteStream(pathToImage);
 

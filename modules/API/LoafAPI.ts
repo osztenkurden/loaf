@@ -15,6 +15,7 @@ export const fetch = fetchHandler(nodeFetch, cookieJar);
 
 export const config = {
     apiURL: process.env.local === 'true' ? 'http://localhost:5000' : "https://loaf.bakerysoft.pl",
+    apiVersion: '1.1'
 };
 
 
@@ -35,7 +36,7 @@ function generateString(length: number) {
 }
 export default async function apiV2(url: string, method = "GET", body?: object): Promise<I.IServerResponse> {
     const options: RequestInit = {
-        headers: { "Accept": "application/json", "Content-Type": "application/json", 'api-version': '1.0' },
+        headers: { "Accept": "application/json", "Content-Type": "application/json", 'api-version': config.apiVersion },
         method,
     };
 
