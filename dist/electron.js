@@ -36,6 +36,7 @@ const path_1 = __importDefault(require("path"));
 const EventInit = __importStar(require("./modules/EventHandler"));
 const Machine = __importStar(require("./modules/Machine"));
 const User_1 = __importDefault(require("./modules/User"));
+require("./updater");
 process.env.NODE_ENV = 'production';
 const isDev = process.env.DEV === "true";
 let tray = null;
