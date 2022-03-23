@@ -8,7 +8,7 @@ import * as Loaf from "./handler";
 import { BrowserWindow, ipcMain, shell } from "electron";
 import fs from 'fs';
 import path from 'path';
-
+import { v4 as uuidv4 } from 'uuid';
 interface CallStatus {
     caller: string | null;
     status: 'incoming' | 'ongoing' | null;
@@ -280,9 +280,12 @@ export const start = (window: BrowserWindow, /*win: Electron.WebContents*/) => {
         return { event: "loadedPage", data: true };
     });
 
-    Loaf.onAsync("sendMessage", async (chatId: number, message: I.IMessageContent, localUUID: string) => {
+    Loaf.onAsync("sendMessage", async (chatId: number, message: I.IMessageContentLocal, localUUID: string) => {
         const inbox = User.getInbox();
-        await inbox?.sendToChat(chatId, message, localUUID);
+
+        const messageWithUUID: I.IMessageContent = { ...message, uuid: uuidv4()}
+
+        await inbox?.sendToChat(chatId, messageWithUUID, localUUID);
         return null;
     });
 

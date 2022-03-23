@@ -6,6 +6,7 @@ import * as Keys from "./../Breadbox/Keys";
 import Breadbox from "./../Breadbox/LoafBreadbox";
 import Cypher from "./../Cypher";
 import * as Machine from "./../Machine";
+import { v4 as uuidv4 } from 'uuid';
 
 export default class Storage {
     private userId?: number;
@@ -148,14 +149,18 @@ export default class Storage {
         if (!bundle) {
             return false;
         }
-        const msg: I.IMessageContent = { type: "text", content: "Hello there!" };
+        const msg: I.IMessageContent = { type: "text", content: "Hello there!", uuid: uuidv4() };
         const message = await this.encodeMessage(msg, userId, machineId, bundle);
 
+        if(!message){
+            return false;
+        }
+
         return {
-            content: message?.content,
+            content: message.content,
             machineId,
             recipientId: userId,
-            type: message?.type,
+            type: message.type,
         };
     }
 

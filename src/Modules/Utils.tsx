@@ -87,13 +87,14 @@ export const sortChats = (chats: I.IChatPaged[]) => {
     return sortedChats;
 }
 
-export const sortMessages = (messages: I.IMessage[]) => {
+export const sortAndFilterMessages = (messages: I.IAnyMessage[]) => {
     messages.sort((a, b) => {
         if(a.date === b.date) return 0;
 
         return new Date(a.date).getTime() - new Date(b.date).getTime();
     });
-    return messages;
+
+    return messages.filter((message, index) => index === messages.findIndex(msg => msg.uuid === message.uuid));
 }
 
 const handleFileClick = (fileData: string, fileName: string, open?: boolean) => {

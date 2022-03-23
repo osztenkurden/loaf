@@ -35,7 +35,12 @@ export interface IMessageContent {
     content: string;
 }*/
 
-export type IMessageContent = IMessageContentText | IMessageContentFile | IMessageContentMixed;
+export type IMessageContentLocal = IMessageContentText | IMessageContentFile | IMessageContentMixed;
+
+export type IMessageContentTopLevel<T> = T & {
+    uuid: string;
+}
+export type IMessageContent = IMessageContentTopLevel<IMessageContentLocal>;
 
 export interface IMessageContentText {
     type: "text";
@@ -52,6 +57,7 @@ export interface IMessageContentFile {
     type: "file";
     content: IMessageContentFileMeta;
 }
+
 
 export interface IMessageContentMixed {
     type: "mixed";
@@ -71,6 +77,7 @@ export interface IMessageRaw {
     read: boolean;
     senderMachine: number;
     entry: boolean;
+    createdAt: string;
 }
 
 export interface IMessage {
@@ -86,8 +93,10 @@ export interface IMessage {
         username: string;
     }
 }
-
-export interface IAnyMessage extends IMessage {
+export interface IMessageLocal extends Omit<IMessage, 'content'> {
+    content: IMessageContent | IMessageContentLocal;
+}
+export interface IAnyMessage extends IMessageLocal {
     temporary?: boolean;
 }
 

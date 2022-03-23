@@ -41,6 +41,7 @@ const Loaf = __importStar(require("./handler"));
 const electron_1 = require("electron");
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
+const uuid_1 = require("uuid");
 const call = {
     caller: null,
     status: null,
@@ -264,7 +265,8 @@ const start = (window) => {
     }));
     Loaf.onAsync("sendMessage", (chatId, message, localUUID) => __awaiter(void 0, void 0, void 0, function* () {
         const inbox = User_1.default.getInbox();
-        yield (inbox === null || inbox === void 0 ? void 0 : inbox.sendToChat(chatId, message, localUUID));
+        const messageWithUUID = Object.assign(Object.assign({}, message), { uuid: uuid_1.v4() });
+        yield (inbox === null || inbox === void 0 ? void 0 : inbox.sendToChat(chatId, messageWithUUID, localUUID));
         return null;
     }));
     Loaf.onAsync("register", (username, password, name) => __awaiter(void 0, void 0, void 0, function* () {

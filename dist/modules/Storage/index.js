@@ -38,6 +38,7 @@ const Keys = __importStar(require("./../Breadbox/Keys"));
 const LoafBreadbox_1 = __importDefault(require("./../Breadbox/LoafBreadbox"));
 const Cypher_1 = __importDefault(require("./../Cypher"));
 const Machine = __importStar(require("./../Machine"));
+const uuid_1 = require("uuid");
 class Storage {
     constructor() {
         /*let storeContent = "";
@@ -168,13 +169,16 @@ class Storage {
             if (!bundle) {
                 return false;
             }
-            const msg = { type: "text", content: "Hello there!" };
+            const msg = { type: "text", content: "Hello there!", uuid: uuid_1.v4() };
             const message = yield this.encodeMessage(msg, userId, machineId, bundle);
+            if (!message) {
+                return false;
+            }
             return {
-                content: message === null || message === void 0 ? void 0 : message.content,
+                content: message.content,
                 machineId,
                 recipientId: userId,
-                type: message === null || message === void 0 ? void 0 : message.type,
+                type: message.type,
             };
         });
     }

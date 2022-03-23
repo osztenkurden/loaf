@@ -124,6 +124,8 @@ export default class Inbox {
 
         const result = await api.inbox.accept(payload);
 
+        console.log(result);
+
         if (result.success) {
             this.loadChats();
             return true;
@@ -153,10 +155,10 @@ export default class Inbox {
                 continue;
             }
 
-            const date = (rawMessage as any).createdAt;
+            const date = rawMessage.createdAt;
 
             const message: I.IMessage = {
-                uuid: uuid(),
+                uuid: decrypted.uuid,
                 chatId,
                 content: decrypted,
                 date,

@@ -9,7 +9,7 @@ import api from "./../../API";
 import AppBar from './AppBar';
 import DragUploadModal from './DragUploadModal';
 import { InView } from 'react-intersection-observer';
-import { scrollToBottom, sortMessages } from "Modules/Utils";
+import { scrollToBottom, sortAndFilterMessages } from "Modules/Utils";
 import { Attachment } from "@material-ui/icons";
 import { v4 as uuidv4 } from 'uuid';
 export interface FilePayloadData {
@@ -33,14 +33,14 @@ interface IState {
     highlight: boolean;
 }
 
-const getKeyFromMessage = (msg: I.IMessage) => {
-    return `${msg.uuid}-${msg.senderId}-${msg.date}-${msg.date}-${msg.id || 'xd'}`;
+const getKeyFromMessage = (msg: I.IAnyMessage) => {
+    return `${msg.uuid}-${msg.senderId}-${msg.date}-${msg.id || 'xd'}`;
 }
 
-const isThisFirstDateOccurence = (pages: I.IPage[], message: I.IMessage) => {
+const isThisFirstDateOccurence = (pages: I.IPage[], message: I.IAnyMessage) => {
     const dateToCheck = moment(message.date).format('dddd, MMMM Do YYYY')
 
-    const allMessages = pages.map(page => page.messages).flat();
+    const allMessages = pages.map(page => page.messages).flat() as I.IAnyMessage[];
 
     const messageIndex = allMessages.indexOf(message);
 
@@ -160,7 +160,7 @@ export default class Chat extends Component<IProps, IState> {
         }
         const minimumPage = Math.min(...chat.pages.map(page => page.page));
 
-        const messages: I.IAnyMessage[] = sortMessages([...chat.pages.map(page => page.messages).flat(), ...temporaryMessages]);
+        const messages: I.IAnyMessage[] = sortAndFilterMessages([...chat.pages.map(page => page.messages).flat(), ...temporaryMessages]);
 
         return (
             <div className="chat_container">
@@ -254,7 +254,7 @@ export default class Chat extends Component<IProps, IState> {
             this.sendMessages(this.props.chat.id, { type: "text", content });
         }
     }
-    private addTemporaryMessage = (chatId: number, message: I.IMessageContent, localUUID: string) => {
+    private addTemporaryMessage = (chatId: number, message: I.IMessageContentLocal, localUUID: string) => {
         const newTemporaryMessage: I.IAnyMessage = {
             uuid: localUUID,
             chatId,
@@ -268,7 +268,7 @@ export default class Chat extends Component<IProps, IState> {
 
         this.props.addTemporaryMessage(newTemporaryMessage);
     }
-    private sendMessages = async (chatId: number, message: I.IMessageContent) => {
+    private sendMessages = async (chatId: number, message: I.IMessageContentLocal) => {
         const uuid = uuidv4();
         this.setState({ form: { textMessage: "", files: [] } }, () => {
             this.addTemporaryMessage(chatId, message, uuid);
@@ -282,7 +282,7 @@ export default class Chat extends Component<IProps, IState> {
         }
         if (files.length === 1) {
             const file = this.state.form.files[0];
-            const message: I.IMessageContent = {
+            const message: I.IMessageContentLocal = {
                 type: "file",
                 content: file
             };

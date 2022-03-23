@@ -14,7 +14,7 @@ const api = {
         updateChatInfo: (chatId: number, name: string, image?: string) => Loaf.api('updateChat', false, chatId, name, image)
     },
     message: {
-        send: (chatId: number, message: I.IMessageContent, localUUID: string) => Loaf.api("sendMessage", false, chatId, message, localUUID),
+        send: (chatId: number, message: I.IMessageContentLocal, localUUID: string) => Loaf.api("sendMessage", false, chatId, message, localUUID),
     },
     call: {
       make: (data: I.CallDescription) => Loaf.api('call-to-user', false, data),

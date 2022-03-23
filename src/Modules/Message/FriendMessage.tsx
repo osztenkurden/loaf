@@ -3,7 +3,7 @@ import { textToRGB, renderGallery, questionMark } from './../Utils';
 import { Avatar } from "@material-ui/core";
 import * as I from "./../../../modules/interface";
 
-export default class FriendMessage extends Component<{message: I.IMessage, sender: { username: string, id: number}}>{
+export default class FriendMessage extends Component<{message: I.IAnyMessage, sender: { username: string, id: number}}>{
     renderAvatar = () => {
         const { sender } = this.props;
         

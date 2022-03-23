@@ -137,6 +137,7 @@ class Inbox {
                 senderMachine: machineId,
             };
             const result = yield API_1.api.inbox.accept(payload);
+            console.log(result);
             if (result.success) {
                 this.loadChats();
                 return true;
@@ -170,7 +171,7 @@ class Inbox {
                 }
                 const date = rawMessage.createdAt;
                 const message = {
-                    uuid: uuid_1.v4(),
+                    uuid: decrypted.uuid,
                     chatId,
                     content: decrypted,
                     date,
