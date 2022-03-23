@@ -27,13 +27,13 @@ export default class Cypher {
             decrypted = Buffer.from(content).toString();
         }
         try {
-            return JSON.parse(decrypted) as I.IMessageContent;
+            return JSON.parse(decrypted) as I.IMessageContentInputWithUUID;
         } catch {
             return null;
         }
     }
 
-    public async encrypt(message: I.IMessageContent, recipientId: number, machineId: number, bundle?: I.IPreKeyBundle) {
+    public async encrypt(message: I.IMessageContentInputWithUUID, recipientId: number, machineId: number, bundle?: I.IPreKeyBundle) {
         const content = this.encodeMessage(message);
         const address = new libsignal.SignalProtocolAddress(recipientId, machineId);
 
@@ -54,7 +54,7 @@ export default class Cypher {
         return ciphered;
     }
 
-    private encodeMessage(message: I.IMessageContent) {
+    private encodeMessage(message: I.IMessageContentInputWithUUID) {
         const text = JSON.stringify(message);
         return ArrayBuffers.create(Buffer.from(text));
     }

@@ -13,6 +13,8 @@ const MessageContent = ({ message }:{ message: I.IAnyMessage }) => {
             return renderGallery([message.content])
         case "mixed":
             return renderGallery(message.content.content);
+        default:
+            return <p>This message is not supported</p>;
     }
 }
 

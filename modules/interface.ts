@@ -24,47 +24,87 @@ export interface CallDescription {
     target: string;
     type?: 'invite' | 'accept' |'answer';
 }
-export interface IMessagePayload {
-    content: IMessageContent;
-    recipientId: number;
-    machineId: number;
-}
-/*
-export interface IMessageContent {
-    type: "text" | "image";
-    content: string;
-}*/
-
-export type IMessageContentLocal = IMessageContentText | IMessageContentFile | IMessageContentMixed;
-
-export type IMessageContentTopLevel<T> = T & {
-    uuid: string;
-}
-export type IMessageContent = IMessageContentTopLevel<IMessageContentLocal>;
-
-export interface IMessageContentText {
-    type: "text";
-    content: string;
-}
-
-export interface IMessageContentFileMeta {
+/** File contents meta info */
+export type IMessageContentFileMeta = {
     data: string,
     size: number,
     name: string,
 }
 
-export interface IMessageContentFile {
+/** Simple message types */
+export type IMessageContentFile = {
     type: "file";
     content: IMessageContentFileMeta;
 }
 
+export type IMessageContentText = {
+    type: "text";
+    content: string;
+}
 
-export interface IMessageContentMixed {
+export type IMessageContentReply = {
+    type: "reply",
+    content: IMessageContentText | IMessageContentFile | IMessageContentMixed;
+    reference: IMessageContentInputWithUUID | null;
+}   
+
+
+/** Types of messages that can be sent parrallel as one message */
+export type IMessageContentPackage = IMessageContentFile | IMessageContentText;
+
+/** Mixed message, can be combined from IMessageContentPackage */
+export type IMessageContentMixed = {
     type: "mixed";
     content: IMessageContentPackage[]
 }
 
-export type IMessageContentPackage = IMessageContentFile | IMessageContentText;
+type IMessageContents = IMessageContentText | IMessageContentFile | IMessageContentMixed | IMessageContentReply;
+
+export type IMessageContentTopLevel<T> = T & {
+    uuid: string;
+}
+export type IMessageContent = IMessageContentTopLevel<IMessageContents>;
+
+
+
+/** INPUT TYPES MAPPING, anything that goes into the db basically */
+
+/** File contents meta info */
+export type IMessageContentFileMetaInput = IMessageContentFileMeta;
+
+/** Simple message types */
+export type IMessageContentFileInput = IMessageContentFile;
+
+export type IMessageContentTextInput = IMessageContentText;
+
+export type IMessageContentReplyInput = {
+    type: "reply",
+    content: IMessageContentTextInput | IMessageContentFileInput | IMessageContentMixedInput;
+    reference: string;
+}   
+
+
+/** Types of messages that can be sent parrallel as one message */
+export type IMessageContentPackageInput = IMessageContentFileInput | IMessageContentTextInput;
+
+/** Mixed message, can be combined from IMessageContentPackage */
+export type IMessageContentMixedInput = {
+    type: "mixed";
+    content: IMessageContentPackageInput[]
+}
+
+export type IMessageContentInput = IMessageContentTextInput | IMessageContentFileInput | IMessageContentMixedInput | IMessageContentReplyInput;
+
+export type IMessageContentInputWithUUID = IMessageContentTopLevel<IMessageContentInput>
+
+/** END OF INPUT TYPES */
+
+
+export interface IMessagePayload {
+    content: IMessageContentInputWithUUID;
+    recipientId: number;
+    machineId: number;
+}
 
 export interface IMessageRaw {
     id: number;
@@ -93,12 +133,45 @@ export interface IMessage {
         username: string;
     }
 }
-export interface IMessageLocal extends Omit<IMessage, 'content'> {
-    content: IMessageContent | IMessageContentLocal;
+
+export interface IMessageInput {
+    uuid: string;
+    id?: number;
+    senderId: number;
+    content: IMessageContentInput;
+    chatId: number;
+    my: boolean;
+    date: string;
+    sender?: {
+        id: number;
+        username: string;
+    }
 }
-export interface IAnyMessage extends IMessageLocal {
+export interface IMessageInputWithUUID {
+    uuid: string;
+    id?: number;
+    senderId: number;
+    content: IMessageContentInputWithUUID;
+    chatId: number;
+    my: boolean;
+    date: string;
+    sender?: {
+        id: number;
+        username: string;
+    }
+}
+
+export type IAnyMessage = (IMessage | IMessageInput | IMessageInputWithUUID) & {
     temporary?: boolean;
 }
+
+
+
+
+
+
+
+
 
 export interface IChat {
     id: number;

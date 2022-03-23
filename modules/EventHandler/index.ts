@@ -280,10 +280,10 @@ export const start = (window: BrowserWindow, /*win: Electron.WebContents*/) => {
         return { event: "loadedPage", data: true };
     });
 
-    Loaf.onAsync("sendMessage", async (chatId: number, message: I.IMessageContentLocal, localUUID: string) => {
+    Loaf.onAsync("sendMessage", async (chatId: number, message: I.IMessageContentInput, localUUID: string) => {
         const inbox = User.getInbox();
 
-        const messageWithUUID: I.IMessageContent = { ...message, uuid: uuidv4()}
+        const messageWithUUID: I.IMessageContentInputWithUUID = { ...message, uuid: uuidv4()}
 
         await inbox?.sendToChat(chatId, messageWithUUID, localUUID);
         return null;

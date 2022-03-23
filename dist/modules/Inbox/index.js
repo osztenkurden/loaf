@@ -38,6 +38,7 @@ const uuid_1 = require("uuid");
 const electron_1 = require("electron");
 const fs_1 = require("fs");
 const path_1 = __importDefault(require("path"));
+const references_1 = require("../Database/references");
 // import * as Machine from "../Machine";
 class Inbox {
     constructor(content, userId, storage) {
@@ -93,22 +94,24 @@ class Inbox {
                 if (entry)
                     entries.push(entry);
             }
-            const message = {
-                uuid: uuid_1.v4(),
-                senderId: this.userId,
-                content: msg,
-                chatId,
-                my: true,
-                date: (new Date()).toISOString(),
-            };
             const result = yield API_1.api.messages.send(chatId, entries, Machine.getMachineId());
             if (result.success) {
+                const messageInput = {
+                    uuid: uuid_1.v4(),
+                    senderId: this.userId,
+                    content: msg,
+                    chatId,
+                    my: true,
+                    date: (new Date()).toISOString(),
+                };
+                yield Database_1.saveFileToDrive(messageInput);
+                yield references_1.saveMessageReferences([messageInput]);
                 const current = this.messages.get(chatId) || [];
-                yield Database_1.saveFileToDrive(message);
+                const message = Object.assign(Object.assign({}, messageInput), { content: yield Database_1.parseContent(messageInput.content) });
                 current.push(message);
                 this.messages.set(chatId, current);
                 this.content.send("chats", this.chats, localUUID);
-                yield Database_1.saveMessages(this.userId, [message]);
+                yield Database_1.saveMessages(this.userId, [messageInput]);
             }
             else {
                 console.log(result);
@@ -164,6 +167,7 @@ class Inbox {
             const messages = (response.data.messages || []);
             const current = this.messages.get(chatId) || [];
             const incoming = [];
+            const decryptedMessages = [];
             for (const rawMessage of messages) {
                 const decrypted = yield this.storage.decodeMessage(rawMessage);
                 if (!decrypted) {
@@ -171,7 +175,7 @@ class Inbox {
                 }
                 const date = rawMessage.createdAt;
                 const message = {
-                    uuid: decrypted.uuid,
+                    uuid: uuid_1.v4(),
                     chatId,
                     content: decrypted,
                     date,
@@ -180,10 +184,15 @@ class Inbox {
                     sender: this.getSenderData(chatId, rawMessage.senderId),
                 };
                 yield Database_1.saveFileToDrive(message);
+                decryptedMessages.push(message);
+            }
+            yield Database_1.saveMessages(this.userId, decryptedMessages);
+            yield references_1.saveMessageReferences(decryptedMessages);
+            for (const decryptedMessage of decryptedMessages) {
+                const message = Object.assign(Object.assign({}, decryptedMessage), { content: yield Database_1.parseContent(decryptedMessage.content) });
                 current.push(message);
                 incoming.push(message);
             }
-            yield Database_1.saveMessages(this.userId, incoming);
             this.messages.set(chatId, current);
             if (!init)
                 yield this.loadChats();

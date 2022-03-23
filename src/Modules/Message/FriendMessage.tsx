@@ -25,6 +25,8 @@ export default class FriendMessage extends Component<{message: I.IAnyMessage, se
                 return renderGallery([message.content], true);
             case "mixed":
                 return renderGallery(message.content.content, true);
+            default:
+                return <p>This message is not supported</p>;
         }
     }
     public render(){

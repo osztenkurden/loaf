@@ -254,7 +254,7 @@ export default class Chat extends Component<IProps, IState> {
             this.sendMessages(this.props.chat.id, { type: "text", content });
         }
     }
-    private addTemporaryMessage = (chatId: number, message: I.IMessageContentLocal, localUUID: string) => {
+    private addTemporaryMessage = (chatId: number, message: I.IMessageContentInput, localUUID: string) => {
         const newTemporaryMessage: I.IAnyMessage = {
             uuid: localUUID,
             chatId,
@@ -268,7 +268,7 @@ export default class Chat extends Component<IProps, IState> {
 
         this.props.addTemporaryMessage(newTemporaryMessage);
     }
-    private sendMessages = async (chatId: number, message: I.IMessageContentLocal) => {
+    private sendMessages = async (chatId: number, message: I.IMessageContentInput) => {
         const uuid = uuidv4();
         this.setState({ form: { textMessage: "", files: [] } }, () => {
             this.addTemporaryMessage(chatId, message, uuid);
@@ -282,7 +282,7 @@ export default class Chat extends Component<IProps, IState> {
         }
         if (files.length === 1) {
             const file = this.state.form.files[0];
-            const message: I.IMessageContentLocal = {
+            const message: I.IMessageContentInput = {
                 type: "file",
                 content: file
             };

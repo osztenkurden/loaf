@@ -44,7 +44,7 @@ export default class Storage {
         this.cypher = new Cypher(this.store);
     }
 
-    public async encodeMessage(message: I.IMessageContent, recipientId: number, machineId: number, bundle?: any) {
+    public async encodeMessage(message: I.IMessageContentInputWithUUID, recipientId: number, machineId: number, bundle?: any) {
         if (!this.cypher) {
             return null;
         }
@@ -55,7 +55,7 @@ export default class Storage {
         return encrypted;
     }
 
-    public async decodeMessage(msg: I.IMessageRaw): Promise<I.IMessageContent | null> {
+    public async decodeMessage(msg: I.IMessageRaw): Promise<I.IMessageContentInputWithUUID | null> {
         if (!this.cypher) {
             return null;
         }

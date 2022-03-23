@@ -1,5 +1,5 @@
 import { api } from "../API";
-import { getMessages, saveFileToDrive, saveMessages } from "../Database";
+import { getMessages, parseContent, saveFileToDrive, saveMessages } from "../Database";
 import * as I from "../interface";
 import * as Machine from "../Machine";
 import Storage from "../Storage";
@@ -7,6 +7,7 @@ import { v4 as uuid } from 'uuid';
 import { BrowserWindow, Notification } from "electron";
 import { existsSync } from "fs";
 import path from 'path';
+import { saveMessageReferences } from "../Database/references";
 // import * as Machine from "../Machine";
 
 export default class Inbox {
@@ -64,7 +65,7 @@ export default class Inbox {
         this.content.send("chatPage", { chatId, pageEntry });
     }
 
-    public async sendToChat(chatId: number, msg: I.IMessageContent, localUUID: string) {
+    public async sendToChat(chatId: number, msg: I.IMessageContentInputWithUUID, localUUID: string) {
         const receivers = await this.getReceivers(chatId);
         const entries: I.ISignalEncrypted[] = [];
         for (const receiver of receivers) {
@@ -76,24 +77,30 @@ export default class Inbox {
             const entry = await this.prepareMessage(payload);
             if(entry) entries.push(entry);
         }
-        const message: I.IMessage = {
-            uuid: uuid(),
-            senderId: this.userId,
-            content: msg,
-            chatId,
-            my: true,
-            date: (new Date()).toISOString(),
-        }
         const result = await api.messages.send(chatId, entries, Machine.getMachineId());
 
         if (result.success) {
+
+            const messageInput: I.IMessageInputWithUUID = {
+                uuid: uuid(),
+                senderId: this.userId,
+                content: msg,
+                chatId,
+                my: true,
+                date: (new Date()).toISOString(),
+            }
+
+            await saveFileToDrive(messageInput);
+            await saveMessageReferences([messageInput]);
+
             const current = this.messages.get(chatId) || [];
 
-            await saveFileToDrive(message);
+            const message: I.IMessage = { ...messageInput, content: await parseContent(messageInput.content) }
+
             current.push(message);
             this.messages.set(chatId, current);
             this.content.send("chats", this.chats, localUUID);
-            await saveMessages(this.userId, [message]);
+            await saveMessages(this.userId, [messageInput]);
         } else {
             console.log(result);
         }
@@ -149,6 +156,9 @@ export default class Inbox {
         const messages = (response.data.messages || []) as I.IMessageRaw[];
         const current = this.messages.get(chatId) || [];
         const incoming: I.IMessage[] = [];
+
+        const decryptedMessages: I.IMessageInputWithUUID[] = [];
+
         for (const rawMessage of messages) {
             const decrypted = await this.storage.decodeMessage(rawMessage);
             if (!decrypted) {
@@ -157,8 +167,8 @@ export default class Inbox {
 
             const date = rawMessage.createdAt;
 
-            const message: I.IMessage = {
-                uuid: decrypted.uuid,
+            const message: I.IMessageInputWithUUID = {
+                uuid: uuid(),
                 chatId,
                 content: decrypted,
                 date,
@@ -167,11 +177,19 @@ export default class Inbox {
                 sender: this.getSenderData(chatId, rawMessage.senderId),
             };
             await saveFileToDrive(message);
+            decryptedMessages.push(message);
+
+
+        }
+        await saveMessages(this.userId, decryptedMessages);
+        await saveMessageReferences(decryptedMessages);
+
+        for(const decryptedMessage of decryptedMessages){
+            const message: I.IMessage = { ...decryptedMessage, content: await parseContent(decryptedMessage.content) }
             current.push(message);
             incoming.push(message);
         }
 
-        await saveMessages(this.userId, incoming);
         this.messages.set(chatId, current);
 
         if(!init) await this.loadChats();

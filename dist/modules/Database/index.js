@@ -31,13 +31,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getMessages = exports.saveMessages = exports.saveFileToDrive = exports.sequelize = void 0;
+exports.getMessages = exports.saveMessages = exports.saveFileToDrive = exports.parseContent = exports.getMessage = exports.sequelize = void 0;
 const path_1 = __importDefault(require("path"));
 const User_1 = __importDefault(require("./../User"));
 const fs_1 = __importDefault(require("fs"));
 const unused_filename_1 = __importDefault(require("unused-filename"));
 const Machine_1 = require("../Machine");
 const sequelize_1 = __importStar(require("sequelize"));
+const references_1 = require("./references");
 class Message extends sequelize_1.Model {
     static Define(seq) {
         this.init({
@@ -61,6 +62,7 @@ exports.sequelize = new sequelize_1.default.Sequelize({
     logging: false
 });
 Message.Define(exports.sequelize);
+references_1.Reference.Define(exports.sequelize);
 exports.sequelize.sync({ force: false });
 const convertRawMessage = (chats = []) => (raw) => {
     const inbox = User_1.default.getInbox();
@@ -88,6 +90,32 @@ const convertToRaw = (userId, message) => {
         userId
     };
 };
+const getMessage = (uuid) => __awaiter(void 0, void 0, void 0, function* () {
+    const rawMessage = yield Message.findOne({
+        where: {
+            uuid
+        },
+        raw: true,
+        order: [['date', 'ASC']]
+    });
+    if (!rawMessage)
+        return null;
+    const message = convertRawMessage()(rawMessage);
+    return message || null;
+});
+exports.getMessage = getMessage;
+const isReply = (content) => content.type === "reply";
+const parseContent = (content) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!isReply(content)) {
+        return content;
+    }
+    const reference = yield references_1.getMessageReference(content.reference);
+    if (!reference)
+        return Object.assign(Object.assign({}, content), { reference: null });
+    const replyTo = yield exports.getMessage(reference.dbUUID);
+    return Object.assign(Object.assign({}, content), { reference: (replyTo === null || replyTo === void 0 ? void 0 : replyTo.content) || null });
+});
+exports.parseContent = parseContent;
 const saveFileMessage = (fileMessage) => __awaiter(void 0, void 0, void 0, function* () {
     const filePath = yield unused_filename_1.default(path_1.default.join(Machine_1.directories.files, fileMessage.content.name));
     let data = fileMessage.content.data;
@@ -98,7 +126,7 @@ const saveFileMessage = (fileMessage) => __awaiter(void 0, void 0, void 0, funct
     return filePath;
 });
 const saveFileToDrive = (message) => __awaiter(void 0, void 0, void 0, function* () {
-    if (message.content.type === "text")
+    if (message.content.type === "text" || message.content.type === 'reply')
         return message;
     if (message.content.type === "file") {
         message.content.content.data = yield saveFileMessage(message.content);
@@ -146,6 +174,10 @@ const getMessages = (userId, chatId, pageFromEnd = 0, chats = [], useLiteralPage
         order: [['date', 'ASC']]
     });
     const filteredMessages = messages.slice(0, MESSAGES_PER_PAGE).map(convertRawMessage(chats)).filter((message) => !!message);
+    const messagesWithReferences = [];
+    for (const message of filteredMessages) {
+        messagesWithReferences.push(Object.assign(Object.assign({}, message), { content: yield exports.parseContent(message.content) }));
+    }
     // const hasMore = messages.length > MESSAGES_PER_PAGE;
     return { messages: filteredMessages, page, maxPage };
 });

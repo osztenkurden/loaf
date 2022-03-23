@@ -7,6 +7,7 @@ import unusedFilename from 'unused-filename';
 import { directories } from '../Machine';
 
 import Sequelize, { Model } from 'sequelize';
+import { getMessageReference, Reference } from './references';
 
 class Message extends Model {
     static Define(seq: Sequelize.Sequelize) {
@@ -33,6 +34,7 @@ export const sequelize = new Sequelize.Sequelize({
 });
 
 Message.Define(sequelize);
+Reference.Define(sequelize);
 
 sequelize.sync({ force: false });
 interface IDBMessageRaw {
@@ -56,7 +58,8 @@ interface IDBMessagePreRaw {
     userId: number
 }
 
-const convertRawMessage = (chats: I.IChatPaged[] = []) => (raw: IDBMessageRaw): I.IMessage | null => {
+
+const convertRawMessage = (chats: I.IChatPaged[] = []) => (raw: IDBMessageRaw): I.IMessageInputWithUUID | null => {
     const inbox = User.getInbox();
     if(!inbox) return null;
     return {
@@ -72,7 +75,7 @@ const convertRawMessage = (chats: I.IChatPaged[] = []) => (raw: IDBMessageRaw): 
     }
 };
 
-const convertToRaw = (userId: number, message: I.IMessage): IDBMessagePreRaw => {
+const convertToRaw = (userId: number, message: I.IMessageInputWithUUID): IDBMessagePreRaw => {
     return {
         id: message.id,
         senderId: message.senderId,
@@ -82,6 +85,38 @@ const convertToRaw = (userId: number, message: I.IMessage): IDBMessagePreRaw => 
         date: new Date(message.date),
         userId
     }
+}
+
+export const getMessage = async (uuid: string) => {
+    const rawMessage = await Message.findOne({
+        where: {
+            uuid
+        },
+        raw: true,
+        order: [['date', 'ASC']]
+    }) as unknown as IDBMessageRaw;
+
+    if(!rawMessage) return null;
+
+    const message = convertRawMessage()(rawMessage);
+
+    return message || null;
+}
+
+const isReply = (content: I.IMessageContentInputWithUUID): content is I.IMessageContentTopLevel<I.IMessageContentReplyInput> => content.type === "reply";
+
+export const parseContent = async (content: I.IMessageContentInputWithUUID): Promise<I.IMessageContent> => {
+    if(!isReply(content)){
+        return content;
+    }
+
+    const reference = await getMessageReference(content.reference);
+
+    if(!reference) return { ...content, reference: null }
+    
+    const replyTo = await getMessage(reference.dbUUID);
+
+    return { ...content, reference: replyTo?.content || null }
 }
 
 const saveFileMessage = async (fileMessage: I.IMessageContentFile) => {
@@ -97,8 +132,8 @@ const saveFileMessage = async (fileMessage: I.IMessageContentFile) => {
     return filePath;
 }
 
-export const saveFileToDrive = async (message: I.IMessage) => {
-    if (message.content.type === "text") return message;
+export const saveFileToDrive = async (message: I.IMessage | I.IMessageInputWithUUID) => {
+    if (message.content.type === "text" || message.content.type === 'reply') return message;
     if (message.content.type === "file") {
         message.content.content.data = await saveFileMessage(message.content);
         return message;
@@ -112,7 +147,7 @@ export const saveFileToDrive = async (message: I.IMessage) => {
     return message;
 }
 
-export const saveMessages = async (userId: number, messages: I.IMessage[]) => {
+export const saveMessages = async (userId: number, messages: I.IMessageInputWithUUID[]) => {
     const rawMessages = messages.map(msg => convertToRaw(userId, msg));
 
     try {
@@ -146,7 +181,13 @@ export const getMessages = async (userId: number, chatId: number, pageFromEnd = 
         raw: true,
         order: [['date', 'ASC']]
     }) as unknown as IDBMessageRaw[];
-    const filteredMessages = messages.slice(0,MESSAGES_PER_PAGE).map(convertRawMessage(chats)).filter((message): message is I.IMessage => !!message);
+    const filteredMessages = messages.slice(0,MESSAGES_PER_PAGE).map(convertRawMessage(chats)).filter((message): message is I.IMessageInputWithUUID => !!message);
+
+    const messagesWithReferences: I.IMessage[] = [];
+
+    for(const message of filteredMessages){
+        messagesWithReferences.push({...message, content: await parseContent(message.content)})
+    }
 
     // const hasMore = messages.length > MESSAGES_PER_PAGE;
     return { messages: filteredMessages, page, maxPage } as I.IPage;
