@@ -84,19 +84,20 @@ const convertToRaw = (userId: number, message: I.IMessage): IDBMessagePreRaw => 
     }
 }
 
+const saveFileMessage = async (fileMessage: I.IMessageContentFile) => {
+
+    const filePath = await unusedFilename(path.join(directories.files, fileMessage.content.name));
+    
+    let data = fileMessage.content.data;
+    if(data.includes(",")){
+        data = data.split(",")[1];
+    } 
+
+    fs.writeFileSync(filePath, data, 'base64');
+    return filePath;
+}
+
 export const saveFileToDrive = async (message: I.IMessage) => {
-    const saveFileMessage = async (fileMessage: I.IMessageContentFile) => {
-
-        const filePath = await unusedFilename(path.join(directories.files, fileMessage.content.name));
-        
-        let data = fileMessage.content.data;
-        if(data.includes(",")){
-            data = data.split(",")[1];
-        } 
-
-        fs.writeFileSync(filePath, data, 'base64');
-        return filePath;
-    }
     if (message.content.type === "text") return message;
     if (message.content.type === "file") {
         message.content.content.data = await saveFileMessage(message.content);

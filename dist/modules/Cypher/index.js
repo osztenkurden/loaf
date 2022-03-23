@@ -66,11 +66,11 @@ class Cypher {
             }
             const cipher = new libsignal.SessionCipher(this.store, address);
             const ciphered = yield cipher.encrypt(content);
-            ciphered.body = Buffer.from(ciphered.body, "ucs-2").toString("base64");
-            ciphered.content = ciphered.body;
+            ciphered.content = Buffer.from(ciphered.body, "ucs-2").toString("base64");
             ciphered.recipientId = recipientId;
             ciphered.machineId = machineId;
             ciphered.entry = ciphered.type == 3;
+            delete ciphered.body;
             return ciphered;
         });
     }

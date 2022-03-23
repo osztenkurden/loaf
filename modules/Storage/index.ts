@@ -152,7 +152,7 @@ export default class Storage {
         const message = await this.encodeMessage(msg, userId, machineId, bundle);
 
         return {
-            content: message?.body,
+            content: message?.content,
             machineId,
             recipientId: userId,
             type: message?.type,

@@ -88,16 +88,16 @@ const convertToRaw = (userId, message) => {
         userId
     };
 };
+const saveFileMessage = (fileMessage) => __awaiter(void 0, void 0, void 0, function* () {
+    const filePath = yield unused_filename_1.default(path_1.default.join(Machine_1.directories.files, fileMessage.content.name));
+    let data = fileMessage.content.data;
+    if (data.includes(",")) {
+        data = data.split(",")[1];
+    }
+    fs_1.default.writeFileSync(filePath, data, 'base64');
+    return filePath;
+});
 const saveFileToDrive = (message) => __awaiter(void 0, void 0, void 0, function* () {
-    const saveFileMessage = (fileMessage) => __awaiter(void 0, void 0, void 0, function* () {
-        const filePath = yield unused_filename_1.default(path_1.default.join(Machine_1.directories.files, fileMessage.content.name));
-        let data = fileMessage.content.data;
-        if (data.includes(",")) {
-            data = data.split(",")[1];
-        }
-        fs_1.default.writeFileSync(filePath, data, 'base64');
-        return filePath;
-    });
     if (message.content.type === "text")
         return message;
     if (message.content.type === "file") {

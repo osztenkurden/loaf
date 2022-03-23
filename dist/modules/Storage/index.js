@@ -171,7 +171,7 @@ class Storage {
             const msg = { type: "text", content: "Hello there!" };
             const message = yield this.encodeMessage(msg, userId, machineId, bundle);
             return {
-                content: message === null || message === void 0 ? void 0 : message.body,
+                content: message === null || message === void 0 ? void 0 : message.content,
                 machineId,
                 recipientId: userId,
                 type: message === null || message === void 0 ? void 0 : message.type,

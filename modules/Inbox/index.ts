@@ -89,6 +89,7 @@ export default class Inbox {
         if (result.success) {
             const current = this.messages.get(chatId) || [];
 
+            await saveFileToDrive(message);
             current.push(message);
             this.messages.set(chatId, current);
             this.content.send("chats", this.chats, localUUID);

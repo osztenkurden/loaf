@@ -43,11 +43,13 @@ export default class Cypher {
 
         const cipher = new libsignal.SessionCipher(this.store, address);
         const ciphered: I.ISignalEncrypted = await cipher.encrypt(content);
-        ciphered.body = Buffer.from(ciphered.body, "ucs-2").toString("base64");
-        ciphered.content = ciphered.body;
+
+        ciphered.content = Buffer.from(ciphered.body, "ucs-2").toString("base64");
         ciphered.recipientId = recipientId;
         ciphered.machineId = machineId;
         ciphered.entry = ciphered.type == 3;
+
+        delete (ciphered as any).body;
 
         return ciphered;
     }

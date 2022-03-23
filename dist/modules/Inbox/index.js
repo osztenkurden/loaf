@@ -104,6 +104,7 @@ class Inbox {
             const result = yield API_1.api.messages.send(chatId, entries, Machine.getMachineId());
             if (result.success) {
                 const current = this.messages.get(chatId) || [];
+                yield Database_1.saveFileToDrive(message);
                 current.push(message);
                 this.messages.set(chatId, current);
                 this.content.send("chats", this.chats, localUUID);
