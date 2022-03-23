@@ -138,7 +138,7 @@ export function renderGallery(message: I.IMessageContentPackage[], open?: boolea
             const fileData = payload.content.data;
             const fileName = payload.content.name;
             if (fileData.startsWith("data:image") || imageExtensions.find(extension => fileName.endsWith(`.${extension}`))) {
-                return <img src={fileData} alt={'Upload'} />
+                return <img src={'file://' + fileData} alt={'Upload'} />
             }
             return filePreview(payload.content, open);
         })}
