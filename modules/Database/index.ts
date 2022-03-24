@@ -48,7 +48,7 @@ interface IDBMessageRaw {
     userId: number
 }
 interface IDBMessagePreRaw {
-    // uuid: string,
+    uuid: string,
     id?: number;
     senderId: number;
     content: string;
@@ -83,7 +83,8 @@ const convertToRaw = (userId: number, message: I.IMessageInputWithUUID): IDBMess
         chatId: message.chatId,
         my: Number(message.my),
         date: new Date(message.date),
-        userId
+        userId,
+        uuid: message.uuid
     }
 }
 
