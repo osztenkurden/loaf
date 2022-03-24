@@ -563,9 +563,11 @@ li > hr.separator {
     margin-top: 5pt;
     margin-bottom: 5pt;
     box-shadow: 0 0 5px 2px #0000004a;
-    word-break: break-all;
+    overflow-wrap: break-word;
 }
-
+.message-container {
+    max-width: 90%;
+}
 .message.sending {
     opacity: 0.5;
 }
@@ -597,6 +599,12 @@ li > hr.separator {
     margin-right: 1em;
     margin-top: 15px;
     margin-bottom: 2px;
+    display:flex;
+    justify-content: space-between;
+}
+.message-preview {
+    background-color: #242b2f;
+    padding: 10px 5px;
 }
 .message_container{
     width: 100%;

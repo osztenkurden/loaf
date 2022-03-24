@@ -3,7 +3,7 @@ import { Menu as MenuIcon, Search as SearchIcon } from "@material-ui/icons";
 import DrawerContent from "./../Drawer";
 import React, { Component } from "react";
 import * as I from "../../../modules/interface";
-import api from "./../../API";
+import api, { events } from "./../../API";
 import * as Loaf from "./../../API/Loaf";
 import logo from "./../../Theme/assets/load_icon.svg";
 import Chat from "./../Chat/Chat";
@@ -215,6 +215,9 @@ export default class Main extends Component<{}, IState> {
         );
     }
     private loadChat = (chat: I.IChatPaged | null) => {
+        if((!this.state.currentChat  || !chat) || (this.state.currentChat.id !== chat.id)){
+            events.emit("currentChatChanged");
+        }
         this.setState({ currentChat: chat }, () => {
             setTimeout(() => {
                 const container = document.getElementById("message_container");

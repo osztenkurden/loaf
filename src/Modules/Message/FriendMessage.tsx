@@ -1,44 +1,35 @@
-import React, { Component } from "react";
-import { textToRGB, renderGallery, questionMark } from './../Utils';
+import React from "react";
+import { textToRGB, renderContent } from './../Utils';
 import { Avatar } from "@material-ui/core";
 import * as I from "./../../../modules/interface";
 
-export default class FriendMessage extends Component<{message: I.IAnyMessage, sender: { username: string, id: number}}>{
-    renderAvatar = () => {
-        const { sender } = this.props;
-        
-        
-        //TODO: Avatar as URL and fallback
-        
-        return <Avatar src={``} className="avatar"/>
-        
-        /*return <Avatar className="avatar" style={{ backgroundColor: textToRGB(sender.username) }}>
-            {sender.username?.charAt(0).toUpperCase() || `#${sender.id}`}
-        </Avatar>*/
-    }
-    renderContent = () => {
-        const { message } = this.props;
-        switch(message.content.type){
-            case "text":
-                return <p>{message.content.content}</p>
-            case "file":
-                return renderGallery([message.content], true);
-            case "mixed":
-                return renderGallery(message.content.content, true);
-            default:
-                return <p>This message is not supported</p>;
+type Props = { message: I.IAnyMessage, sender: { username: string, id: number }, setAsReply: (message: I.IMessage | null) => void };
+
+const isMSG = (msg: I.IAnyMessage): msg is I.IMessage => {
+    return "uuid" in msg.content;
+} 
+
+const FriendMessage = ({ message, sender, setAsReply }: Props) => {
+    const setReply = () => {
+        if(isMSG(message)){
+            setAsReply(message);
         }
     }
-    public render(){
-        const { message, sender } = this.props;
-        return <div className={`message friend ${message.content.type}`}>
-            {this.renderAvatar()}
+    return (
+        <div className={`message friend ${message.content.type}`}>
+            <Avatar className="avatar" style={{ backgroundColor: textToRGB(sender.username) }}>
+                {sender.username?.charAt(0).toUpperCase() || `#${sender.id}`}
+            </Avatar>
             <div className="message-container">
                 <div className="message-sender-name">
                     {sender.username}
+                    <div className="message-reply" onClick={setReply}>
+                        Reply
+                    </div>
                 </div>
-                {this.renderContent()}
+                {renderContent(message, true)}
             </div>
-        </div>;
-    }
+        </div>
+    )
 }
+export default FriendMessage;

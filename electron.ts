@@ -7,9 +7,8 @@ import './updater';
 
 // import * as Storage from "./storage/storage";
 
-interface IExtApp extends App {
-    isQuitting?: boolean;
-}
+let isQuitting = false;
+
 process.env.NODE_ENV = 'production'
 const isDev = process.env.DEV === "true";
 
@@ -57,9 +56,8 @@ const startApp = async () => {
         },
         {
             click: () => {
-                const application: IExtApp = app;
-                application.isQuitting = true;
-                application.quit();
+                isQuitting = true;
+                app.quit();
             },
             label: "Quit Loaf",
         },
@@ -88,8 +86,7 @@ const startApp = async () => {
     win.loadURL(isDev ? "http://localhost:3000" : `file://${__dirname}/build/index.html`);
 
     win.on("close", (event) => {
-        const application: IExtApp = app;
-        if (!application.isQuitting) {
+        if (!isQuitting) {
             event.preventDefault();
             win.hide();
         }

@@ -5,11 +5,11 @@ import Announcement from "../Message/Announcement";
 import Message from "../Message/Message";
 import * as Loaf from "./../../API/Loaf";
 import * as I from "./../../../modules/interface";
-import api from "./../../API";
+import api, { events } from "./../../API";
 import AppBar from './AppBar';
 import DragUploadModal from './DragUploadModal';
 import { InView } from 'react-intersection-observer';
-import { scrollToBottom, sortAndFilterMessages } from "Modules/Utils";
+import { renderPreviewContent, scrollToBottom, sortAndFilterMessages } from "Modules/Utils";
 import { Attachment } from "@material-ui/icons";
 import { v4 as uuidv4 } from 'uuid';
 export interface FilePayloadData {
@@ -28,7 +28,8 @@ interface IProps {
 interface IState {
     form: {
         textMessage: string;
-        files: FilePayloadData[]
+        files: FilePayloadData[],
+        replyTo: I.IMessage | null,
     };
     highlight: boolean;
 }
@@ -57,7 +58,8 @@ export default class Chat extends Component<IProps, IState> {
         this.state = {
             form: {
                 textMessage: "",
-                files: []
+                files: [],
+                replyTo: null,
             },
             highlight: false
         };
@@ -94,6 +96,7 @@ export default class Chat extends Component<IProps, IState> {
                 isLoading = false;
             }, 0);
         });
+        events.on("currentChatChanged", this.clearInputs);
     }
 
     public handleFiles = (files: FileList | null) => {
@@ -136,6 +139,10 @@ export default class Chat extends Component<IProps, IState> {
         if (!chat) return 0;
         const allMessagesCount = chat.pages.map(page => page.messages.length).reduce((a, b) => a + b, 0);
         return allMessagesCount;
+    }
+
+    setAsReply = (message: I.IMessage | null) => {
+        this.setState({ form: { ...this.state.form, replyTo: message }});
     }
 
     public loadMoreMessages = (page: number) => {
@@ -196,7 +203,7 @@ export default class Chat extends Component<IProps, IState> {
                                                     <div className="date-tag">{moment(message.date).format('dddd, MMMM Do YYYY')}</div>
                                                 ) : null
                                             }
-                                            <Message message={message} />
+                                            <Message message={message} setAsReply={this.setAsReply} />
                                         </React.Fragment>
                                     ))
                                 }
@@ -209,6 +216,13 @@ export default class Chat extends Component<IProps, IState> {
                     setFiles={this.setFiles}
                     sendFiles={this.sendFiles}
                 />
+                {
+                   this.state.form.replyTo ? (
+                       <div className="message-preview">
+                           {this.state.form.replyTo.sender?.username}: {renderPreviewContent(this.state.form.replyTo)}
+                       </div>
+                   ) : null 
+                }
                 {chat.status === 2 ? <div className="text_sender">
                     <TextField
                         onChange={this.handleChange}
@@ -247,6 +261,10 @@ export default class Chat extends Component<IProps, IState> {
         });
     }
 
+    private clearInputs = () => {
+        this.setState({ form: { textMessage: '', files: [], replyTo: null }});
+    }
+
     private handleKeyDown = (e: any) => {
         if (e.key === "Enter" && this.state.form.textMessage && this.props.chat) {
             // TODO: SEND MESSAGE
@@ -270,10 +288,21 @@ export default class Chat extends Component<IProps, IState> {
     }
     private sendMessages = async (chatId: number, message: I.IMessageContentInput) => {
         const uuid = uuidv4();
-        this.setState({ form: { textMessage: "", files: [] } }, () => {
-            this.addTemporaryMessage(chatId, message, uuid);
-        });
-        api.message.send(chatId, message, uuid);
+        let messageInput: I.IMessageContentInput = message;
+
+        if(this.state.form.replyTo){
+            messageInput = {
+                type: 'reply',
+                content: message.content as I.IMessageContentTextInput | I.IMessageContentFileInput | I.IMessageContentMixedInput,
+                reference: ''
+            }
+        }
+
+        this.clearInputs();
+        this.addTemporaryMessage(chatId, messageInput, uuid);
+
+    
+        api.message.send(chatId, messageInput, uuid);
     }
     private sendFiles = () => {
         const files = this.state.form.files;
@@ -304,8 +333,7 @@ export default class Chat extends Component<IProps, IState> {
     }
     private handleChange = (e: any) => {
         const { form } = this.state;
-        const field: "textMessage" = e.target.name;
-        form[field] = e.target.value;
+        form.textMessage = e.target.value;
         this.setState({ form });
     }
 }

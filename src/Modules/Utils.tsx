@@ -147,6 +147,19 @@ export function renderGallery(message: I.IMessageContentPackage[], open?: boolea
     </div>
 }
 
+export const renderContent = (message: I.IAnyMessage, open?: boolean) => {
+    switch(message.content.type){
+        case "text":
+            return <p>{message.content.content}</p>
+        case "file":
+            return renderGallery([message.content], open);
+        case "mixed":
+            return renderGallery(message.content.content, open);
+        default:
+            return <p>This message is not supported</p>;
+    }
+}
+
 export function bytesToString(bytes: number) {
     function toHigherOrder(lowerBytes: number) {
         return (lowerBytes / 1024);
@@ -162,4 +175,28 @@ export function bytesToString(bytes: number) {
     }
 
     return `${bytes.toFixed(1)} PB`;
+}
+
+export const renderPreviewContent = (message: I.IMessage) => {
+    if(message.content.type === 'text'){
+        return message.content.content;
+    }
+    if(message.content.type === 'file'){
+        return `Sent file`
+    }
+    if(message.content.type === 'mixed'){
+        const textContent = message.content.content.find(content => content.type === 'text');
+        if(textContent) return textContent.content;
+        return `Ssent file`
+    }
+    if(message.content.content.type === 'text') {
+        return message.content.content.content;
+    }
+    if(message.content.content.type === 'file'){
+        return `Sent file`
+    }
+    
+    const textContent = message.content.content.content.find(content => content.type === 'text');
+    if(textContent) return textContent.content;
+    return `Sent file`
 }

@@ -37,6 +37,8 @@ const EventInit = __importStar(require("./modules/EventHandler"));
 const Machine = __importStar(require("./modules/Machine"));
 const User_1 = __importDefault(require("./modules/User"));
 require("./updater");
+// import * as Storage from "./storage/storage";
+let isQuitting = false;
 process.env.NODE_ENV = 'production';
 const isDev = process.env.DEV === "true";
 let tray = null;
@@ -77,9 +79,8 @@ const startApp = () => __awaiter(void 0, void 0, void 0, function* () {
         },
         {
             click: () => {
-                const application = electron_1.app;
-                application.isQuitting = true;
-                application.quit();
+                isQuitting = true;
+                electron_1.app.quit();
             },
             label: "Quit Loaf",
         },
@@ -103,8 +104,7 @@ const startApp = () => __awaiter(void 0, void 0, void 0, function* () {
     win.setMenuBarVisibility(false);
     win.loadURL(isDev ? "http://localhost:3000" : `file://${__dirname}/build/index.html`);
     win.on("close", (event) => {
-        const application = electron_1.app;
-        if (!application.isQuitting) {
+        if (!isQuitting) {
             event.preventDefault();
             win.hide();
         }

@@ -1,5 +1,8 @@
 import * as I from "../../modules/interface";
 import * as Loaf from "./Loaf";
+import EventEmitter from 'eventemitter3';
+
+export const events = new EventEmitter();
 
 const api = {
     session: {
