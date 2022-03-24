@@ -117,7 +117,7 @@ export const parseContent = async (content: I.IMessageContentInputWithUUID): Pro
     
     const replyTo = await getMessage(reference.dbUUID);
 
-    return { ...content, reference: replyTo?.content || null }
+    return { ...content, reference: replyTo || null }
 }
 
 const saveFileMessage = async (fileMessage: I.IMessageContentFile) => {
@@ -191,6 +191,6 @@ export const getMessages = async (userId: number, chatId: number, pageFromEnd = 
     }
 
     // const hasMore = messages.length > MESSAGES_PER_PAGE;
-    return { messages: filteredMessages, page, maxPage } as I.IPage;
+    return { messages: messagesWithReferences, page, maxPage } as I.IPage;
 }
 

@@ -142,7 +142,7 @@ export default class Chat extends Component<IProps, IState> {
     }
 
     setAsReply = (message: I.IMessage | null) => {
-        this.setState({ form: { ...this.state.form, replyTo: message }});
+        this.setState({ form: { ...this.state.form, replyTo: this.state.form.replyTo === message ? null: message }});
     }
 
     public loadMoreMessages = (page: number) => {
@@ -219,7 +219,7 @@ export default class Chat extends Component<IProps, IState> {
                 {
                    this.state.form.replyTo ? (
                        <div className="message-preview">
-                           {this.state.form.replyTo.sender?.username}: {renderPreviewContent(this.state.form.replyTo)}
+                           {this.state.form.replyTo.sender?.username}: {renderPreviewContent(this.state.form.replyTo.content)}
                        </div>
                    ) : null 
                 }

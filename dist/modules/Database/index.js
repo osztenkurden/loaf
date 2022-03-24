@@ -87,7 +87,8 @@ const convertToRaw = (userId, message) => {
         chatId: message.chatId,
         my: Number(message.my),
         date: new Date(message.date),
-        userId
+        userId,
+        uuid: message.uuid
     };
 };
 const getMessage = (uuid) => __awaiter(void 0, void 0, void 0, function* () {
@@ -113,7 +114,7 @@ const parseContent = (content) => __awaiter(void 0, void 0, void 0, function* ()
     if (!reference)
         return Object.assign(Object.assign({}, content), { reference: null });
     const replyTo = yield exports.getMessage(reference.dbUUID);
-    return Object.assign(Object.assign({}, content), { reference: (replyTo === null || replyTo === void 0 ? void 0 : replyTo.content) || null });
+    return Object.assign(Object.assign({}, content), { reference: replyTo || null });
 });
 exports.parseContent = parseContent;
 const saveFileMessage = (fileMessage) => __awaiter(void 0, void 0, void 0, function* () {
@@ -179,6 +180,6 @@ const getMessages = (userId, chatId, pageFromEnd = 0, chats = [], useLiteralPage
         messagesWithReferences.push(Object.assign(Object.assign({}, message), { content: yield exports.parseContent(message.content) }));
     }
     // const hasMore = messages.length > MESSAGES_PER_PAGE;
-    return { messages: filteredMessages, page, maxPage };
+    return { messages: messagesWithReferences, page, maxPage };
 });
 exports.getMessages = getMessages;

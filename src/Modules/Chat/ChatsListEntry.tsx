@@ -21,7 +21,9 @@ function getSubText(chat: I.IChatPaged, last: I.IMessage | null) {
             return "Waiting for response...";
         case 2:
             if(last?.content.type === "file" || last?.content.type === "mixed") return "sent an image";
-            return last?.content.content || "No messages";
+            if(last?.content.type === 'text') return last?.content.content || "No messages";
+            if(last?.content.content.type === 'text') return last?.content.content.content || "No messages";
+            return "sent an image";
         case 1:
             return <span className="strong">requested your attention</span>;
         default:

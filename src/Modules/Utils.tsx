@@ -106,6 +106,31 @@ const handleFileClick = (fileData: string, fileName: string, open?: boolean) => 
     window.ipcApi.send('openFileDirectory', fileData);
 }
 
+export const renderPreviewContent = (message: I.IAnyMessage["content"] | string | null) => {
+    if(!message) return 'Message unavailable';
+    if(typeof message === 'string') return message;
+    if(message.type === 'text'){
+        return message.content;
+    }
+    if(message.type === 'file'){
+        return `Sent file`
+    }
+    if(message.type === 'mixed'){
+        const textContent = message.content.find(content => content.type === 'text') as I.IMessageContentText;
+        if(textContent) return textContent.content;
+        return `Ssent file`
+    }
+    if(message.content.type === 'text') {
+        return message.content.content;
+    }
+    if(message.content.type === 'file'){
+        return `Sent file`
+    }
+    
+    const textContent = message.content.content.find(content => content.type === 'text') as I.IMessageContentText;
+    if(textContent) return textContent.content;
+    return `Sent file`
+}
 export const filePreview = (file: I.IMessageContentFileMeta, open?: boolean) => {
     const fileData = file.data;
     const fileType = fileData.substr(fileData.indexOf(':') + 1, fileData.indexOf('/') - fileData.indexOf(':') - 1);
@@ -149,7 +174,7 @@ export function renderGallery(message: I.IMessageContentPackage[], open?: boolea
 
 //export const renderContents = ()
 
-export const renderContent = (content: I.IAnyMessage["content"], open?: boolean) => {
+export const renderContent = (content: I.IAnyMessage["content"], open?: boolean): JSX.Element => {
     switch(content.type){
         case "text":
             return <p>{content.content}</p>
@@ -158,8 +183,15 @@ export const renderContent = (content: I.IAnyMessage["content"], open?: boolean)
         case "mixed":
             return renderGallery(content.content, open);
         case "reply":
-            console.log(content)
+            const { reference } = content;
+            if(typeof reference === "string") {
+                return renderContent(content.content);
+            }
             return <div>
+                <div className="reply-quote">
+                    <div className="reply-quote-author">{reference?.sender?.username || 'Unknown'}:</div>
+                    <div className="reply-quote-content">{renderPreviewContent(reference?.content || null).substring(0, 30)}</div>
+                </div>
                 {renderContent(content.content)}
             </div>;
         default:
@@ -182,28 +214,4 @@ export function bytesToString(bytes: number) {
     }
 
     return `${bytes.toFixed(1)} PB`;
-}
-
-export const renderPreviewContent = (message: I.IMessage) => {
-    if(message.content.type === 'text'){
-        return message.content.content;
-    }
-    if(message.content.type === 'file'){
-        return `Sent file`
-    }
-    if(message.content.type === 'mixed'){
-        const textContent = message.content.content.find(content => content.type === 'text');
-        if(textContent) return textContent.content;
-        return `Ssent file`
-    }
-    if(message.content.content.type === 'text') {
-        return message.content.content.content;
-    }
-    if(message.content.content.type === 'file'){
-        return `Sent file`
-    }
-    
-    const textContent = message.content.content.content.find(content => content.type === 'text');
-    if(textContent) return textContent.content;
-    return `Sent file`
 }

@@ -45,7 +45,7 @@ export type IMessageContentText = {
 export type IMessageContentReply = {
     type: "reply",
     content: IMessageContentText | IMessageContentFile | IMessageContentMixed;
-    reference: IMessageContentInputWithUUID | null;
+    reference: IMessageInputWithUUID | null;
 }   
 
 
@@ -164,15 +164,6 @@ export interface IMessageInputWithUUID {
 export type IAnyMessage = (IMessage | IMessageInput | IMessageInputWithUUID) & {
     temporary?: boolean;
 }
-
-
-
-
-
-
-
-
-
 export interface IChat {
     id: number;
     name: string;

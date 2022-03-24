@@ -434,6 +434,8 @@ body {
 .file-preview {
     display: flex;
     padding: 10px;
+    max-width: calc(100% - 20px);
+    word-break: break-all;
 }
 .file-preview .file-icon {
     display: flex;
@@ -606,6 +608,12 @@ li > hr.separator {
     background-color: #242b2f;
     padding: 10px 5px;
 }
+.message .reply-quote {
+    text-align: left;
+    margin: 1em 1em 0.25em;
+    border-left: 2px solid white;
+    padding-left: 0.25em;
+}
 .message_container{
     width: 100%;
     flex: 1;
@@ -613,6 +621,10 @@ li > hr.separator {
     overflow:auto;
     height: 100%;
     flex-direction: column;
+}
+.message .message-reply {
+    margin-left: 10px;
+    cursor: pointer;
 }
 .load-messages-button {
     height: 60px;
