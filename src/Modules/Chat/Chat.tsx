@@ -293,7 +293,7 @@ export default class Chat extends Component<IProps, IState> {
         if(this.state.form.replyTo){
             messageInput = {
                 type: 'reply',
-                content: message.content as I.IMessageContentTextInput | I.IMessageContentFileInput | I.IMessageContentMixedInput,
+                content: message as I.IMessageContentTextInput | I.IMessageContentFileInput | I.IMessageContentMixedInput,
                 reference: this.state.form.replyTo.content.uuid
             }
         }

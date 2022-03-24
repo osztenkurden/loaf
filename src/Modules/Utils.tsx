@@ -147,14 +147,21 @@ export function renderGallery(message: I.IMessageContentPackage[], open?: boolea
     </div>
 }
 
-export const renderContent = (message: I.IAnyMessage, open?: boolean) => {
-    switch(message.content.type){
+//export const renderContents = ()
+
+export const renderContent = (content: I.IAnyMessage["content"], open?: boolean) => {
+    switch(content.type){
         case "text":
-            return <p>{message.content.content}</p>
+            return <p>{content.content}</p>
         case "file":
-            return renderGallery([message.content], open);
+            return renderGallery([content], open);
         case "mixed":
-            return renderGallery(message.content.content, open);
+            return renderGallery(content.content, open);
+        case "reply":
+            console.log(content)
+            return <div>
+                {renderContent(content.content)}
+            </div>;
         default:
             return <p>This message is not supported</p>;
     }

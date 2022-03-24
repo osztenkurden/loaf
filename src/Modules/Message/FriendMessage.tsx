@@ -27,7 +27,7 @@ const FriendMessage = ({ message, sender, setAsReply }: Props) => {
                         Reply
                     </div>
                 </div>
-                {renderContent(message, true)}
+                {renderContent(message.content, true)}
             </div>
         </div>
     )

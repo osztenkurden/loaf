@@ -9,9 +9,10 @@ const Message = ({ message, setAsReply }: Props) => {
     if(!message.my && message.sender) {
         return <FriendMessage message={message} sender={message.sender} setAsReply={setAsReply} />
     }
+
     return (
         <div className={`message ${message.temporary ? 'sending':''}`}>
-            {renderContent(message)}
+            {renderContent(message.content)}
         </div>
     )
 }
