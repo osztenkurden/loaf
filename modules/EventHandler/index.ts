@@ -295,7 +295,7 @@ export const start = (window: BrowserWindow, /*win: Electron.WebContents*/) => {
         return { event: "userCreated", data: result };
     });
 
-    Loaf.onAsync("authenticateUser", async (authCode: number) => {
+    Loaf.onAsync("authenticateUser", async (authCode: string) => {
         const status = await User.authenticate(authCode);
 
         return { event: "userStatus", data: status };

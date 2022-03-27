@@ -28,7 +28,7 @@ const api = {
     },
     user: {
         add: (userId: number | string) => Loaf.api("addUser", false, userId),
-        authenticate: (authCode: number) => Loaf.api("authenticateUser", false, authCode),
+        authenticate: (authCode: string) => Loaf.api("authenticateUser", false, authCode),
         get: () => Loaf.api("getUser", true),
         getUserByName: (name: string) => Loaf.api("getUserByName", false, name),
         load: () => Loaf.api("loadUser", false),

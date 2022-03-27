@@ -19,7 +19,7 @@ export const api = {
             Loaf(`messages/${chatId}`, "POST", {chatId, entries, senderMachine}),
     },
     user: {
-        authenticate: (authcode: number, machineName: string) => Loaf("auth/auth", "POST", { authcode, machineName }),
+        authenticate: (authcode: string, machineName: string) => Loaf("auth/auth", "POST", { authcode, machineName }),
         get: async (): Promise<I.IUser | null> => {
             const res = await Loaf("auth");
             if (res.data && res.success) {
