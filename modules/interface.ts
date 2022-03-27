@@ -5,6 +5,18 @@ export interface IEventResponseObject {
 
 export type IEventResponse = IEventResponseObject | null;
 
+export type ISessionPayloadMessage = {
+    content: string,
+    machineId: number,
+    recipientId: number,
+    type: number;
+}
+export type ISessionPayload = {
+    chatId: number,
+    entries: ISessionPayloadMessage[],
+    senderId: number,
+    senderMachine: number
+}
 export interface IPreKeyBundle {
     registrationId: number;
     identityKey: ArrayBuffer;

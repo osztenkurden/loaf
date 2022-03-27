@@ -113,7 +113,7 @@ export default class Inbox {
         if (!receivers.length) {
             return false;
         }
-        const messages = [];
+        const messages: I.ISessionPayloadMessage[] = [];
         const machineId = Machine.getMachineId();
 
         for (const machine of receivers) {
@@ -122,7 +122,7 @@ export default class Inbox {
                 messages.push(message);
             }
         }
-        const payload = {
+        const payload: I.ISessionPayload = {
             chatId,
             entries: messages,
             senderId: this.userId,
