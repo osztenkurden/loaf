@@ -102,6 +102,7 @@ export default class Inbox {
             this.content.send("chats", this.chats, localUUID);
             await saveMessages(this.userId, [messageInput]);
         } else {
+            console.log("I GUESS HERE?")
             console.log(result);
         }
 

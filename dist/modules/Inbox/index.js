@@ -114,6 +114,7 @@ class Inbox {
                 yield Database_1.saveMessages(this.userId, [messageInput]);
             }
             else {
+                console.log("I GUESS HERE?");
                 console.log(result);
             }
             return result;
