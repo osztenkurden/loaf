@@ -89,6 +89,7 @@ export default class Main extends Component<{}, IState> {
                 if(newCurrentChat){
                     newInCurrent = didLastPageChange(currentChat, newCurrentChat.pages);
                     addPageToChat(currentChat, newCurrentChat.pages);
+                    currentChat.status = newCurrentChat.status;
                 }
                 const indexOfCurrentChat = newChats.findIndex(chat => chat.id === currentChat.id);
                 if(indexOfCurrentChat >= 0){
@@ -97,7 +98,7 @@ export default class Main extends Component<{}, IState> {
             }
             this.setState({
                 chats: sortChats(newChats),
-                currentChat,
+                currentChat : currentChat ? { ...currentChat } : currentChat,
                 temporaryMessages: this.state.temporaryMessages.filter(msg => !localUUID || msg.uuid !== localUUID)
             }, () => {
                 if(!newInCurrent && !localUUID) return;

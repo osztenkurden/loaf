@@ -169,7 +169,6 @@ export default class Chat extends Component<IProps, IState> {
         const minimumPage = Math.min(...chat.pages.map(page => page.page));
 
         const messages: I.IAnyMessage[] = sortAndFilterMessages([...chat.pages.map(page => page.messages).flat(), ...temporaryMessages]);
-
         return (
             <div className="chat_container" style={{ maxWidth }}>
                 <AppBar chat={chat} />
