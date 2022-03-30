@@ -114,7 +114,6 @@ class Inbox {
                 yield Database_1.saveMessages(this.userId, [messageInput]);
             }
             else {
-                console.log(result);
             }
             return result;
         });
@@ -140,9 +139,8 @@ class Inbox {
                 senderMachine: machineId,
             };
             const result = yield API_1.api.inbox.accept(payload);
-            console.log(result);
             if (result.success) {
-                this.loadChats();
+                this.loadChats(true);
                 return true;
             }
             return false;
@@ -248,7 +246,6 @@ class Inbox {
             const machineId = Machine.getMachineId();
             const machines = response.data.machines;
             if (!machines) {
-                console.log(response);
                 return [];
             }
             const receivers = machines.filter((mch) => mch.userId !== this.userId || mch.machineId !== machineId);

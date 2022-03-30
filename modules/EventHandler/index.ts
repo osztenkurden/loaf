@@ -61,10 +61,11 @@ export function initSockets() {
     });
 
     socket.on("chat", () => {
+        console.log("information about new chat");
         const inbox = User.getInbox();
 
         if (inbox) {
-            inbox.loadChats();
+            inbox.loadChats(true);
         }
     });
 
@@ -295,17 +296,15 @@ export const start = (window: BrowserWindow, /*win: Electron.WebContents*/) => {
         return { event: "userCreated", data: result };
     });
 
-    Loaf.onAsync("authenticateUser", async (authCode: number) => {
+    Loaf.onAsync("authenticateUser", async (authCode: string) => {
         const status = await User.authenticate(authCode);
 
         return { event: "userStatus", data: status };
     });
 
     Loaf.onAsync("logInUser", async (username: string, password: string) => {
-        console.log(username)
         const status = await User.logIn(username, password);
 
-        console.log(status)
 
         return { event: "userStatus", data: status };
     });

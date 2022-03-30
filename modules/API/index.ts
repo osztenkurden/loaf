@@ -3,7 +3,7 @@ import Loaf from "./LoafAPI";
 
 export const api = {
     inbox: {
-        accept: (payload: any) => Loaf("chats/users", "PATCH", { messages: payload, chatId: payload.chatId}),
+        accept: (payload: I.ISessionPayload) => Loaf("chats/users", "PATCH", { messages: payload, chatId: payload.chatId}),
         addFriend: (userId: number) => Loaf("chats?private=true", "POST", { name: "", users: [userId]}),
         getChats: () => Loaf("chats"),
         createGroup: (name: string, users: number[]) => Loaf("chats", "POST", { name, users }),
@@ -19,7 +19,7 @@ export const api = {
             Loaf(`messages/${chatId}`, "POST", {chatId, entries, senderMachine}),
     },
     user: {
-        authenticate: (authcode: number, machineName: string) => Loaf("auth/auth", "POST", { authcode, machineName }),
+        authenticate: (authcode: string, machineName: string) => Loaf("auth/auth", "POST", { authcode, machineName }),
         get: async (): Promise<I.IUser | null> => {
             const res = await Loaf("auth");
             if (res.data && res.success) {

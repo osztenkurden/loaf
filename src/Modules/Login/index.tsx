@@ -11,14 +11,14 @@ interface IProps {
 interface IState {
     username: string;
     password: string;
-    authCode: number;
+    authCode: string;
 }
 
 export default class Login extends Component<IProps, IState> {
     constructor(props: IProps) {
         super(props);
         this.state = {
-            authCode: 0,
+            authCode: '',
             password: "",
             username: "",
         };
@@ -36,7 +36,7 @@ export default class Login extends Component<IProps, IState> {
                 <div className="loaf-app-splash">
                     <div id="login-page">
                         <TextField
-                            type="number"
+                            type="text"
                             className="username-input"
                             placeholder="Username"
                             color="primary"

@@ -102,7 +102,6 @@ export default class Inbox {
             this.content.send("chats", this.chats, localUUID);
             await saveMessages(this.userId, [messageInput]);
         } else {
-            console.log(result);
         }
 
         return result;
@@ -113,7 +112,7 @@ export default class Inbox {
         if (!receivers.length) {
             return false;
         }
-        const messages = [];
+        const messages: I.ISessionPayloadMessage[] = [];
         const machineId = Machine.getMachineId();
 
         for (const machine of receivers) {
@@ -122,7 +121,7 @@ export default class Inbox {
                 messages.push(message);
             }
         }
-        const payload = {
+        const payload: I.ISessionPayload = {
             chatId,
             entries: messages,
             senderId: this.userId,
@@ -131,10 +130,8 @@ export default class Inbox {
 
         const result = await api.inbox.accept(payload);
 
-        console.log(result);
-
         if (result.success) {
-            this.loadChats();
+            this.loadChats(true);
             return true;
         }
         return false;
@@ -253,7 +250,6 @@ export default class Inbox {
         const machineId = Machine.getMachineId();
         const machines = response.data.machines as I.IMachine[];
         if(!machines){
-            console.log(response);
             return [];
         }
         const receivers = machines.filter((mch) => mch.userId !== this.userId || mch.machineId !== machineId);

@@ -22,6 +22,7 @@ interface IProps {
     hash: string;
     addTemporaryMessage: (message: I.IAnyMessage) => void;
     temporaryMessages: I.IAnyMessage[];
+    maxWidth: string;
 }
 
 
@@ -161,7 +162,7 @@ export default class Chat extends Component<IProps, IState> {
     }
 
     public render() {
-        const { chat, temporaryMessages } = this.props;
+        const { chat, temporaryMessages, maxWidth } = this.props;
         if (!chat) {
             return <div className={`chat_container empty`}></div>;
         }
@@ -170,7 +171,7 @@ export default class Chat extends Component<IProps, IState> {
         const messages: I.IAnyMessage[] = sortAndFilterMessages([...chat.pages.map(page => page.messages).flat(), ...temporaryMessages]);
 
         return (
-            <div className="chat_container">
+            <div className="chat_container" style={{ maxWidth }}>
                 <AppBar chat={chat} />
                 <div id="message_container" className={`message_container ${this.state.highlight ? 'highlight-drag' : ''} ${this.state.form.files.length ? 'upload' : ''}`}
                     onDragOver={this.allow}

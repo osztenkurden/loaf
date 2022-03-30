@@ -83,9 +83,10 @@ function initSockets() {
         console.log("DISCONNECTION");
     });
     socket.on("chat", () => {
+        console.log("information about new chat");
         const inbox = User_1.default.getInbox();
         if (inbox) {
-            inbox.loadChats();
+            inbox.loadChats(true);
         }
     });
     setInterval(() => {
@@ -278,9 +279,7 @@ const start = (window) => {
         return { event: "userStatus", data: status };
     }));
     Loaf.onAsync("logInUser", (username, password) => __awaiter(void 0, void 0, void 0, function* () {
-        console.log(username);
         const status = yield User_1.default.logIn(username, password);
-        console.log(status);
         return { event: "userStatus", data: status };
     }));
     Loaf.onAsync("logout", () => __awaiter(void 0, void 0, void 0, function* () {

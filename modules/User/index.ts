@@ -120,7 +120,7 @@ export class User {
          }
     }
 
-    public async authenticate(authCode: number) {
+    public async authenticate(authCode: string) {
         const result = await api.user.authenticate(authCode, Machine.getMachineName());
         if (result.status === 200) {
             await this.loadUser();

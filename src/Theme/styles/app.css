@@ -422,7 +422,7 @@ body {
 .chat-list {
     margin-top:60px !important;
 
-    width:34%;
+    position: relative;
 }
 .many-msg-types {
     display: flex;
@@ -481,7 +481,7 @@ body {
 }
 .chat_container{
     /*margin-top: 56px !important;*/
-    width: 66%;
+    flex: 1;
     background-color: rgba(0,0,0,0.2);
     display:flex;
     flex-direction: column;
@@ -907,6 +907,33 @@ li > hr.separator {
     align-items: center;
     justify-content: center;
 }
+.chat-list-resizer {
+    width: 1px;
+    height: 100%;
+    position: absolute;
+    right: 0;
+    top: 0;
+    cursor: col-resize;
+    resize: horizontal;
+}
+.chat-list-resizer:hover {
+    width: 3px;
+    background: #c1c3c5b4;
+}
 .avatar-container:hover .editable-hover {
     opacity: 1;
+}
+/*
+::-webkit-scrollbar-thumb {
+    box-shadow: inset 0 0 10px 10px red;
+    border: solid 3px transparent;
+}*/
+::-webkit-scrollbar {
+    width: 15px;
+}
+
+::-webkit-scrollbar-thumb {
+    box-shadow: inset 0 0 15px 15px #242b2f;
+    border: solid 5px transparent;
+    border-radius: 25px;
 }

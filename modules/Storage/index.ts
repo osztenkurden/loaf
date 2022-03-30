@@ -137,7 +137,7 @@ export default class Storage {
         return bundle as I.IPreKeyBundle;
     }
 
-    public async createSession(machine: I.IMachine) {
+    public async createSession(machine: I.IMachine): Promise<boolean | I.ISessionPayloadMessage> {
         const { store, cypher } = this;
         const { userId, machineId } = machine;
         const session = await store?.loadSession(`${userId}.${machineId}`);
