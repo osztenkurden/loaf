@@ -208,8 +208,10 @@ export default class Main extends Component<{}, IState> {
                         chats={chats}
                         currentChat={currentChat}
                         loadChat={this.loadChat}
+                        temporaryMessages={temporaryMessages.filter(msg => currentChat && msg.chatId === currentChat.id)}
+                        hash={hash}
+                        addTemporaryMessage={this.addTemporaryMessage}
                     />
-                    <Chat chat={currentChat} temporaryMessages={temporaryMessages.filter(msg => currentChat && msg.chatId === currentChat.id)}  hash={hash} addTemporaryMessage={this.addTemporaryMessage} />
                 </div>
             </div>
         );

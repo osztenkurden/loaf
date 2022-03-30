@@ -73,7 +73,6 @@ function apiV2(url, method = "GET", body) {
                 status: res.status,
                 success: res.status < 300,
             };
-            console.log(url, response.data);
             if (!response.success && response.data && response.data.errorMessage && User_1.default.window) {
                 User_1.default.window.send('error-message', response.data.errorMessage);
             }

@@ -23,9 +23,9 @@ const FriendMessage = ({ message, sender, setAsReply }: Props) => {
             <div className="message-container">
                 <div className="message-sender-name">
                     {sender.username}
-                    <div className="message-reply" onClick={setReply}>
+                    { "uuid" in message.content && message.content.uuid ? <div className="message-reply" onClick={setReply}>
                         Reply
-                    </div>
+                    </div> : null }
                 </div>
                 {renderContent(message.content, true)}
             </div>

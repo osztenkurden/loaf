@@ -278,9 +278,7 @@ const start = (window) => {
         return { event: "userStatus", data: status };
     }));
     Loaf.onAsync("logInUser", (username, password) => __awaiter(void 0, void 0, void 0, function* () {
-        console.log(username);
         const status = yield User_1.default.logIn(username, password);
-        console.log(status);
         return { event: "userStatus", data: status };
     }));
     Loaf.onAsync("logout", () => __awaiter(void 0, void 0, void 0, function* () {
