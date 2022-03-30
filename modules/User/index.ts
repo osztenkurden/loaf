@@ -82,16 +82,19 @@ export class User {
                 return false;
             }
 
+            const machineInfo = Machine.getMachine();
+
             const payload  = {
                  firstName,
                  identityKey: parseKeyObject(identityKeyPair).pubKey,
                  keys: this.getKeys(keys),
-                 machineId: Machine.getMachineId(),
+                 machineId: machineInfo.id,
                  password,
                  preKeys,
                  registrationId: await storage.getRegistrationId(),
                  signedPreKey,
                  username,
+                 machineName: machineInfo.name
             } as I.IRegisterPayload;
             const result = await api.user.register(payload);
             if (!result) {

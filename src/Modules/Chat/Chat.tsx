@@ -180,6 +180,7 @@ export default class Chat extends Component<IProps, IState> {
                     onDragLeave={this.whileOver}
                     onDrop={this.drop}
                 >
+                    {/** Fix this */}
                     {chat.status === 1 || !this.getAllMessagesCount() ?
                         <Announcement
                             request={chat.status === 1}
