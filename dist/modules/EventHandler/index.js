@@ -83,9 +83,10 @@ function initSockets() {
         console.log("DISCONNECTION");
     });
     socket.on("chat", () => {
+        console.log("information about new chat");
         const inbox = User_1.default.getInbox();
         if (inbox) {
-            inbox.loadChats();
+            inbox.loadChats(true);
         }
     });
     setInterval(() => {

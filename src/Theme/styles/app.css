@@ -422,8 +422,6 @@ body {
 .chat-list {
     margin-top:60px !important;
 
-    min-width: 150px;
-    max-width: 300px;
     position: relative;
 }
 .many-msg-types {

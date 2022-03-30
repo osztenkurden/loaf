@@ -140,7 +140,7 @@ class Inbox {
             };
             const result = yield API_1.api.inbox.accept(payload);
             if (result.success) {
-                this.loadChats();
+                this.loadChats(true);
                 return true;
             }
             return false;

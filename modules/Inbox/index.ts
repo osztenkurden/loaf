@@ -130,9 +130,8 @@ export default class Inbox {
 
         const result = await api.inbox.accept(payload);
 
-
         if (result.success) {
-            this.loadChats();
+            this.loadChats(true);
             return true;
         }
         return false;
