@@ -1,5 +1,7 @@
-import { Divider, ListItem, ListItemText } from "@material-ui/core";
-import { getLast } from "Modules/Utils";
+import Divider from "@material-ui/core/Divider";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemText from "@material-ui/core/ListItemText";
+import { Emoji, getLast } from "Modules/Utils";
 import moment from "moment";
 import React, { Component } from "react";
 // import * as API from "./api";
@@ -22,6 +24,7 @@ function getSubText(chat: I.IChatPaged, last: I.IMessage | null) {
         case 2:
             if(last?.content.type === "file" || last?.content.type === "mixed") return "sent an image";
             if(last?.content.type === 'text') return last?.content.content || "No messages";
+            if(last?.content.type === 'reaction') return Emoji(last?.content.content || '😃');
             if(last?.content.content.type === 'text') return last?.content.content.content || "No messages";
             return "sent an image";
         case 1:

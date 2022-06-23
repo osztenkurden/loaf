@@ -107,7 +107,7 @@ class Inbox {
                 yield Database_1.saveFileToDrive(messageInput);
                 yield references_1.saveMessageReferences([messageInput]);
                 const current = this.messages.get(chatId) || [];
-                const message = Object.assign(Object.assign({}, messageInput), { content: yield Database_1.parseContent(messageInput.content) });
+                const message = Object.assign(Object.assign({}, messageInput), { content: yield Database_1.parseContent(messageInput.content), replies: [], reactions: [] });
                 current.push(message);
                 this.messages.set(chatId, current);
                 this.content.send("chats", this.chats, localUUID);
@@ -186,8 +186,11 @@ class Inbox {
             }
             yield Database_1.saveMessages(this.userId, decryptedMessages);
             yield references_1.saveMessageReferences(decryptedMessages);
+            const references = yield Database_1.getReferencesTo(decryptedMessages);
             for (const decryptedMessage of decryptedMessages) {
-                const message = Object.assign(Object.assign({}, decryptedMessage), { content: yield Database_1.parseContent(decryptedMessage.content) });
+                const replies = references.filter(reference => "reference" in reference.content && reference.content.reference === message.content.uuid && reference.content.type === 'reply');
+                const reactions = references.filter(reference => "reference" in reference.content && reference.content.reference === message.content.uuid && reference.content.type === 'reaction');
+                const message = Object.assign(Object.assign({}, decryptedMessage), { content: yield Database_1.parseContent(decryptedMessage.content), reactions, replies });
                 current.push(message);
                 incoming.push(message);
             }

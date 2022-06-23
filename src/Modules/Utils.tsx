@@ -1,6 +1,8 @@
 import React from 'react';
 import * as I from '../../modules/interface';
-import { Audiotrack, InsertDriveFile, CloudDownload } from "@material-ui/icons";
+import Audiotrack from "@material-ui/icons/Audiotrack";
+import InsertDriveFile from "@material-ui/icons/InsertDriveFile";
+import CloudDownload from "@material-ui/icons/CloudDownload";
 import imageExtensions from './imageExtensions';
 
 export function hashCode(str: string) { // java String#hashCode
@@ -118,8 +120,9 @@ export const renderPreviewContent = (message: I.IAnyMessage["content"] | string 
     if(message.type === 'mixed'){
         const textContent = message.content.find(content => content.type === 'text') as I.IMessageContentText;
         if(textContent) return textContent.content;
-        return `Ssent file`
+        return `Sent file`
     }
+    if(message.type === 'reaction') return ':)'
     if(message.content.type === 'text') {
         return message.content.content;
     }
@@ -194,6 +197,8 @@ export const renderContent = (content: I.IAnyMessage["content"], open?: boolean)
                 </div>
                 {renderContent(content.content)}
             </div>;
+        case "reaction":
+            return <p>REACTION: {Emoji(content.content)}</p>;
         default:
             return <p>This message is not supported</p>;
     }
@@ -215,3 +220,6 @@ export function bytesToString(bytes: number) {
 
     return `${bytes.toFixed(1)} PB`;
 }
+
+
+export const Emoji = (emoji: string) => <span className="emoji-font">{emoji}</span>

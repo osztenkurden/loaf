@@ -1,11 +1,23 @@
 import React, { Component } from 'react';
-import { Paper, DialogTitle, DialogContent, DialogActions, TextField, List, ListItem, ListItemAvatar, Avatar, ListItemText, ListItemSecondaryAction, IconButton } from '@material-ui/core';
+import Paper from '@material-ui/core/Paper';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogActions from '@material-ui/core/DialogActions';
+import TextField from '@material-ui/core/TextField';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemAvatar from '@material-ui/core/ListItemAvatar';
+import Avatar from '@material-ui/core/Avatar';
+import ListItemText from '@material-ui/core/ListItemText';
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
+import IconButton from '@material-ui/core/IconButton';
 import Button from "./../../Theme/Components/LoafButton";
 import * as Loaf from "./../../API/Loaf";
 import api from "../../API";
 import * as I from "./../../../modules/interface";
 import LoafAvatar from "./../../Theme/Components/Avatar";
-import { Remove as RemoveIcon, Add as AddIcon } from '@material-ui/icons';
+import RemoveIcon from '@material-ui/icons/Remove';
+import AddIcon from '@material-ui/icons/Add';
 
 interface IProps {
     onClose: () => void;

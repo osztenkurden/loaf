@@ -1,9 +1,13 @@
 import React, { Component } from 'react';
-import { Paper, DialogTitle, DialogContent, DialogActions, TextField, InputAdornment } from '@material-ui/core';
+import Paper from '@material-ui/core/Paper';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogActions from '@material-ui/core/DialogActions';
+import TextField from '@material-ui/core/TextField';
+import InputAdornment from '@material-ui/core/InputAdornment';
 import Button from "./../../Theme/Components/LoafButton";
 import * as Loaf from "./../../API/Loaf";
 import api from "../../API";
-//import { MoveToInbox, Mail, Group, Settings, GroupAdd, PersonAdd, Cancel, ContactSupport, PermMedia } from '@material-ui/icons';
 
 interface IProps {
     onClose: () => void;

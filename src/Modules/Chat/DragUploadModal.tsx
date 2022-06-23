@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { CloudUpload } from "@material-ui/icons";
+import CloudUpload from "@material-ui/icons/CloudUpload";
 import { FilePayloadData } from './Chat';
 import UploadImagePreview from './UploadImagePreview';
 

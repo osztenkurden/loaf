@@ -1,8 +1,20 @@
 import * as I from "../../modules/interface";
 import * as Loaf from "./Loaf";
 import EventEmitter from 'eventemitter3';
+import { v4 as uuidv4 } from 'uuid';
 
 export const events = new EventEmitter();
+
+const addReaction = (chatId: number, emoji: string, reactionTo: I.IAnyMessage) => {
+    if(!("uuid" in reactionTo.content)) return;
+    const uuid = uuidv4();
+    const message: I.IMessageContentReactionInput = {
+        type: "reaction",
+        content: emoji,
+        reference: reactionTo.content.uuid
+    }
+    api.message.send(chatId, message, uuid);
+}
 
 const api = {
     session: {
@@ -18,6 +30,7 @@ const api = {
     },
     message: {
         send: (chatId: number, message: I.IMessageContentInput, localUUID: string) => Loaf.api("sendMessage", false, chatId, message, localUUID),
+        addReaction: addReaction
     },
     call: {
       make: (data: I.CallDescription) => Loaf.api('call-to-user', false, data),

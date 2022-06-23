@@ -49,3 +49,14 @@ export const getMessageReference = async (contentUUID: string) => {
 
     return reference;
 }
+
+export const getReferencesOfMessages = async (dbUUID: string[]) => {
+    const references = await Reference.findAll({
+        where: {
+            dbUUID
+        },
+        raw: true,
+    }) as unknown as MessageReference[];
+
+    return references;
+}

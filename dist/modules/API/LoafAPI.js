@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.LoafStatus = exports.getCookie = exports.config = exports.fetch = void 0;
+exports.LoafStatus = exports.isSingularEmojiEmoji = exports.getCookie = exports.config = exports.fetch = void 0;
 const fetch_cookie_1 = __importDefault(require("fetch-cookie"));
 const node_fetch_1 = __importDefault(require("node-fetch"));
 const tough_cookie_1 = require("tough-cookie");
@@ -24,6 +24,7 @@ const User_1 = __importDefault(require("../User"));
 const electron_1 = require("electron");
 const cookiePath = path_1.default.join(electron_1.app.getPath('userData'), 'cookie.json');
 const cookieJar = new tough_cookie_1.CookieJar(new tough_cookie_file_store_1.FileCookieStore(cookiePath));
+const isEmojiRegex = /^\p{Emoji}$/u;
 exports.fetch = fetch_cookie_1.default(node_fetch_1.default, cookieJar);
 exports.config = {
     apiURL: process.env.local === 'true' ? 'http://localhost:5000' : "https://loaf.bakerysoft.pl",
@@ -43,6 +44,8 @@ function generateString(length) {
     }
     return result;
 }
+const isSingularEmojiEmoji = (text) => isEmojiRegex.test(text);
+exports.isSingularEmojiEmoji = isSingularEmojiEmoji;
 function apiV2(url, method = "GET", body) {
     return __awaiter(this, void 0, void 0, function* () {
         const options = {
@@ -68,8 +71,9 @@ function apiV2(url, method = "GET", body) {
             return { status: 500, success: false };
         }
         try {
+            const body = yield res.text();
             const response = {
-                data: yield res.json(),
+                data: JSON.parse(body),
                 status: res.status,
                 success: res.status < 300,
             };

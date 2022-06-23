@@ -1,4 +1,4 @@
-import { List } from "@material-ui/core";
+import List from "@material-ui/core/List";
 import React, { Component, useEffect, useRef, useState } from "react";
 import * as I from "./../../../modules/interface";
 import ChatsListEntry from "./ChatsListEntry";

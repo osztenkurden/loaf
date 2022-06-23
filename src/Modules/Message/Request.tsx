@@ -1,4 +1,5 @@
-import { BlockRounded, CheckCircleRounded } from "@material-ui/icons";
+import BlockRounded from "@material-ui/icons/BlockRounded";
+import CheckCircleRounded from "@material-ui/icons/CheckCircleRounded";
 import React, { Component } from "react";
 import * as I from "./../../../modules/interface";
 

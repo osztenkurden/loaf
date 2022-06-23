@@ -1,7 +1,9 @@
 import React from 'react';
-import { AppBar, Toolbar, ListItem } from '@material-ui/core';
+import AppBar from '@material-ui/core/AppBar';
+import Toolbar from '@material-ui/core/Toolbar';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
 import * as I from "./../../../modules/interface";
-import { ListItemText } from '@material-ui/core';
 import api from "./../../API";
 import LoafAvatar from 'Theme/Components/Avatar';
 import { UserContext } from 'Context';

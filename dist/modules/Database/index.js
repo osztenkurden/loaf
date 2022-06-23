@@ -31,7 +31,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getMessages = exports.saveMessages = exports.saveFileToDrive = exports.parseContent = exports.getMessage = exports.sequelize = void 0;
+exports.getMessages = exports.saveMessages = exports.saveFileToDrive = exports.getReferencesTo = exports.parseContent = exports.getMessagesByContent = exports.getMessage = exports.sequelize = void 0;
 const path_1 = __importDefault(require("path"));
 const User_1 = __importDefault(require("./../User"));
 const fs_1 = __importDefault(require("fs"));
@@ -105,9 +105,26 @@ const getMessage = (uuid) => __awaiter(void 0, void 0, void 0, function* () {
     return message || null;
 });
 exports.getMessage = getMessage;
-const isReply = (content) => content.type === "reply";
+const getMessagesByContent = (contentUUIDs) => __awaiter(void 0, void 0, void 0, function* () {
+    const rawMessages = yield Message.findAll({
+        where: {
+            content: {
+                [sequelize_1.default.Op.or]: contentUUIDs.map(contentUUID => ({ [sequelize_1.default.Op.like]: `%${contentUUID}%` }))
+            }
+        },
+        raw: true,
+        order: [['date', 'ASC']]
+    });
+    if (!rawMessages)
+        return [];
+    const converter = convertRawMessage();
+    const messages = rawMessages.map(message => converter(message)).filter(message => message && "reference" in message.content && contentUUIDs.includes(message.content.reference));
+    return messages || [];
+});
+exports.getMessagesByContent = getMessagesByContent;
+const isReplyOrEmoji = (content) => content.type === "reply" || content.type === 'reaction';
 const parseContent = (content) => __awaiter(void 0, void 0, void 0, function* () {
-    if (!isReply(content)) {
+    if (!isReplyOrEmoji(content)) {
         return content;
     }
     const reference = yield references_1.getMessageReference(content.reference);
@@ -117,6 +134,11 @@ const parseContent = (content) => __awaiter(void 0, void 0, void 0, function* ()
     return Object.assign(Object.assign({}, content), { reference: replyTo || null });
 });
 exports.parseContent = parseContent;
+const getReferencesTo = (messages) => __awaiter(void 0, void 0, void 0, function* () {
+    const references = yield exports.getMessagesByContent(messages.map(message => message.content.uuid));
+    return references;
+});
+exports.getReferencesTo = getReferencesTo;
 const saveFileMessage = (fileMessage) => __awaiter(void 0, void 0, void 0, function* () {
     const filePath = yield unused_filename_1.default(path_1.default.join(Machine_1.directories.files, fileMessage.content.name));
     let data = fileMessage.content.data;
@@ -127,7 +149,7 @@ const saveFileMessage = (fileMessage) => __awaiter(void 0, void 0, void 0, funct
     return filePath;
 });
 const saveFileToDrive = (message) => __awaiter(void 0, void 0, void 0, function* () {
-    if (message.content.type === "text" || message.content.type === 'reply')
+    if (message.content.type === "text" || message.content.type === 'reply' || message.content.type === 'reaction')
         return message;
     if (message.content.type === "file") {
         message.content.content.data = yield saveFileMessage(message.content);
@@ -176,8 +198,11 @@ const getMessages = (userId, chatId, pageFromEnd = 0, chats = [], useLiteralPage
     });
     const filteredMessages = messages.slice(0, MESSAGES_PER_PAGE).map(convertRawMessage(chats)).filter((message) => !!message);
     const messagesWithReferences = [];
+    const references = yield exports.getReferencesTo(filteredMessages);
     for (const message of filteredMessages) {
-        messagesWithReferences.push(Object.assign(Object.assign({}, message), { content: yield exports.parseContent(message.content) }));
+        const replies = references.filter(reference => "reference" in reference.content && reference.content.reference === message.content.uuid && reference.content.type === 'reply');
+        const reactions = references.filter(reference => "reference" in reference.content && reference.content.reference === message.content.uuid && reference.content.type === 'reaction');
+        messagesWithReferences.push(Object.assign(Object.assign({}, message), { content: yield exports.parseContent(message.content), replies, reactions }));
     }
     // const hasMore = messages.length > MESSAGES_PER_PAGE;
     return { messages: messagesWithReferences, page, maxPage };

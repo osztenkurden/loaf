@@ -1,9 +1,9 @@
-import { MuiThemeProvider } from "@material-ui/core";
+import {MuiThemeProvider} from "@material-ui/core/styles";
 import React from "react";
 import ReactDOM from "react-dom";
 import Loaf from "./Window";
 import Theme from "./Theme";
-import "./Theme/styles/app.css";
+import "./Theme/styles/app.scss";
 import "./Theme/styles/fonts/montserrat.css";
 import "./Theme/styles/index.css";
 

@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { FilePayloadData } from './Chat';
 import { bytesToString, questionMark } from './../Utils';
-import { Cancel } from '@material-ui/icons';
+import Cancel from '@material-ui/icons/Cancel';
 
 interface IProps {
     images: FilePayloadData[];

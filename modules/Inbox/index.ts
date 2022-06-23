@@ -1,5 +1,5 @@
 import { api } from "../API";
-import { getMessages, parseContent, saveFileToDrive, saveMessages } from "../Database";
+import { getMessages, getReferencesTo, parseContent, saveFileToDrive, saveMessages } from "../Database";
 import * as I from "../interface";
 import * as Machine from "../Machine";
 import Storage from "../Storage";
@@ -95,7 +95,7 @@ export default class Inbox {
 
             const current = this.messages.get(chatId) || [];
 
-            const message: I.IMessage = { ...messageInput, content: await parseContent(messageInput.content) }
+            const message: I.IMessage = { ...messageInput, content: await parseContent(messageInput.content), replies: [], reactions: [] }
 
             current.push(message);
             this.messages.set(chatId, current);
@@ -181,8 +181,12 @@ export default class Inbox {
         await saveMessages(this.userId, decryptedMessages);
         await saveMessageReferences(decryptedMessages);
 
+        const references = await getReferencesTo(decryptedMessages);
+        
         for(const decryptedMessage of decryptedMessages){
-            const message: I.IMessage = { ...decryptedMessage, content: await parseContent(decryptedMessage.content) }
+            const replies =  references.filter(reference => "reference" in reference.content && reference.content.reference === message.content.uuid && reference.content.type === 'reply');
+            const reactions =  references.filter(reference => "reference" in reference.content && reference.content.reference === message.content.uuid && reference.content.type === 'reaction');
+            const message: I.IMessage = { ...decryptedMessage, content: await parseContent(decryptedMessage.content), reactions, replies }
             current.push(message);
             incoming.push(message);
         }

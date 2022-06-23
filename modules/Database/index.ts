@@ -7,7 +7,7 @@ import unusedFilename from 'unused-filename';
 import { directories } from '../Machine';
 
 import Sequelize, { Model } from 'sequelize';
-import { getMessageReference, Reference } from './references';
+import { getMessageReference, Reference, getReferencesOfMessages } from './references';
 
 class Message extends Model {
     static Define(seq: Sequelize.Sequelize) {
@@ -15,13 +15,13 @@ class Message extends Model {
             uuid: { type: Sequelize.UUID, primaryKey: true, allowNull: false, defaultValue: Sequelize.UUIDV4 },
             id: { type: Sequelize.BIGINT },
             senderId: { type: Sequelize.BIGINT },
-            content: { type: Sequelize.TEXT,  },
+            content: { type: Sequelize.TEXT, },
             chatId: { type: Sequelize.BIGINT },
             my: { type: Sequelize.BOOLEAN },
             date: { type: Sequelize.DATE },
             userId: { type: Sequelize.TEXT },
         }, {
-            timestamps:false,
+            timestamps: false,
             sequelize: seq
         });
     }
@@ -61,7 +61,7 @@ interface IDBMessagePreRaw {
 
 const convertRawMessage = (chats: I.IChatPaged[] = []) => (raw: IDBMessageRaw): I.IMessageInputWithUUID | null => {
     const inbox = User.getInbox();
-    if(!inbox) return null;
+    if (!inbox) return null;
     return {
         uuid: raw.uuid,
         id: raw.id,
@@ -97,44 +97,70 @@ export const getMessage = async (uuid: string) => {
         order: [['date', 'ASC']]
     }) as unknown as IDBMessageRaw;
 
-    if(!rawMessage) return null;
+    if (!rawMessage) return null;
 
     const message = convertRawMessage()(rawMessage);
 
     return message || null;
 }
 
-const isReply = (content: I.IMessageContentInputWithUUID): content is I.IMessageContentTopLevel<I.IMessageContentReplyInput> => content.type === "reply";
+export const getMessagesByContent = async (contentUUIDs: string[]) => {
+    const rawMessages = await Message.findAll({
+        where: {
+            content: {
+                [Sequelize.Op.or]: contentUUIDs.map(contentUUID => ({ [Sequelize.Op.like]: `%${contentUUID}%` }))
+            }
+        },
+        raw: true,
+        order: [['date', 'ASC']]
+    }) as unknown as IDBMessageRaw[];
+
+    if (!rawMessages) return [];
+
+    const converter = convertRawMessage();
+
+    const messages = rawMessages.map(message => converter(message)).filter(message => message && "reference" in message.content && contentUUIDs.includes(message.content.reference)) as I.IMessageInputWithUUID[];
+
+    return messages || [];
+}
+
+const isReplyOrEmoji = (content: I.IMessageContentInputWithUUID): content is I.IMessageContentTopLevel<I.IMessageContentReplyInput | I.IMessageContentReactionInput> => content.type === "reply" || content.type === 'reaction';
 
 export const parseContent = async (content: I.IMessageContentInputWithUUID): Promise<I.IMessageContent> => {
-    if(!isReply(content)){
+    if (!isReplyOrEmoji(content)) {
         return content;
     }
 
     const reference = await getMessageReference(content.reference);
 
-    if(!reference) return { ...content, reference: null }
-    
+    if (!reference) return { ...content, reference: null }
+
     const replyTo = await getMessage(reference.dbUUID);
 
     return { ...content, reference: replyTo || null }
 }
 
+export const getReferencesTo = async (messages: I.IMessageInputWithUUID[]) => {
+    const references = await getMessagesByContent(messages.map(message => message.content.uuid));
+
+    return references;
+}
+
 const saveFileMessage = async (fileMessage: I.IMessageContentFile) => {
 
     const filePath = await unusedFilename(path.join(directories.files, fileMessage.content.name));
-    
+
     let data = fileMessage.content.data;
-    if(data.includes(",")){
+    if (data.includes(",")) {
         data = data.split(",")[1];
-    } 
+    }
 
     fs.writeFileSync(filePath, data, 'base64');
     return filePath;
 }
 
 export const saveFileToDrive = async (message: I.IMessage | I.IMessageInputWithUUID) => {
-    if (message.content.type === "text" || message.content.type === 'reply') return message;
+    if (message.content.type === "text" || message.content.type === 'reply' || message.content.type === 'reaction') return message;
     if (message.content.type === "file") {
         message.content.content.data = await saveFileMessage(message.content);
         return message;
@@ -153,7 +179,7 @@ export const saveMessages = async (userId: number, messages: I.IMessageInputWith
 
     try {
         return await Message.bulkCreate(rawMessages)
-    } catch(e) {
+    } catch (e) {
         console.log(e);
         return null;
     }
@@ -169,7 +195,7 @@ export const getMessages = async (userId: number, chatId: number, pageFromEnd = 
         }
     });
     // Page count starts from 0
-    const maxPage = Math.ceil(messageCount/MESSAGES_PER_PAGE)-1;
+    const maxPage = Math.ceil(messageCount / MESSAGES_PER_PAGE) - 1;
 
     const page = !useLiteralPage ? (maxPage - pageFromEnd) : pageFromEnd;
     const messages = await Message.findAll({
@@ -177,17 +203,22 @@ export const getMessages = async (userId: number, chatId: number, pageFromEnd = 
             userId,
             chatId
         },
-        limit: MESSAGES_PER_PAGE+1,
-        offset: page*MESSAGES_PER_PAGE,
+        limit: MESSAGES_PER_PAGE + 1,
+        offset: page * MESSAGES_PER_PAGE,
         raw: true,
         order: [['date', 'ASC']]
     }) as unknown as IDBMessageRaw[];
-    const filteredMessages = messages.slice(0,MESSAGES_PER_PAGE).map(convertRawMessage(chats)).filter((message): message is I.IMessageInputWithUUID => !!message);
+    const filteredMessages = messages.slice(0, MESSAGES_PER_PAGE).map(convertRawMessage(chats)).filter((message): message is I.IMessageInputWithUUID => !!message);
 
     const messagesWithReferences: I.IMessage[] = [];
 
-    for(const message of filteredMessages){
-        messagesWithReferences.push({...message, content: await parseContent(message.content)})
+    const references = await getReferencesTo(filteredMessages);
+
+    for (const message of filteredMessages) {
+        const replies = references.filter(reference => "reference" in reference.content && reference.content.reference === message.content.uuid && reference.content.type === 'reply');
+        const reactions = references.filter(reference => "reference" in reference.content && reference.content.reference === message.content.uuid && reference.content.type === 'reaction');
+        
+        messagesWithReferences.push({ ...message, content: await parseContent(message.content), replies, reactions })
     }
 
     // const hasMore = messages.length > MESSAGES_PER_PAGE;

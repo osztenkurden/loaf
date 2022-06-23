@@ -105,16 +105,18 @@ class User {
                 if (!signedPreKey || !preKeys || !identityKeyPair) {
                     return false;
                 }
+                const machineInfo = Machine.getMachine();
                 const payload = {
                     firstName,
                     identityKey: LoafBreadbox_1.parseKeyObject(identityKeyPair).pubKey,
                     keys: this.getKeys(keys),
-                    machineId: Machine.getMachineId(),
+                    machineId: machineInfo.id,
                     password,
                     preKeys,
                     registrationId: yield storage.getRegistrationId(),
                     signedPreKey,
                     username,
+                    machineName: machineInfo.name
                 };
                 const result = yield API_1.api.user.register(payload);
                 if (!result) {

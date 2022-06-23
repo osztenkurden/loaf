@@ -28,7 +28,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getMessageReference = exports.saveMessageReferences = exports.Reference = void 0;
+exports.getReferencesOfMessages = exports.getMessageReference = exports.saveMessageReferences = exports.Reference = void 0;
 const sequelize_1 = __importStar(require("sequelize"));
 class Reference extends sequelize_1.Model {
     static Define(seq) {
@@ -64,3 +64,13 @@ const getMessageReference = (contentUUID) => __awaiter(void 0, void 0, void 0, f
     return reference;
 });
 exports.getMessageReference = getMessageReference;
+const getReferencesOfMessages = (dbUUID) => __awaiter(void 0, void 0, void 0, function* () {
+    const references = yield Reference.findAll({
+        where: {
+            dbUUID
+        },
+        raw: true,
+    });
+    return references;
+});
+exports.getReferencesOfMessages = getReferencesOfMessages;

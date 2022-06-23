@@ -1,5 +1,5 @@
 
-import { createMuiTheme } from "@material-ui/core";
+import createMuiTheme from "@material-ui/core/styles/createMuiTheme";
 const theme = createMuiTheme({
     overrides: {
         MuiAppBar: {
@@ -63,7 +63,7 @@ const theme = createMuiTheme({
         },
     },
     typography: {
-        fontFamily: "Montserrat",
+        fontFamily:['"Montserrat"'].join(", "),
     },
 });
 

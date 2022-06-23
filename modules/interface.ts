@@ -54,6 +54,12 @@ export type IMessageContentText = {
     content: string;
 }
 
+export type IMessageContentReaction = {
+    type: "reaction";
+    content: string;
+    reference: IMessageInputWithUUID | null;
+}
+
 export type IMessageContentReply = {
     type: "reply",
     content: IMessageContentText | IMessageContentFile | IMessageContentMixed;
@@ -70,7 +76,7 @@ export type IMessageContentMixed = {
     content: IMessageContentPackage[]
 }
 
-type IMessageContents = IMessageContentText | IMessageContentFile | IMessageContentMixed | IMessageContentReply;
+type IMessageContents = IMessageContentText | IMessageContentFile | IMessageContentMixed | IMessageContentReply | IMessageContentReaction;
 
 export type IMessageContentTopLevel<T> = T & {
     uuid: string;
@@ -93,7 +99,13 @@ export type IMessageContentReplyInput = {
     type: "reply",
     content: IMessageContentTextInput | IMessageContentFileInput | IMessageContentMixedInput;
     reference: string;
-}   
+}
+
+export type IMessageContentReactionInput = {
+    type: "reaction";
+    content: string;
+    reference: string;
+}
 
 
 /** Types of messages that can be sent parrallel as one message */
@@ -105,7 +117,7 @@ export type IMessageContentMixedInput = {
     content: IMessageContentPackageInput[]
 }
 
-export type IMessageContentInput = IMessageContentTextInput | IMessageContentFileInput | IMessageContentMixedInput | IMessageContentReplyInput;
+export type IMessageContentInput = IMessageContentTextInput | IMessageContentFileInput | IMessageContentMixedInput | IMessageContentReplyInput | IMessageContentReactionInput;
 
 export type IMessageContentInputWithUUID = IMessageContentTopLevel<IMessageContentInput>
 
@@ -143,7 +155,9 @@ export interface IMessage {
     sender?: {
         id: number;
         username: string;
-    }
+    },
+    replies: IMessageInputWithUUID[],
+    reactions: IMessageInputWithUUID[]
 }
 
 export interface IMessageInput {

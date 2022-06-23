@@ -1,4 +1,4 @@
-import { TextField } from "@material-ui/core";
+import TextField from "@material-ui/core/TextField";
 import moment from "moment";
 import React, { Component } from "react";
 import Announcement from "../Message/Announcement";
@@ -9,8 +9,10 @@ import api, { events } from "./../../API";
 import AppBar from './AppBar';
 import DragUploadModal from './DragUploadModal';
 import { InView } from 'react-intersection-observer';
-import { renderPreviewContent, scrollToBottom, sortAndFilterMessages } from "Modules/Utils";
-import { Attachment } from "@material-ui/icons";
+import { renderPreviewContent, scrollToBottom, sortAndFilterMessages, textToRGB } from "Modules/Utils";
+import Attachment from "@material-ui/icons/Attachment";
+import Close from "@material-ui/icons/Close";
+import Reply from "@material-ui/icons/Reply";
 import { v4 as uuidv4 } from 'uuid';
 export interface FilePayloadData {
     data: string,
@@ -143,7 +145,7 @@ export default class Chat extends Component<IProps, IState> {
     }
 
     setAsReply = (message: I.IMessage | null) => {
-        this.setState({ form: { ...this.state.form, replyTo: this.state.form.replyTo === message ? null: message }});
+        this.setState(state => ({ form: { ...state.form, replyTo: state.form.replyTo === message ? null : message } }));
     }
 
     public loadMoreMessages = (page: number) => {
@@ -197,14 +199,14 @@ export default class Chat extends Component<IProps, IState> {
                                     ) : null
                                 }
                                 {
-                                    messages.map(message => (
+                                    messages.map((message, i) => (
                                         <React.Fragment key={getKeyFromMessage(message)}>
                                             {
                                                 isThisFirstDateOccurence(chat.pages, message) ? (
                                                     <div className="date-tag">{moment(message.date).format('dddd, MMMM Do YYYY')}</div>
                                                 ) : null
                                             }
-                                            <Message message={message} setAsReply={this.setAsReply} />
+                                            <Message isLast={messages[i+1]?.senderId !== message.senderId} isFirst={messages[i-1]?.senderId !== message.senderId} addReaction={(emoji: string) => api.message.addReaction(chat.id, emoji, message)} message={message} setAsReply={this.setAsReply} />
                                         </React.Fragment>
                                     ))
                                 }
@@ -218,11 +220,16 @@ export default class Chat extends Component<IProps, IState> {
                     sendFiles={this.sendFiles}
                 />
                 {
-                   this.state.form.replyTo ? (
-                       <div className="message-preview">
-                           {this.state.form.replyTo.sender?.username}: {renderPreviewContent(this.state.form.replyTo.content)}
-                       </div>
-                   ) : null 
+                    this.state.form.replyTo ? (
+                        <div className="message-preview">
+                            <Reply />
+                            <div className="message-reply-info" style={{ borderLeftColor: textToRGB(this.state.form.replyTo.sender?.username || 'none') }}>
+                                <div className="reply-to-user" style={{ color: textToRGB(this.state.form.replyTo.sender?.username || 'none') }}>{this.state.form.replyTo.sender?.username}</div>
+                                <div className="reply-to-content">{renderPreviewContent(this.state.form.replyTo.content)}</div>
+                            </div>
+                            <Close className="close-icon"  onClick={() => this.setAsReply(null)} />
+                        </div>
+                    ) : null
                 }
                 {chat.status === 2 ? <div className="text_sender">
                     <TextField
@@ -263,7 +270,7 @@ export default class Chat extends Component<IProps, IState> {
     }
 
     private clearInputs = () => {
-        this.setState({ form: { textMessage: '', files: [], replyTo: null }});
+        this.setState({ form: { textMessage: '', files: [], replyTo: null } });
     }
 
     private handleKeyDown = (e: any) => {
@@ -291,7 +298,7 @@ export default class Chat extends Component<IProps, IState> {
         const uuid = uuidv4();
         let messageInput: I.IMessageContentInput = message;
 
-        if(this.state.form.replyTo){
+        if (this.state.form.replyTo) {
             messageInput = {
                 type: 'reply',
                 content: message as I.IMessageContentTextInput | I.IMessageContentFileInput | I.IMessageContentMixedInput,
@@ -302,7 +309,7 @@ export default class Chat extends Component<IProps, IState> {
         this.clearInputs();
         this.addTemporaryMessage(chatId, messageInput, uuid);
 
-    
+
         api.message.send(chatId, messageInput, uuid);
     }
     private sendFiles = () => {

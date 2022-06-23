@@ -1,6 +1,15 @@
 import React, { Component } from 'react';
-import { ListItemIcon, List, Divider, ListItem, ListItemText } from '@material-ui/core';
-import { Settings, GroupAdd, PersonAdd, Cancel, ContactSupport, PermMedia } from '@material-ui/icons';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import List from '@material-ui/core/List';
+import Divider from '@material-ui/core/Divider';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
+import Settings from '@material-ui/icons/Settings';
+import GroupAdd from '@material-ui/icons/GroupAdd';
+import PersonAdd from '@material-ui/icons/PersonAdd';
+import Cancel from '@material-ui/icons/Cancel';
+import ContactSupport from '@material-ui/icons/ContactSupport';
+import PermMedia from '@material-ui/icons/PermMedia';
 import api from 'API';
 import { UserContext } from 'Context';
 

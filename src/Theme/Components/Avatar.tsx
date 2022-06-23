@@ -1,9 +1,9 @@
-import { Avatar } from "@material-ui/core";
+import Avatar from "@material-ui/core/Avatar";
 import React from "react";
 import * as I from "./../../../modules/interface";
 import { textToRGB } from './../../Modules/Utils';
 import storage from "./../../API/ChatImages";
-import { AddAPhoto } from "@material-ui/icons";
+import AddAPhoto from "@material-ui/icons/AddAPhoto";
 
 interface IProps {
     chat: I.IChatPaged;

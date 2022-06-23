@@ -1,4 +1,6 @@
-import { Backdrop, CircularProgress, TextField } from "@material-ui/core";
+import Backdrop from "@material-ui/core/Backdrop";
+import CircularProgress from "@material-ui/core/CircularProgress";
+import TextField from "@material-ui/core/TextField";
 import API from "API";
 import QRCode from "qrcode";
 import React, { Component } from "react";

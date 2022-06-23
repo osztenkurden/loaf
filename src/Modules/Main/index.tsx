@@ -1,5 +1,11 @@
-import { AppBar, SwipeableDrawer, IconButton, Toolbar, Typography, Modal } from "@material-ui/core";
-import { Menu as MenuIcon, Search as SearchIcon } from "@material-ui/icons";
+import AppBar from "@material-ui/core/AppBar";
+import SwipeableDrawer from "@material-ui/core/SwipeableDrawer";
+import IconButton from "@material-ui/core/IconButton";
+import Toolbar from "@material-ui/core/Toolbar";
+import Typography from "@material-ui/core/Typography";
+import Modal from "@material-ui/core/Modal";
+import MenuIcon from "@material-ui/icons/Menu";
+import SearchIcon from "@material-ui/icons/Search";
 import DrawerContent from "./../Drawer";
 import React, { Component } from "react";
 import * as I from "../../../modules/interface";

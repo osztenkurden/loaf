@@ -11,6 +11,9 @@ import { app } from "electron";
 
 const cookiePath = path.join(app.getPath('userData'), 'cookie.json');
 const cookieJar = new CookieJar(new FileCookieStore(cookiePath));
+
+const isEmojiRegex = /^\p{Emoji}$/u;
+
 export const fetch = fetchHandler(nodeFetch, cookieJar);
 
 export const config = {
@@ -34,6 +37,9 @@ function generateString(length: number) {
 
     return result;
 }
+
+export const isSingularEmojiEmoji = (text: string) => isEmojiRegex.test(text)
+
 export default async function apiV2(url: string, method = "GET", body?: object): Promise<I.IServerResponse> {
     const options: RequestInit = {
         headers: { "Accept": "application/json", "Content-Type": "application/json", 'api-version': config.apiVersion },
@@ -58,8 +64,9 @@ export default async function apiV2(url: string, method = "GET", body?: object):
         return { status: 500, success: false};
     }
     try {
+        const body = await res.text();
         const response = {
-            data: await res.json(),
+            data: JSON.parse(body),
             status: res.status,
             success: res.status < 300,
         };
